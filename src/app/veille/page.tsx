@@ -249,10 +249,6 @@ const categories: Categorie[] = [
         sources: [
           { nom: "Auth0 Blog", url: "https://auth0.com/blog" },
           {
-            nom: "Supabase Auth Docs",
-            url: "https://supabase.com/docs/guides/auth",
-          },
-          {
             nom: "WeWeb Auth Documentation",
             url: "https://docs.weweb.io/auth",
           },
@@ -260,7 +256,7 @@ const categories: Categorie[] = [
         avantages:
           "Sécuriser les applications et proposer des expériences de connexion modernes (SSO, OAuth).",
         consultation:
-          "Documentation Auth0/Supabase lors de la mise en place de l'auth sur un projet.",
+          "Documentation Auth0 lors de la mise en place de l'auth sur un projet.",
         utiliseDansProjet: true,
         apprentissage:
           "Utilisation du système d'authentification natif WeWeb + Xano Auth pour gérer les rôles (admin, commercial, manager) dans SpartCRM.",
@@ -268,10 +264,9 @@ const categories: Categorie[] = [
       {
         theme: "Gestion des bases de données et workflows",
         description:
-          "Mises à jour sur Xano, Supabase, Airtable, Firebase pour structurer les données.",
+          "Mises à jour sur Xano, Airtable, Firebase pour structurer les données.",
         sources: [
           { nom: "Xano Changelog", url: "https://xano.com/changelog" },
-          { nom: "Supabase Blog", url: "https://supabase.com/blog" },
           {
             nom: "Firebase Release Notes",
             url: "https://firebase.google.com/support/releases",
@@ -280,7 +275,7 @@ const categories: Categorie[] = [
         avantages:
           "Exploiter les nouvelles fonctionnalités BDD pour optimiser les performances.",
         consultation:
-          "Changelog Xano à chaque mise à jour + Supabase blog bi-mensuel.",
+          "Changelog Xano à chaque mise à jour.",
         utiliseDansProjet: true,
         apprentissage:
           "Adoption des filtres natifs Xano plutôt qu'un endpoint custom pour les requêtes de recherche contacts, réduisant le temps de développement de 40%.",

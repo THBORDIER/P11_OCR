@@ -151,19 +151,6 @@ export default function Home() {
               sécurisés consommés par WeWeb. Scalable et sans serveur à gérer.
             </p>
           </div>
-          <div className="bg-[#f1f5f9] rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-lg font-bold text-[#22c55e]">Supabase</span>
-              <span className="text-xs bg-[#dcfce7] text-[#22c55e] px-2 py-0.5 rounded-full font-medium">
-                Base de données
-              </span>
-            </div>
-            <p className="text-sm text-[#475569] leading-relaxed">
-              Base PostgreSQL managée avec authentification intégrée et stockage
-              fichiers. Offre des performances élevées, un modèle relationnel
-              robuste et une compatibilité native avec Xano.
-            </p>
-          </div>
         </div>
       </div>
 

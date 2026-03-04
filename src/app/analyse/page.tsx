@@ -634,7 +634,7 @@ export default function AnalysePage() {
             </h3>
             <div className="space-y-2 text-sm text-[#166534]">
               {[
-                "Stack technique retenue : WeWeb (front) + Xano (back) + Supabase (BDD)",
+                "Stack technique retenue : WeWeb (front) + Xano (back + BDD)",
                 "Authentification SSO via Outlook confirmée",
                 "Pipeline Kanban en 5 étapes validé avec le client",
                 "Hébergement Europe (conformité RGPD) validé",
@@ -691,7 +691,7 @@ export default function AnalysePage() {
               response: "~2 500 comptes, ~10 000 contacts",
               arrow: "→",
               decision: "Dimensionnement BDD",
-              detail: "Supabase configurée pour 2 500 comptes et 10 000 contacts avec index de recherche optimisés.",
+              detail: "Xano configurée pour 2 500 comptes et 10 000 contacts avec index de recherche optimisés.",
               color: "bg-[#f0f9ff] border-[#bae6fd]",
             },
             {
@@ -727,7 +727,7 @@ export default function AnalysePage() {
               response: "Conformité RGPD obligatoire, données sensibles",
               arrow: "→",
               decision: "Hébergement Europe, conformité RGPD",
-              detail: "Hébergement des données exclusivement en Europe (Supabase EU), chiffrement, droits d'accès par rôle et politique de rétention.",
+              detail: "Hébergement des données exclusivement en Europe (Xano EU), chiffrement, droits d'accès par rôle et politique de rétention.",
               color: "bg-[#faf5ff] border-[#e9d5ff]",
             },
           ].map((item, i) => (
