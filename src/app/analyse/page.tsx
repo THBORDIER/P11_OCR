@@ -109,6 +109,108 @@ export default function AnalysePage() {
         </div>
       </div>
 
+      {/* Personas */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-2">
+          Personas utilisateurs
+        </h2>
+        <p className="text-sm text-[#64748b] mb-4">
+          Trois profils types représentatifs des futurs utilisateurs du CRM, construits à partir des entretiens et du questionnaire.
+        </p>
+        <div className="grid grid-cols-3 gap-4">
+          {/* Persona 1 */}
+          <div className="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 rounded-full bg-[#dbeafe] flex items-center justify-center text-xl font-bold text-[#2563eb]">
+                MD
+              </div>
+              <div>
+                <p className="font-semibold text-[#1e293b]">Marc Duval</p>
+                <p className="text-xs text-[#64748b]">35 ans — Commercial terrain</p>
+              </div>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium text-[#334155]">Contexte : </span>
+                <span className="text-[#475569]">Passe 80% de son temps en déplacement chez les clients. Utilise principalement son smartphone entre deux rendez-vous.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#334155]">Besoin principal : </span>
+                <span className="text-[#475569]">Saisie rapide d'un prospect sur mobile après un RDV, accès immédiat aux fiches clients avant un meeting.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#dc2626]">Frustration : </span>
+                <span className="text-[#475569]">Perd des informations entre deux RDV car il note sur papier ou dans des SMS. Oublie de relancer faute de rappel.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#166534]">Objectif : </span>
+                <span className="text-[#475569]">Ne plus perdre aucun prospect et gagner du temps sur la saisie administrative.</span>
+              </div>
+            </div>
+          </div>
+          {/* Persona 2 */}
+          <div className="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 rounded-full bg-[#fce7f3] flex items-center justify-center text-xl font-bold text-[#db2777]">
+                SM
+              </div>
+              <div>
+                <p className="font-semibold text-[#1e293b]">Sophie Martin</p>
+                <p className="text-xs text-[#64748b]">42 ans — Directrice commerciale</p>
+              </div>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium text-[#334155]">Contexte : </span>
+                <span className="text-[#475569]">Pilote une équipe de 10 commerciaux. Doit rendre compte au CODIR chaque semaine avec des prévisions fiables.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#334155]">Besoin principal : </span>
+                <span className="text-[#475569]">Vision pipeline en temps réel, forecast consolidé et indicateurs de performance par commercial.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#dc2626]">Frustration : </span>
+                <span className="text-[#475569]">Prépare ses comités commerciaux dans Excel en agrégeant manuellement les données de chaque commercial. Prend une demi-journée.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#166534]">Objectif : </span>
+                <span className="text-[#475569]">Avoir un tableau de bord fiable et automatisé pour piloter la performance commerciale.</span>
+              </div>
+            </div>
+          </div>
+          {/* Persona 3 */}
+          <div className="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 rounded-full bg-[#d1fae5] flex items-center justify-center text-xl font-bold text-[#059669]">
+                LP
+              </div>
+              <div>
+                <p className="font-semibold text-[#1e293b]">Lucas Petit</p>
+                <p className="text-xs text-[#64748b]">28 ans — Support client</p>
+              </div>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium text-[#334155]">Contexte : </span>
+                <span className="text-[#475569]">Traite 30 à 40 demandes clients par jour. Doit comprendre rapidement le contexte de chaque client pour résoudre les problèmes.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#334155]">Besoin principal : </span>
+                <span className="text-[#475569]">Accès rapide à l'historique complet du client (interactions, contrat, tickets passés) depuis un seul écran.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#dc2626]">Frustration : </span>
+                <span className="text-[#475569]">Doit demander aux commerciaux le contexte d'un client par email ou Slack avant de pouvoir répondre. Temps de réponse allongé.</span>
+              </div>
+              <div>
+                <span className="font-medium text-[#166534]">Objectif : </span>
+                <span className="text-[#475569]">Réduire le temps de résolution en ayant toutes les informations client accessibles instantanément.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Fonctionnalites */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-lg font-semibold text-[#1e293b] mb-4">
@@ -196,6 +298,110 @@ export default function AnalysePage() {
         </div>
       </div>
 
+      {/* Matrice Impact / Effort */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-2">
+          Matrice Impact / Effort — Priorisation des fonctionnalités
+        </h2>
+        <p className="text-sm text-[#64748b] mb-4">
+          Classification des fonctionnalités identifiées selon leur impact business et l'effort de mise en œuvre. Cette matrice guide la priorisation du backlog et le séquençage des sprints.
+        </p>
+        <div className="grid grid-cols-2 gap-0 border border-[#e2e8f0] rounded-lg overflow-hidden">
+          {/* Axe labels */}
+          <div className="col-span-2 flex items-center justify-center bg-[#f1f5f9] py-2 border-b border-[#e2e8f0]">
+            <span className="text-xs font-semibold text-[#475569] tracking-wide uppercase">Effort faible &larr;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&rarr; Effort élevé</span>
+          </div>
+          {/* Quick Wins - High Impact / Low Effort */}
+          <div className="bg-[#f0fdf4] p-5 border-r border-b border-[#e2e8f0]">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-block w-3 h-3 rounded-full bg-[#22c55e]"></span>
+              <h3 className="font-semibold text-[#166534] text-sm">Quick Wins</h3>
+              <span className="text-xs text-[#166534] opacity-70 ml-auto">Impact élevé / Effort faible</span>
+            </div>
+            <ul className="space-y-2 text-sm text-[#166534]">
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#10003;</span>
+                <span>Fiches clients &amp; recherche</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#10003;</span>
+                <span>Pipeline Kanban</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#10003;</span>
+                <span>Filtres et tri</span>
+              </li>
+            </ul>
+            <p className="text-xs text-[#166534] mt-3 opacity-70 italic">Priorité maximale — Sprint 1</p>
+          </div>
+          {/* High Impact / High Effort */}
+          <div className="bg-[#fff7ed] p-5 border-b border-[#e2e8f0]">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-block w-3 h-3 rounded-full bg-[#f97316]"></span>
+              <h3 className="font-semibold text-[#9a3412] text-sm">Projets stratégiques</h3>
+              <span className="text-xs text-[#9a3412] opacity-70 ml-auto">Impact élevé / Effort élevé</span>
+            </div>
+            <ul className="space-y-2 text-sm text-[#9a3412]">
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#9679;</span>
+                <span>Intégrations Outlook</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#9679;</span>
+                <span>Tableau de bord &amp; KPIs</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#9679;</span>
+                <span>Migration données</span>
+              </li>
+            </ul>
+            <p className="text-xs text-[#9a3412] mt-3 opacity-70 italic">Planifier soigneusement — Sprints 2-3</p>
+          </div>
+          {/* Low Impact / Low Effort */}
+          <div className="bg-[#f0f9ff] p-5 border-r border-[#e2e8f0]">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-block w-3 h-3 rounded-full bg-[#3b82f6]"></span>
+              <h3 className="font-semibold text-[#1e40af] text-sm">Bonus rapides</h3>
+              <span className="text-xs text-[#1e40af] opacity-70 ml-auto">Impact faible / Effort faible</span>
+            </div>
+            <ul className="space-y-2 text-sm text-[#1e40af]">
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#9679;</span>
+                <span>Export CSV</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#9679;</span>
+                <span>Tags et labels personnalisés</span>
+              </li>
+            </ul>
+            <p className="text-xs text-[#1e40af] mt-3 opacity-70 italic">Si le temps le permet — Sprint 3+</p>
+          </div>
+          {/* Low Impact / High Effort */}
+          <div className="bg-[#f8fafc] p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-block w-3 h-3 rounded-full bg-[#94a3b8]"></span>
+              <h3 className="font-semibold text-[#475569] text-sm">À éviter / reporter</h3>
+              <span className="text-xs text-[#475569] opacity-70 ml-auto">Impact faible / Effort élevé</span>
+            </div>
+            <ul className="space-y-2 text-sm text-[#475569]">
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#10007;</span>
+                <span>BI avancée</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 shrink-0">&#10007;</span>
+                <span>Intégration SAP</span>
+              </li>
+            </ul>
+            <p className="text-xs text-[#475569] mt-3 opacity-70 italic">Hors scope MVP — Évolution future</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between mt-3 text-xs text-[#94a3b8]">
+          <span>&#8593; Impact élevé &nbsp;|&nbsp; &#8595; Impact faible</span>
+          <span>Lecture : les Quick Wins sont développés en premier pour maximiser la valeur livrée rapidement.</span>
+        </div>
+      </div>
+
       {/* Maquette Figma */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-lg font-semibold text-[#1e293b] mb-4">
@@ -205,33 +411,127 @@ export default function AnalysePage() {
           Captures écran de la maquette Figma, annotées pour le développement. Cliquer pour agrandir.
         </p>
         <div className="grid grid-cols-2 gap-4">
-          {[
-            { label: "Capture 1 — Vue liste clients", desc: "Liste tabulaire avec filtres, recherche et tags de statut" },
-            { label: "Capture 2 — Fiche client détaillée", desc: "Layout fiche avec onglets, KPIs et informations de contact" },
-            { label: "Capture 3 — Pipeline Kanban", desc: "Vue Kanban des opportunités avec colonnes par étape" },
-            { label: "Capture 4 — Tableau de bord", desc: "Dashboard direction avec KPIs, graphiques et prévisions" },
-          ].map((capture, i) => (
-            <div
-              key={i}
-              className="border-2 border-dashed border-[#cbd5e1] rounded-lg p-6 flex flex-col items-center justify-center text-center min-h-[160px] bg-[#f8fafc]"
-            >
-              <svg
-                className="w-10 h-10 text-[#94a3b8] mb-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
-                />
-              </svg>
-              <p className="text-sm font-medium text-[#475569]">{capture.label}</p>
-              <p className="text-xs text-[#94a3b8] mt-1">{capture.desc}</p>
+          {/* Wireframe 1 — Vue liste clients */}
+          <div className="border-2 border-[#cbd5e1] rounded-lg bg-[#f8fafc] overflow-hidden">
+            <div className="bg-[#e2e8f0] px-4 py-2 border-b border-[#cbd5e1]">
+              <p className="text-sm font-semibold text-[#334155]">Capture 1 — Vue liste clients</p>
             </div>
-          ))}
+            <div className="p-4">
+              <pre className="text-[11px] text-[#475569] font-mono leading-relaxed whitespace-pre">{`┌─────────────────────────────────────────────┐
+│  [Logo]  SpartCRM    Clients | Pipeline | TB │
+├─────────────────────────────────────────────┤
+│  🔍 Recherche client...    [+ Nouveau]      │
+│  Filtre: Statut ▼  Secteur ▼  Commercial ▼  │
+├──────┬──────────┬────────┬─────────┬────────┤
+│ Nom  │ Société  │ Statut │ Dernier │ Action │
+│      │          │        │ contact │        │
+├──────┼──────────┼────────┼─────────┼────────┤
+│ Dupont│ TechCo  │ ● Actif│ 02/03   │ [Voir] │
+│ Moreau│ DataSA  │ ○ Lead │ 28/02   │ [Voir] │
+│ Leroy │ WebInc  │ ● Actif│ 01/03   │ [Voir] │
+├──────┴──────────┴────────┴─────────┴────────┤
+│  ◀ 1 2 3 ... 12 ▶    Afficher: 25 ▼        │
+└─────────────────────────────────────────────┘`}</pre>
+              <div className="mt-3 flex flex-wrap gap-1">
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Barre de recherche</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Filtres multi-critères</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Tags de statut</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Pagination</span>
+              </div>
+            </div>
+          </div>
+          {/* Wireframe 2 — Fiche client détaillée */}
+          <div className="border-2 border-[#cbd5e1] rounded-lg bg-[#f8fafc] overflow-hidden">
+            <div className="bg-[#e2e8f0] px-4 py-2 border-b border-[#cbd5e1]">
+              <p className="text-sm font-semibold text-[#334155]">Capture 2 — Fiche client détaillée</p>
+            </div>
+            <div className="p-4">
+              <pre className="text-[11px] text-[#475569] font-mono leading-relaxed whitespace-pre">{`┌─────────────────────────────────────────────┐
+│  ← Retour   Fiche client : TechCo SAS       │
+├──────────────┬──────────────────────────────┤
+│  INFOS       │  KPIs client                  │
+│  Nom: TechCo │  ┌────┐ ┌────┐ ┌────┐        │
+│  Secteur: IT │  │ CA │ │Opp.│ │Sat.│        │
+│  Taille: PME │  │45k€│ │ 3  │ │4.2 │        │
+│  Tél: 01...  │  └────┘ └────┘ └────┘        │
+│  Email: ...  │                               │
+├──────────────┴──────────────────────────────┤
+│ [Infos] [Historique] [Opportunités] [Notes]  │
+├─────────────────────────────────────────────┤
+│  📞 02/03 — Appel commercial (Marc D.)       │
+│  📧 28/02 — Email relance envoyé             │
+│  📅 25/02 — RDV sur site (compte-rendu)      │
+└─────────────────────────────────────────────┘`}</pre>
+              <div className="mt-3 flex flex-wrap gap-1">
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">KPIs en haut</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Navigation par onglets</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Timeline interactions</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Infos de contact</span>
+              </div>
+            </div>
+          </div>
+          {/* Wireframe 3 — Pipeline Kanban */}
+          <div className="border-2 border-[#cbd5e1] rounded-lg bg-[#f8fafc] overflow-hidden">
+            <div className="bg-[#e2e8f0] px-4 py-2 border-b border-[#cbd5e1]">
+              <p className="text-sm font-semibold text-[#334155]">Capture 3 — Pipeline Kanban</p>
+            </div>
+            <div className="p-4">
+              <pre className="text-[11px] text-[#475569] font-mono leading-relaxed whitespace-pre">{`┌─────────────────────────────────────────────┐
+│  Pipeline commercial     Total: 245 000 €    │
+├────────┬────────┬────────┬────────┬─────────┤
+│Prospec.│Qualif. │Propos. │Négo.   │Gagné    │
+│  (12)  │  (8)   │  (5)   │  (3)   │  (15)   │
+├────────┼────────┼────────┼────────┼─────────┤
+│┌──────┐│┌──────┐│┌──────┐│┌──────┐│┌───────┐│
+││WebInc ││DataSA ││TechCo ││BigCo  ││InfoPME ││
+││ 15k€ ││ 25k€ ││ 45k€ ││ 80k€ ││ 30k€  ││
+││ Marc  ││Sophie ││ Marc  ││Sophie ││ Lucas  ││
+│└──────┘│└──────┘│└──────┘│└──────┘│└───────┘│
+│┌──────┐│┌──────┐│        │        │┌───────┐│
+││NewCo  ││StartX ││        │        ││OldCo   ││
+││ 10k€ ││ 20k€ ││        │        ││ 45k€  ││
+│└──────┘│└──────┘│        │        │└───────┘│
+└────────┴────────┴────────┴────────┴─────────┘`}</pre>
+              <div className="mt-3 flex flex-wrap gap-1">
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">5 colonnes d'étapes</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Drag &amp; drop</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Montant par carte</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Total pipeline</span>
+              </div>
+            </div>
+          </div>
+          {/* Wireframe 4 — Tableau de bord */}
+          <div className="border-2 border-[#cbd5e1] rounded-lg bg-[#f8fafc] overflow-hidden">
+            <div className="bg-[#e2e8f0] px-4 py-2 border-b border-[#cbd5e1]">
+              <p className="text-sm font-semibold text-[#334155]">Capture 4 — Tableau de bord</p>
+            </div>
+            <div className="p-4">
+              <pre className="text-[11px] text-[#475569] font-mono leading-relaxed whitespace-pre">{`┌─────────────────────────────────────────────┐
+│  Tableau de bord — Mars 2026                 │
+├───────────┬───────────┬───────────┬─────────┤
+│ CA Mois   │ Pipe actif│ Tx conv.  │ RDV/sem │
+│  125k€    │  245k€    │  34%      │  48     │
+│  ▲ +12%   │  ▲ +8%    │  ▼ -2pts  │  ▲ +5   │
+├───────────┴───────────┴───────────┴─────────┤
+│  📊 Évolution CA mensuel                     │
+│  ┌──────────────────────────────────┐        │
+│  │    ▄▄                            │        │
+│  │  ▄▄██▄▄  ▄▄                      │        │
+│  │▄▄██████▄▄██▄▄▄▄██               │        │
+│  └──────────────────────────────────┘        │
+│  Jan  Fév  Mar  Avr  Mai                     │
+├─────────────────────────────────────────────┤
+│  Forecast Q2: 380k€   Objectif: 400k€       │
+│  [Exporter CSV]  [Exporter PDF]              │
+└─────────────────────────────────────────────┘`}</pre>
+              <div className="mt-3 flex flex-wrap gap-1">
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">4 KPIs principaux</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Graphique CA</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Forecast</span>
+                <span className="text-[10px] bg-[#dbeafe] text-[#1e40af] px-2 py-0.5 rounded">Exports</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -372,6 +672,89 @@ export default function AnalysePage() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Traçabilité Questionnaire → Analyse */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-2">
+          Traçabilité Questionnaire → Analyse
+        </h2>
+        <p className="text-sm text-[#64748b] mb-4">
+          Correspondance entre les questions posées lors du recueil des besoins et les décisions d'analyse qui en découlent. Cette traçabilité garantit que chaque choix est justifié par une donnée terrain.
+        </p>
+        <div className="space-y-3">
+          {[
+            {
+              question: "Q1.3",
+              label: "Volume de clients/prospects gérés",
+              response: "~2 500 comptes, ~10 000 contacts",
+              arrow: "→",
+              decision: "Dimensionnement BDD",
+              detail: "Supabase configurée pour 2 500 comptes et 10 000 contacts avec index de recherche optimisés.",
+              color: "bg-[#f0f9ff] border-[#bae6fd]",
+            },
+            {
+              question: "Q2.2",
+              label: "Difficultés actuelles dans le suivi client",
+              response: "Données dispersées (Excel, emails, carnets)",
+              arrow: "→",
+              decision: "Priorité P1 sur la centralisation des données",
+              detail: "La gestion des fiches clients et l'historique des interactions sont classés en priorité maximale (P1) dans le backlog.",
+              color: "bg-[#fef2f2] border-[#fecaca]",
+            },
+            {
+              question: "Q3.4",
+              label: "Échelle de priorisation des fonctionnalités",
+              response: "Pipeline Kanban noté 9/10, Fiches clients 10/10",
+              arrow: "→",
+              decision: "Priorisation MoSCoW : Pipeline Kanban = Must Have",
+              detail: "Les fonctionnalités les mieux notées par le client sont classées Must Have et planifiées dans le Sprint 1 du MVP.",
+              color: "bg-[#f0fdf4] border-[#bbf7d0]",
+            },
+            {
+              question: "Q4.1",
+              label: "Budget et contraintes financières",
+              response: "120 000 EUR tout compris",
+              arrow: "→",
+              decision: "Choix stack low-code (WeWeb + Xano)",
+              detail: "Le budget contraint oriente vers une stack low-code pour réduire les coûts de développement tout en gardant la flexibilité.",
+              color: "bg-[#fff7ed] border-[#fed7aa]",
+            },
+            {
+              question: "Q4.5",
+              label: "Exigences RGPD et sécurité des données",
+              response: "Conformité RGPD obligatoire, données sensibles",
+              arrow: "→",
+              decision: "Hébergement Europe, conformité RGPD",
+              detail: "Hébergement des données exclusivement en Europe (Supabase EU), chiffrement, droits d'accès par rôle et politique de rétention.",
+              color: "bg-[#faf5ff] border-[#e9d5ff]",
+            },
+          ].map((item, i) => (
+            <div key={i} className={`rounded-lg border p-4 ${item.color}`}>
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 w-[45%]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-bold bg-[#1e293b] text-white px-2 py-0.5 rounded">
+                      {item.question}
+                    </span>
+                    <span className="text-sm font-medium text-[#334155]">{item.label}</span>
+                  </div>
+                  <p className="text-xs text-[#64748b] italic ml-1">Réponse : &ldquo;{item.response}&rdquo;</p>
+                </div>
+                <div className="shrink-0 flex items-center justify-center text-xl text-[#94a3b8] font-bold mt-1">
+                  {item.arrow}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-[#334155] mb-1">{item.decision}</p>
+                  <p className="text-xs text-[#64748b]">{item.detail}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="bg-[#f1f5f9] rounded-lg p-3 mt-4 text-xs text-[#475569]">
+          <strong>Note :</strong> Les numéros de questions (Q1.3, Q2.2, etc.) correspondent au questionnaire de recueil des besoins administré lors de la phase de cadrage. Le questionnaire complet est disponible dans le livrable 1.
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ interface Question {
 interface Section {
   title: string;
   description: string;
+  pourquoi: string;
   questions: Question[];
 }
 
@@ -22,6 +23,8 @@ const sections: Section[] = [
     title: "1. Contexte business",
     description:
       "Pour bien comprendre votre activité et adapter le CRM à vos besoins réels.",
+    pourquoi:
+      "Ces questions permettent de dimensionner le projet (nombre d'utilisateurs, volume de données) et d'adapter l'architecture technique aux besoins réels de Spart.",
     questions: [
       {
         id: "q1_1",
@@ -76,6 +79,8 @@ const sections: Section[] = [
     title: "2. Outils et pratiques actuels",
     description:
       "Pour comprendre comment vous travaillez aujourd'hui et identifier les points de friction.",
+    pourquoi:
+      "Comprendre l'existant est essentiel pour identifier les points de douleur, planifier la migration des données et assurer la compatibilité avec l'écosystème Microsoft 365.",
     questions: [
       {
         id: "q2_1",
@@ -127,6 +132,8 @@ const sections: Section[] = [
     title: "3. Objectifs et indicateurs de réussite",
     description:
       "Pour définir les résultats attendus et mesurer le succès du projet.",
+    pourquoi:
+      "Définir des objectifs mesurables permet de valider le succès du projet via des KPIs concrets et d'orienter la priorisation MoSCoW du backlog.",
     questions: [
       {
         id: "q3_1",
@@ -172,6 +179,8 @@ const sections: Section[] = [
     title: "4. Contraintes et ressources",
     description:
       "Pour dimensionner le projet de manière réaliste et planifier les livrables.",
+    pourquoi:
+      "Ces informations conditionnent le planning, le périmètre du MVP et les choix techniques (budget, RGPD, migration, ressources disponibles).",
     questions: [
       {
         id: "q4_1",
@@ -227,6 +236,8 @@ const sections: Section[] = [
     title: "5. Vision et positionnement",
     description:
       "Pour comprendre votre vision à long terme et éviter les erreurs de conception.",
+    pourquoi:
+      "Anticiper l'évolution du produit permet d'éviter des erreurs d'architecture et de concevoir un CRM évolutif aligné avec la stratégie de Spart.",
     questions: [
       {
         id: "q5_1",
@@ -463,12 +474,51 @@ export default function QuestionnairePage() {
         <h2 className="text-xl font-semibold text-[#1e293b] mb-1">
           {section.title}
         </h2>
-        <p className="text-sm text-[#64748b] mb-6">{section.description}</p>
+        <p className="text-sm text-[#64748b] mb-4">{section.description}</p>
+
+        {/* Pourquoi - justification block */}
+        <div className="bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-2">
+            <svg
+              className="w-5 h-5 text-[#3b82f6] mt-0.5 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div>
+              <p className="text-xs font-semibold text-[#1e40af] mb-1">
+                Pourquoi ces questions ?
+              </p>
+              <p className="text-sm text-[#1e40af]">
+                {section.pourquoi}
+              </p>
+            </div>
+          </div>
+        </div>
 
         <div className="space-y-6">
-          {section.questions.map((q) => (
+          {section.questions.map((q, qIndex) => {
+            // Compute global question number (Q1, Q2, ... across all sections)
+            const globalIndex =
+              sections
+                .slice(0, currentSection)
+                .reduce((acc, s) => acc + s.questions.length, 0) +
+              qIndex +
+              1;
+
+            return (
             <div key={q.id}>
               <label className="block text-sm font-medium text-[#334155] mb-2">
+                <span className="inline-flex items-center justify-center bg-[#3b82f6] text-white text-xs font-bold rounded-full w-7 h-7 mr-2">
+                  Q{globalIndex}
+                </span>
                 {q.label}
                 {q.required && <span className="text-[#ef4444] ml-1">*</span>}
               </label>
@@ -563,7 +613,8 @@ export default function QuestionnairePage() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Recap before submit on last section */}

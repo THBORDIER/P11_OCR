@@ -350,6 +350,21 @@ export default function SprintBacklogPage() {
         </p>
       </div>
 
+      {/* Sprint Goal Banner */}
+      <div className="bg-gradient-to-r from-[#1e40af] to-[#3b82f6] rounded-lg p-6 mb-6 shadow-md">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl mt-0.5">🎯</span>
+          <div>
+            <h2 className="text-sm font-bold text-blue-200 uppercase tracking-wider mb-1">
+              Objectif du Sprint 1
+            </h2>
+            <p className="text-white text-lg font-semibold leading-relaxed">
+              &laquo; À la fin du Sprint 1, un commercial peut créer, consulter, rechercher et modifier des fiches clients/prospects avec historique des échanges, depuis n&apos;importe quel navigateur. &raquo;
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Sprint info */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-xl font-semibold text-[#1e293b] mb-2">
@@ -373,6 +388,82 @@ export default function SprintBacklogPage() {
             <div className="text-lg font-bold text-[#f59e0b]">{totalHeures}h</div>
             <div className="text-xs text-[#64748b]">Estimation totale</div>
           </div>
+        </div>
+
+        {/* Team Capacity */}
+        <div className="mt-6 border-t border-[#e2e8f0] pt-5">
+          <h3 className="text-sm font-bold text-[#1e293b] uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span className="text-base">👥</span> Capacité de l&apos;équipe
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
+              <div className="text-xs text-[#64748b] mb-1">Développeur</div>
+              <div className="text-sm font-semibold text-[#1e293b]">Thomas Bordier</div>
+              <div className="text-xs text-[#475569] mt-0.5">5j/semaine, 7h/jour = 35h/semaine</div>
+            </div>
+            <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
+              <div className="text-xs text-[#64748b] mb-1">Capacité brute</div>
+              <div className="text-sm font-semibold text-[#1e293b]">105 heures</div>
+              <div className="text-xs text-[#475569] mt-0.5">Sprint de 3 semaines (35h × 3)</div>
+            </div>
+            <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
+              <div className="text-xs text-[#64748b] mb-1">Facteur de focus</div>
+              <div className="text-sm font-semibold text-[#f59e0b]">80% → 84h disponibles</div>
+              <div className="text-xs text-[#475569] mt-0.5">Réunions, imprévus, apprentissage</div>
+            </div>
+            <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
+              <div className="text-xs text-[#64748b] mb-1">Charge planifiée</div>
+              <div className="text-sm font-semibold text-[#22c55e]">50h → taux d&apos;occupation 60%</div>
+              <div className="text-xs text-[#475569] mt-0.5">Marge pour imprévus et dette technique</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Daily Standup */}
+        <div className="mt-5 bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-3 flex items-start gap-2.5">
+          <span className="text-base mt-0.5">💬</span>
+          <div>
+            <div className="text-xs font-bold text-[#1e40af] mb-0.5">Rituel quotidien</div>
+            <p className="text-xs text-[#1e40af]">
+              Standup asynchrone via Slack (<span className="font-mono font-semibold">#spartcrm-daily</span>) — Qu&apos;ai-je fait hier ? Que vais-je faire aujourd&apos;hui ? Ai-je des blocages ?
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Sprint Selection Criteria */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-3 flex items-center gap-2">
+          <span className="text-base">📋</span> Pourquoi ces 6 User Stories dans le Sprint 1 ?
+        </h2>
+        <div className="space-y-2.5">
+          {[
+            {
+              icon: "🔴",
+              text: "Toutes sont des US « Must Have » (priorité MoSCoW la plus haute)",
+            },
+            {
+              icon: "🧩",
+              text: "Elles forment un ensemble fonctionnel complet et autonome (module Clients)",
+            },
+            {
+              icon: "📊",
+              text: "29 points d'effort respectent la vélocité cible de l'équipe",
+            },
+            {
+              icon: "🏗️",
+              text: "Elles constituent le socle de données nécessaire aux sprints suivants (Pipeline, Tâches)",
+            },
+            {
+              icon: "✅",
+              text: "Le client a validé ce périmètre lors du Sprint Planning",
+            },
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-2.5 text-sm text-[#334155]">
+              <span className="mt-0.5 shrink-0">{item.icon}</span>
+              <span>{item.text}</span>
+            </div>
+          ))}
         </div>
       </div>
 

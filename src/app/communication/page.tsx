@@ -398,6 +398,230 @@ export default function CommunicationPage() {
         </div>
       </div>
 
+      {/* Conduite du changement */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-4">
+          Conduite du changement
+        </h2>
+        <div className="space-y-4">
+          {[
+            {
+              phase: "Phase 1 — Sensibilisation",
+              periode: "M1-M2",
+              actions: [
+                "Communication sur le projet auprès de toutes les équipes",
+                "Présentation des bénéfices attendus (gain de temps, vision 360° client, pilotage commercial)",
+                "Identification des ambassadeurs par équipe (1 référent par service)",
+              ],
+              color: "border-l-[#3b82f6]",
+            },
+            {
+              phase: "Phase 2 — Accompagnement",
+              periode: "M3-M4",
+              actions: [
+                "Formations par rôle : commerciaux (saisie, pipeline), managers (reporting, KPIs), support (tickets, FAQ)",
+                "Documentation utilisateur : guides pas-à-pas, vidéos courtes, fiches réflexes",
+                "FAQ en ligne mise à jour en continu sur Notion",
+              ],
+              color: "border-l-[#8b5cf6]",
+            },
+            {
+              phase: "Phase 3 — Déploiement progressif",
+              periode: "M4-M5",
+              actions: [
+                "Pilote avec 20 utilisateurs volontaires sur le périmètre MVP",
+                "Collecte de feedback structuré (questionnaire + entretiens courts)",
+                "Ajustements UX et fonctionnels avant généralisation",
+              ],
+              color: "border-l-[#f59e0b]",
+            },
+            {
+              phase: "Phase 4 — Généralisation",
+              periode: "M5-M6",
+              actions: [
+                "Déploiement à tous les utilisateurs (formation collective + accès progressif)",
+                "Support renforcé pendant 2 semaines (permanence Teams, hotline dédiée)",
+                "Suivi du taux d'adoption et accompagnement des retardataires",
+              ],
+              color: "border-l-[#22c55e]",
+            },
+          ].map((p, i) => (
+            <div key={i} className={`bg-[#f8fafc] rounded-lg border-l-4 ${p.color} p-5`}>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-[#334155]">{p.phase}</h3>
+                <span className="text-xs bg-[#eff6ff] text-[#3b82f6] px-3 py-1 rounded-full font-medium">
+                  {p.periode}
+                </span>
+              </div>
+              <ul className="space-y-1.5">
+                {p.actions.map((a, j) => (
+                  <li key={j} className="flex items-start gap-2 text-sm text-[#475569]">
+                    <span className="text-[#94a3b8] mt-0.5">•</span>
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* KPIs de conduite du changement */}
+        <div className="mt-5 bg-[#f0fdf4] rounded-lg border border-[#bbf7d0] p-4">
+          <h3 className="text-sm font-semibold text-[#166534] mb-3">
+            KPIs de conduite du changement
+          </h3>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              {
+                kpi: "Taux d'adoption",
+                cible: "90% à M+3",
+                detail: "Pourcentage d'utilisateurs actifs sur le CRM",
+              },
+              {
+                kpi: "Satisfaction utilisateur",
+                cible: "> 4/5",
+                detail: "Score moyen sur questionnaire de satisfaction post-déploiement",
+              },
+              {
+                kpi: "Tickets de support",
+                cible: "-50%",
+                detail: "Réduction de 50% des tickets de support entre M+1 et M+3",
+              },
+            ].map((k, i) => (
+              <div key={i} className="text-center">
+                <p className="text-lg font-bold text-[#166534]">{k.cible}</p>
+                <p className="text-sm font-medium text-[#334155]">{k.kpi}</p>
+                <p className="text-xs text-[#64748b] mt-1">{k.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Processus de validation (DoD / Acceptation) */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-4">
+          Processus de validation des livrables
+        </h2>
+        <p className="text-sm text-[#64748b] mb-4">
+          Chaque livrable suit un processus de validation en 3 étapes avant d'être considéré comme terminé.
+        </p>
+        <div className="space-y-4">
+          {[
+            {
+              etape: "1",
+              titre: "Revue interne (Thomas)",
+              description: "Vérification technique, exécution des tests unitaires et d'intégration, contrôle qualité du code, vérification de la documentation.",
+              criteres: "Code reviewé, tests passés (couverture > 80%), pas de régression, documentation technique à jour",
+              color: "bg-[#dbeafe] text-[#2563eb]",
+            },
+            {
+              etape: "2",
+              titre: "Validation fonctionnelle (Chef de projet IT + Référent métier)",
+              description: "Vérification de la conformité aux critères d'acceptation définis dans les user stories. Tests sur environnement de staging.",
+              criteres: "Tous les critères d'acceptation validés, parcours utilisateur testé, performance acceptable",
+              color: "bg-[#fef3c7] text-[#d97706]",
+            },
+            {
+              etape: "3",
+              titre: "Approbation finale (Sponsor)",
+              description: "Validation formelle du livrable après démonstration en sprint review. Signature du PV de recette si applicable.",
+              criteres: "Démo réalisée, feedback intégré, PV de recette signé, livrable accepté formellement",
+              color: "bg-[#fef2f2] text-[#dc2626]",
+            },
+          ].map((e, i) => (
+            <div key={i} className="bg-[#f8fafc] rounded-lg p-5">
+              <div className="flex items-start gap-4">
+                <span className={`flex-shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold ${e.color}`}>
+                  {e.etape}
+                </span>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-[#334155] mb-1">{e.titre}</h3>
+                  <p className="text-sm text-[#475569] mb-2">{e.description}</p>
+                  <div className="bg-white rounded border border-[#e2e8f0] px-3 py-2">
+                    <span className="text-xs font-bold text-[#64748b] uppercase">Critères</span>
+                    <p className="text-xs text-[#475569] mt-0.5">{e.criteres}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Definition of Done */}
+        <div className="mt-5 bg-[#faf5ff] rounded-lg border border-[#e9d5ff] p-4">
+          <h3 className="text-sm font-semibold text-[#7c3aed] mb-3">
+            Definition of Done (DoD) des livrables
+          </h3>
+          <div className="grid grid-cols-2 gap-2 text-sm text-[#6b21a8]">
+            {[
+              "Documentation à jour (technique + utilisateur)",
+              "Tests passés (unitaires, intégration, acceptance)",
+              "Démo réalisée en sprint review",
+              "Feedback client intégré ou priorisé dans le backlog",
+              "Code mergé sur la branche principale",
+              "Déployé sur l'environnement de staging",
+              "Critères d'acceptation validés par le référent métier",
+              "Pas de bug bloquant ou majeur ouvert",
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="mt-0.5">&#10003;</span>
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Cycle de communication visuel */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <h2 className="text-lg font-semibold text-[#1e293b] mb-4">
+          Cycle de communication projet
+        </h2>
+        <p className="text-sm text-[#64748b] mb-5">
+          Le projet suit un cycle itératif Agile où chaque sprint génère un flux de communication continu entre les parties prenantes.
+        </p>
+        <div className="flex items-center justify-center flex-wrap gap-2 py-4">
+          {[
+            { label: "Besoin identifié", color: "bg-[#dbeafe] text-[#2563eb] border-[#93c5fd]" },
+            { label: "Backlog", color: "bg-[#fef3c7] text-[#d97706] border-[#fcd34d]" },
+            { label: "Sprint Planning", color: "bg-[#ede9fe] text-[#7c3aed] border-[#c4b5fd]" },
+            { label: "Développement", color: "bg-[#fce7f3] text-[#db2777] border-[#f9a8d4]" },
+            { label: "Sprint Review", color: "bg-[#d1fae5] text-[#059669] border-[#6ee7b7]" },
+            { label: "Feedback", color: "bg-[#ffedd5] text-[#ea580c] border-[#fdba74]" },
+          ].map((step, i, arr) => (
+            <div key={i} className="flex items-center gap-2">
+              <div className={`px-4 py-2 rounded-lg border-2 text-sm font-semibold ${step.color}`}>
+                {step.label}
+              </div>
+              <span className="text-[#94a3b8] text-lg font-bold">
+                {i < arr.length - 1 ? "→" : "→"}
+              </span>
+            </div>
+          ))}
+          <div className="px-4 py-2 rounded-lg border-2 text-sm font-semibold bg-[#fef3c7] text-[#d97706] border-[#fcd34d]">
+            Backlog
+          </div>
+          <span className="text-xs text-[#64748b] font-medium ml-2">(cycle)</span>
+        </div>
+        <div className="mt-4 bg-[#f8fafc] rounded-lg p-4">
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <span className="text-xs font-bold text-[#64748b] uppercase">Entrée du cycle</span>
+              <p className="text-[#475569] mt-1">Nouveau besoin ou retour utilisateur identifié lors d'une réunion, d'un test ou d'un échange.</p>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-[#64748b] uppercase">Boucle de feedback</span>
+              <p className="text-[#475569] mt-1">Chaque sprint review génère du feedback qui alimente le backlog pour le sprint suivant.</p>
+            </div>
+            <div>
+              <span className="text-xs font-bold text-[#64748b] uppercase">Amélioration continue</span>
+              <p className="text-[#475569] mt-1">Le cycle garantit que les priorités sont ajustées en continu selon les retours des parties prenantes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Matrice RACI */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-lg font-semibold text-[#1e293b] mb-4">

@@ -13,6 +13,7 @@ interface UserStory {
   estimation: number;
   priorite: "Must" | "Should" | "Could" | "Won't";
   sprint: string;
+  valeur: "Critique" | "Haute" | "Moyenne";
 }
 
 const backlog: UserStory[] = [
@@ -32,6 +33,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Must",
     sprint: "Sprint 1",
+    valeur: "Critique",
   },
   {
     id: "US-002",
@@ -49,6 +51,7 @@ const backlog: UserStory[] = [
     estimation: 3,
     priorite: "Must",
     sprint: "Sprint 1",
+    valeur: "Critique",
   },
   {
     id: "US-003",
@@ -67,6 +70,7 @@ const backlog: UserStory[] = [
     estimation: 8,
     priorite: "Must",
     sprint: "Sprint 1",
+    valeur: "Critique",
   },
   {
     id: "US-004",
@@ -84,6 +88,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Must",
     sprint: "Sprint 1",
+    valeur: "Critique",
   },
   {
     id: "US-005",
@@ -100,6 +105,7 @@ const backlog: UserStory[] = [
     estimation: 3,
     priorite: "Must",
     sprint: "Sprint 1",
+    valeur: "Critique",
   },
   {
     id: "US-006",
@@ -116,6 +122,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Must",
     sprint: "Sprint 1",
+    valeur: "Critique",
   },
 
   // Epic: Pipeline Commercial
@@ -134,6 +141,7 @@ const backlog: UserStory[] = [
     estimation: 8,
     priorite: "Must",
     sprint: "Sprint 2",
+    valeur: "Critique",
   },
   {
     id: "US-008",
@@ -150,6 +158,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Must",
     sprint: "Sprint 2",
+    valeur: "Critique",
   },
   {
     id: "US-009",
@@ -166,6 +175,7 @@ const backlog: UserStory[] = [
     estimation: 3,
     priorite: "Must",
     sprint: "Sprint 2",
+    valeur: "Critique",
   },
   {
     id: "US-010",
@@ -181,6 +191,7 @@ const backlog: UserStory[] = [
     estimation: 3,
     priorite: "Must",
     sprint: "Sprint 2",
+    valeur: "Critique",
   },
 
   // Epic: Tâches et Rappels
@@ -200,6 +211,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Must",
     sprint: "Sprint 3",
+    valeur: "Critique",
   },
   {
     id: "US-012",
@@ -216,6 +228,7 @@ const backlog: UserStory[] = [
     estimation: 3,
     priorite: "Must",
     sprint: "Sprint 3",
+    valeur: "Critique",
   },
   {
     id: "US-013",
@@ -232,6 +245,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Should",
     sprint: "Sprint 3",
+    valeur: "Haute",
   },
 
   // Epic: Tableau de bord
@@ -252,6 +266,7 @@ const backlog: UserStory[] = [
     estimation: 8,
     priorite: "Must",
     sprint: "Sprint 4",
+    valeur: "Critique",
   },
   {
     id: "US-015",
@@ -269,6 +284,7 @@ const backlog: UserStory[] = [
     estimation: 8,
     priorite: "Should",
     sprint: "Sprint 4",
+    valeur: "Haute",
   },
   {
     id: "US-016",
@@ -285,6 +301,7 @@ const backlog: UserStory[] = [
     estimation: 3,
     priorite: "Should",
     sprint: "Sprint 3",
+    valeur: "Haute",
   },
 
   // Epic: Intégrations
@@ -303,6 +320,7 @@ const backlog: UserStory[] = [
     estimation: 8,
     priorite: "Could",
     sprint: "Sprint 5",
+    valeur: "Moyenne",
   },
   {
     id: "US-018",
@@ -319,6 +337,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Could",
     sprint: "Sprint 5",
+    valeur: "Moyenne",
   },
   {
     id: "US-019",
@@ -335,6 +354,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Could",
     sprint: "Sprint 4",
+    valeur: "Moyenne",
   },
   {
     id: "US-020",
@@ -352,6 +372,7 @@ const backlog: UserStory[] = [
     estimation: 8,
     priorite: "Must",
     sprint: "Sprint 5",
+    valeur: "Critique",
   },
 
   // Epic: Sécurité
@@ -370,6 +391,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Must",
     sprint: "Phase 0",
+    valeur: "Critique",
   },
   {
     id: "US-022",
@@ -387,6 +409,7 @@ const backlog: UserStory[] = [
     estimation: 5,
     priorite: "Must",
     sprint: "Phase 0",
+    valeur: "Critique",
   },
 ];
 
@@ -397,6 +420,33 @@ const priorityColors = {
   Should: "bg-[#fff7ed] text-[#ea580c] border-[#fed7aa]",
   Could: "bg-[#f0f9ff] text-[#0284c7] border-[#bae6fd]",
   "Won't": "bg-[#f8fafc] text-[#64748b] border-[#e2e8f0]",
+};
+
+const valeurColors: Record<string, string> = {
+  Critique: "bg-[#fef2f2] text-[#991b1b] border-[#fecaca]",
+  Haute: "bg-[#fff7ed] text-[#9a3412] border-[#fed7aa]",
+  Moyenne: "bg-[#f0f9ff] text-[#075985] border-[#bae6fd]",
+};
+
+const exemplesDetailles: Record<string, { label: string; justification: string[] }> = {
+  "US-003": {
+    label: "Exemple détaillé",
+    justification: [
+      "Layout complexe avec en-tête, sidebar et zone de contenu dynamique",
+      "5 onglets distincts à implémenter (Aperçu, Affaires, Échanges, Tâches, Documents)",
+      "4 KPIs avec calculs dynamiques (valeur totale, affaires actives, revenus, tâches)",
+      "API avec relations multiples (client + contacts + opportunités + tâches)",
+    ],
+  },
+  "US-007": {
+    label: "Exemple détaillé",
+    justification: [
+      "6 colonnes Kanban avec affichage responsive",
+      "Drag & drop natif entre colonnes avec gestion d'état complexe",
+      "Calculs en temps réel des totaux et compteurs par colonne",
+      "State management avancé (réorganisation, persistance, synchronisation)",
+    ],
+  },
 };
 
 export default function ProductBacklogPage() {
@@ -554,6 +604,56 @@ export default function ProductBacklogPage() {
         </div>
       </div>
 
+      {/* Estimation Methodology */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-4 mb-6">
+        <h3 className="text-sm font-bold text-[#334155] mb-3 flex items-center gap-2">
+          <span className="text-base">&#127922;</span> Méthodologie d'estimation
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h4 className="text-xs font-semibold text-[#475569] uppercase mb-2">Méthode utilisée</h4>
+            <p className="text-sm text-[#475569] mb-2">
+              <strong>Planning Poker</strong> avec story points — suite de Fibonacci : 1, 2, 3, 5, 8, 13
+            </p>
+            <div className="bg-[#eff6ff] rounded-lg p-3 border border-[#bfdbfe]">
+              <p className="text-xs font-medium text-[#1e40af] mb-1">Story de référence</p>
+              <p className="text-sm text-[#1e3a5f]">
+                <strong>US-002</strong> &laquo;Filtrer et rechercher&raquo; = <strong>3 points</strong>
+              </p>
+              <p className="text-xs text-[#3b82f6] mt-1">
+                Complexité moyenne, pas d'API custom, logique de filtrage standard
+              </p>
+            </div>
+          </div>
+          <div>
+            <h4 className="text-xs font-semibold text-[#475569] uppercase mb-2">Barème des points</h4>
+            <div className="space-y-1.5 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#3b82f6] bg-[#eff6ff] px-2 py-0.5 rounded w-12 text-center">1-2</span>
+                <span className="text-[#475569]">Configuration simple, composant UI basique</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#22c55e] bg-[#f0fdf4] px-2 py-0.5 rounded w-12 text-center">3</span>
+                <span className="text-[#475569]">Développement standard, logique métier modérée</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#f59e0b] bg-[#fffbeb] px-2 py-0.5 rounded w-12 text-center">5</span>
+                <span className="text-[#475569]">Multi-composants, interactions entre modules</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#ef4444] bg-[#fef2f2] px-2 py-0.5 rounded w-12 text-center">8</span>
+                <span className="text-[#475569]">Complexe : API + UI riche + logique avancée</span>
+              </div>
+            </div>
+            <div className="mt-3 bg-[#f0fdf4] rounded-lg p-3 border border-[#bbf7d0]">
+              <p className="text-xs font-medium text-[#166534]">
+                Total : <strong>116 points</strong> sur 6 itérations — vélocité cible de <strong>~20 pts/sprint</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="flex flex-wrap gap-4 mb-6">
         <select
@@ -621,6 +721,14 @@ export default function ProductBacklogPage() {
                   <span className={`text-xs font-bold px-2 py-0.5 rounded border ${priorityColors[us.priorite]}`}>
                     {us.priorite}
                   </span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded border ${valeurColors[us.valeur]}`}>
+                    {us.valeur}
+                  </span>
+                  {exemplesDetailles[us.id] && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded border bg-[#faf5ff] text-[#7c3aed] border-[#ddd6fe]">
+                      {exemplesDetailles[us.id].label}
+                    </span>
+                  )}
                   <span className="flex-1 font-medium text-sm text-[#334155]">{us.titre}</span>
                   {isValidated && (
                     <span className="text-xs font-bold text-[#22c55e] bg-[#dcfce7] px-2 py-0.5 rounded border border-[#86efac] flex items-center gap-1">
@@ -668,6 +776,24 @@ export default function ProductBacklogPage() {
                       ))}
                     </ul>
                   </div>
+                  {exemplesDetailles[us.id] && (
+                    <div className="mb-4 bg-[#faf5ff] rounded-lg p-4 border border-[#ddd6fe]">
+                      <h4 className="text-xs font-bold text-[#7c3aed] uppercase mb-2 flex items-center gap-2">
+                        <span>&#9733;</span> Pourquoi {us.estimation} points ? — Justification détaillée
+                      </h4>
+                      <ul className="space-y-1.5">
+                        {exemplesDetailles[us.id].justification.map((j, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-[#6b21a8]">
+                            <span className="text-[#7c3aed] mt-0.5 font-bold">&rarr;</span>
+                            <span>{j}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="text-xs text-[#7c3aed] mt-3 pt-2 border-t border-[#ddd6fe]">
+                        Cette US sert de <strong>référence haute</strong> dans le barème d'estimation (8 pts = complexité élevée avec API + UI riche + logique avancée).
+                      </p>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between pt-3 border-t border-[#e2e8f0]">
                     <div className="text-xs text-[#94a3b8]">
                       Sprint : {us.sprint} · Estimation : {us.estimation} pts
