@@ -335,6 +335,101 @@ export default function QuestionnairePage() {
     // localStorage.removeItem(STORAGE_KEY);
   };
 
+  // Generate Markdown content from responses
+  const generateMarkdown = useCallback((): string => {
+    const lines: string[] = [];
+    lines.push("# Questionnaire de recueil de besoins — SpartCRM");
+    lines.push("");
+    lines.push(`> Document généré le ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} à ${new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`);
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+
+    let globalIndex = 0;
+
+    for (const sec of sections) {
+      lines.push(`## ${sec.title}`);
+      lines.push("");
+      lines.push(`*${sec.description}*`);
+      lines.push("");
+
+      for (const q of sec.questions) {
+        globalIndex++;
+        lines.push(`### Q${globalIndex}. ${q.label}`);
+        lines.push("");
+
+        if (q.type === "scale" && q.options) {
+          let hasAnyScale = false;
+          for (const opt of q.options) {
+            const val = formData[`${q.id}_${opt}`];
+            if (val && String(val).trim() !== "") {
+              lines.push(`- **${opt}** : ${val}/5`);
+              hasAnyScale = true;
+            } else {
+              lines.push(`- **${opt}** : _Non renseigné_`);
+            }
+          }
+          if (!hasAnyScale) {
+            lines.push("_Aucune note attribuée_");
+          }
+        } else if (q.type === "checkbox") {
+          const val = formData[q.id] as string[] | undefined;
+          if (val && val.length > 0) {
+            for (const item of val) {
+              lines.push(`- [x] ${item}`);
+            }
+            // Show unchecked options too
+            const unchecked = (q.options || []).filter((o) => !val.includes(o));
+            for (const item of unchecked) {
+              lines.push(`- [ ] ${item}`);
+            }
+          } else {
+            lines.push("_Non renseigné_");
+          }
+        } else {
+          const val = formData[q.id] as string | undefined;
+          if (val && val.trim() !== "") {
+            lines.push(`**Réponse :** ${val}`);
+          } else {
+            lines.push("_Non renseigné_");
+          }
+        }
+
+        lines.push("");
+      }
+
+      lines.push("---");
+      lines.push("");
+    }
+
+    // Summary footer
+    const { answered: a, total: t } = getAnsweredCount();
+    lines.push(`## Récapitulatif`);
+    lines.push("");
+    lines.push(`- **Questions répondues :** ${a} / ${t}`);
+    lines.push(`- **Taux de complétion :** ${t > 0 ? Math.round((a / t) * 100) : 0}%`);
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+    lines.push("*Document généré automatiquement depuis le questionnaire SpartCRM.*");
+
+    return lines.join("\n");
+  }, [formData]);
+
+  // Download Markdown file
+  const downloadMarkdown = useCallback(() => {
+    const md = generateMarkdown();
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `questionnaire-spartcrm-${new Date().toISOString().slice(0, 10)}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [generateMarkdown]);
+
   // Count answered questions
   const getAnsweredCount = (): { answered: number; total: number } => {
     let total = 0;
@@ -407,12 +502,21 @@ export default function QuestionnairePage() {
               sauvegardées localement et peuvent être consultées à tout moment.
             </p>
           </div>
-          <div className="mt-6">
+          <div className="mt-6 flex items-center justify-center gap-3">
             <button
               onClick={() => setSubmitted(false)}
               className="px-6 py-2 rounded-lg border border-[#e2e8f0] text-sm text-[#475569] hover:bg-[#f8fafc]"
             >
               Revenir au questionnaire
+            </button>
+            <button
+              onClick={downloadMarkdown}
+              className="px-6 py-2 rounded-lg bg-[#3b82f6] text-white text-sm hover:bg-[#2563eb] flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Télécharger (.md)
             </button>
           </div>
         </div>
@@ -649,13 +753,23 @@ export default function QuestionnairePage() {
         )}
 
         {/* Navigation */}
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between items-center mt-8">
           <button
             onClick={() => setCurrentSection((p) => Math.max(0, p - 1))}
             disabled={currentSection === 0}
             className="px-6 py-2 rounded-lg border border-[#e2e8f0] text-sm text-[#475569] hover:bg-[#f8fafc] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Précédent
+          </button>
+          <button
+            onClick={downloadMarkdown}
+            className="px-4 py-2 rounded-lg border border-[#3b82f6] text-[#3b82f6] text-sm hover:bg-[#eff6ff] flex items-center gap-2"
+            title="Télécharger les réponses en Markdown"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Télécharger (.md)
           </button>
           {currentSection < sections.length - 1 ? (
             <button
