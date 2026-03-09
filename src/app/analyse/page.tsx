@@ -19,6 +19,67 @@ export default function AnalysePage() {
         <span>Auteur : Thomas Bordier</span>
       </div>
 
+      {/* Retours fictifs */}
+      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-[#1e293b]">Retours client fictifs recus</h2>
+            <p className="text-sm text-[#64748b] mt-1">
+              Cette section simule des retours recueillis apres envoi du questionnaire pour illustrer la demarche d'analyse.
+            </p>
+          </div>
+          <span className="text-xs font-semibold bg-[#eff6ff] text-[#1d4ed8] px-2 py-1 rounded">
+            Donnees simulees - Exercice P11
+          </span>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
+            <p className="text-xs text-[#64748b] mb-1">Priorites citees</p>
+            <p className="text-2xl font-bold text-[#1e293b]">63%</p>
+            <p className="text-xs text-[#475569]">des retours orientent le Sprint 1 sur la centralisation client.</p>
+          </div>
+          <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
+            <p className="text-xs text-[#64748b] mb-1">Satisfaction percue (avant projet)</p>
+            <p className="text-2xl font-bold text-[#1e293b]">2.4 / 5</p>
+            <p className="text-xs text-[#475569]">sur les outils actuels (Excel + email + notes).</p>
+          </div>
+          <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
+            <p className="text-xs text-[#64748b] mb-1">Irritants frequents</p>
+            <p className="text-2xl font-bold text-[#1e293b]">71%</p>
+            <p className="text-xs text-[#475569]">signalent pertes d'information et doublons de suivi.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
+            <h3 className="font-semibold text-[#334155] text-sm mb-2">Synthese qualitative</h3>
+            <ul className="space-y-2 text-sm text-[#475569]">
+              <li>&ldquo;On perd du temps a reconstruire le contexte d'un client avant chaque appel.&rdquo;</li>
+              <li>&ldquo;Le pipeline actuel est incomplet, impossible de fiabiliser le forecast.&rdquo;</li>
+              <li>&ldquo;On veut une interface simple, utilisable sans formation longue.&rdquo;</li>
+            </ul>
+          </div>
+          <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
+            <h3 className="font-semibold text-[#334155] text-sm mb-2">Besoins non couverts identifies</h3>
+            <ul className="list-disc list-inside space-y-1 text-sm text-[#475569]">
+              <li>Historique unifie (emails, appels, reunions) visible en un ecran.</li>
+              <li>Rappels de relance automatiques sur les opportunites inactives.</li>
+              <li>Vue manager avec indicateurs de conversion par commercial.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg p-4">
+          <h3 className="font-semibold text-[#166534] text-sm mb-2">Decisions prises suite aux retours</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm text-[#166534]">
+            <li>Maintien du module Clients en priorite absolue sur le Sprint 1.</li>
+            <li>Ajout d'un critere d'acceptation sur la fiabilite du pipeline (mise a jour en temps reel).</li>
+            <li>Renforcement des scenarios de recette sur recherche, doublons et historique.</li>
+          </ul>
+        </div>
+      </div>
+
       {/* Contexte et objectifs */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-lg font-semibold text-[#1e293b] mb-4">

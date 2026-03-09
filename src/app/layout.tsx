@@ -11,6 +11,7 @@ const navItems = [
   { href: "/", label: "Accueil", icon: "🏠" },
   { href: "/questionnaire", label: "Questionnaire", icon: "📋" },
   { href: "/analyse", label: "Analyse retours", icon: "🔍" },
+  { href: "/recettage", label: "Recettage", icon: "✅" },
   { href: "/roadmap", label: "Roadmap", icon: "🗺️" },
   { href: "/product-backlog", label: "Product Backlog", icon: "📦" },
   { href: "/sprint-backlog", label: "Sprint Backlog", icon: "🏃" },

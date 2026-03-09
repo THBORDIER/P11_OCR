@@ -32,6 +32,12 @@ const livrables = [
     status: "Livrable 5",
   },
   {
+    href: "/recettage",
+    title: "Template de recettage",
+    desc: "Grille de recette avec suivi des tests par US (attendu/obtenu/statut), conforme au critère de soumission.",
+    status: "Annexe soumission",
+  },
+  {
     href: "/veille",
     title: "Tableau de veille",
     desc: "Système de veille technologique et métier pour le domaine Low-Code / CRM.",

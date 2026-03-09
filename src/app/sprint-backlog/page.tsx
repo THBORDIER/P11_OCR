@@ -340,6 +340,7 @@ export default function SprintBacklogPage() {
   };
 
   const pct = (hours: number) => totalHeures > 0 ? Math.round((hours / totalHeures) * 100) : 0;
+  const completedPct = pct(statusCounts["Termine"]);
 
   return (
     <div>
@@ -477,34 +478,28 @@ export default function SprintBacklogPage() {
             {statusCounts["Termine"] > 0 && (
               <div
                 className="bg-[#22c55e] h-full flex items-center justify-center text-white text-xs font-bold transition-all"
-                style={{ width: `${pct(statusCounts["Termine"])}%` }}
+                style={{ width: `${completedPct}%` }}
               >
-                {pct(statusCounts["Termine"])}%
+                {completedPct}%
               </div>
             )}
             {statusCounts["En review"] > 0 && (
               <div
-                className="bg-[#f97316] h-full flex items-center justify-center text-white text-xs font-bold transition-all"
+                className="bg-[#f97316] h-full transition-all"
                 style={{ width: `${pct(statusCounts["En review"])}%` }}
-              >
-                {pct(statusCounts["En review"])}%
-              </div>
+              />
             )}
             {statusCounts["En cours"] > 0 && (
               <div
-                className="bg-[#3b82f6] h-full flex items-center justify-center text-white text-xs font-bold transition-all"
+                className="bg-[#3b82f6] h-full transition-all"
                 style={{ width: `${pct(statusCounts["En cours"])}%` }}
-              >
-                {pct(statusCounts["En cours"])}%
-              </div>
+              />
             )}
             {statusCounts["A faire"] > 0 && (
               <div
-                className="bg-[#cbd5e1] h-full flex items-center justify-center text-[#475569] text-xs font-bold transition-all"
+                className="bg-[#cbd5e1] h-full transition-all"
                 style={{ width: `${pct(statusCounts["A faire"])}%` }}
-              >
-                {pct(statusCounts["A faire"])}%
-              </div>
+              />
             )}
           </div>
         </div>
@@ -526,7 +521,7 @@ export default function SprintBacklogPage() {
             À faire — {statusCounts["A faire"]}h
           </div>
           <div className="ml-auto font-semibold text-[#1e293b]">
-            {pct(statusCounts["Termine"])}% complété ({statusCounts["Termine"]}h / {totalHeures}h)
+            {completedPct}% complété ({statusCounts["Termine"]}h / {totalHeures}h)
           </div>
         </div>
       </div>
