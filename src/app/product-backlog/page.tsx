@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 
@@ -10,6 +10,9 @@ interface UserStory {
   jeSouhaite: string;
   afinDe: string;
   criteres: string[];
+  detailsMetier?: string[];
+  contraintes?: string[];
+  dependancesTech?: string[];
   estimation: number;
   priorite: "Must" | "Should" | "Could" | "Won't";
   sprint: string;
@@ -449,6 +452,47 @@ const exemplesDetailles: Record<string, { label: string; justification: string[]
   },
 };
 
+const getCardDetails = (us: UserStory) => {
+  const detailsMetier = us.detailsMetier ?? [
+    `Acteur principal : ${us.enTantQue}`,
+    `Valeur metier attendue : ${us.afinDe}`,
+    `Priorisation : ${us.priorite} (${us.valeur})`,
+  ];
+
+  const contraintes = us.contraintes ?? [
+    "Respect des droits d'acces par role (RBAC).",
+    "Conformite RGPD sur les donnees clients et prospects.",
+  ];
+
+  const fullText = `${us.jeSouhaite} ${us.criteres.join(" ")}`.toLowerCase();
+  const dependances: string[] = [];
+
+  if (fullText.includes("outlook") || fullText.includes("calendar")) {
+    dependances.push("Integration Microsoft 365 (Graph API) pour emails et agendas.");
+  }
+  if (fullText.includes("hubspot")) {
+    dependances.push("Connecteur API HubSpot pour synchronisation des leads.");
+  }
+  if (fullText.includes("email") || fullText.includes("brevo")) {
+    dependances.push("Service email transactionnel (ex: Brevo) pour notifications.");
+  }
+  if (fullText.includes("excel") || fullText.includes("erp") || fullText.includes("import")) {
+    dependances.push("Module d'import de donnees (CSV/Excel/ERP) et mapping de champs.");
+  }
+  if (fullText.includes("auth") || fullText.includes("sso")) {
+    dependances.push("Mecanisme d'authentification et gestion de session securisee.");
+  }
+
+  const dependancesTech =
+    us.dependancesTech && us.dependancesTech.length > 0
+      ? us.dependancesTech
+      : dependances.length > 0
+        ? dependances
+        : ["Aucune dependance externe bloquante (implementation CRM interne)."];
+
+  return { detailsMetier, contraintes, dependancesTech };
+};
+
 export default function ProductBacklogPage() {
   const [filterEpic, setFilterEpic] = useState<string>("all");
   const [filterPriority, setFilterPriority] = useState<string>("all");
@@ -702,6 +746,7 @@ export default function ProductBacklogPage() {
 
           const isValidated = isUSValidated(us.id);
           const validationDate = validatedUS[us.id];
+          const cardDetails = getCardDetails(us);
 
           return (
             <div
@@ -741,6 +786,9 @@ export default function ProductBacklogPage() {
                   <span className="text-xs font-medium text-[#059669] bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">
                     {us.criteres.length} critère{us.criteres.length > 1 ? "s" : ""}
                   </span>
+                  <span className="text-xs font-medium text-[#7c3aed] bg-[#faf5ff] px-2 py-0.5 rounded border border-[#ddd6fe]">
+                    {cardDetails.contraintes.length} contrainte{cardDetails.contraintes.length > 1 ? "s" : ""}
+                  </span>
                   <span className="text-xs font-bold text-[#3b82f6] bg-[#eff6ff] px-2 py-0.5 rounded">
                     {us.estimation} pts
                   </span>
@@ -775,6 +823,32 @@ export default function ProductBacklogPage() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+                  <div className="mb-4 grid md:grid-cols-3 gap-3">
+                    <div className="bg-white rounded-lg p-3 border border-[#e2e8f0]">
+                      <h4 className="text-xs font-bold text-[#64748b] uppercase mb-2">Détails métier</h4>
+                      <ul className="space-y-1">
+                        {cardDetails.detailsMetier.map((detail, i) => (
+                          <li key={i} className="text-sm text-[#475569]">{detail}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-[#e2e8f0]">
+                      <h4 className="text-xs font-bold text-[#64748b] uppercase mb-2">Contraintes</h4>
+                      <ul className="space-y-1">
+                        {cardDetails.contraintes.map((contrainte, i) => (
+                          <li key={i} className="text-sm text-[#475569]">{contrainte}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-[#e2e8f0]">
+                      <h4 className="text-xs font-bold text-[#64748b] uppercase mb-2">Dépendances techniques</h4>
+                      <ul className="space-y-1">
+                        {cardDetails.dependancesTech.map((dep, i) => (
+                          <li key={i} className="text-sm text-[#475569]">{dep}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                   {exemplesDetailles[us.id] && (
                     <div className="mb-4 bg-[#faf5ff] rounded-lg p-4 border border-[#ddd6fe]">
@@ -839,3 +913,11 @@ export default function ProductBacklogPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
