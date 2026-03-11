@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 
@@ -22,27 +22,27 @@ const sections: Section[] = [
   {
     title: "1. Contexte business",
     description:
-      "Pour bien comprendre votre activitÃƒÆ’Ã‚Â© et adapter le CRM ÃƒÆ’Ã‚Â  vos besoins rÃƒÆ’Ã‚Â©els.",
+      "Pour bien comprendre votre activité et adapter le CRM à vos besoins réels.",
     pourquoi:
-      "Ces questions permettent de dimensionner le projet (nombre d'utilisateurs, volume de donnÃƒÆ’Ã‚Â©es) et d'adapter l'architecture technique aux besoins rÃƒÆ’Ã‚Â©els de Spart.",
+      "Ces questions permettent de dimensionner le projet (nombre d'utilisateurs, volume de données) et d'adapter l'architecture technique aux besoins réels de Spart.",
     questions: [
       {
         id: "q1_1",
-        label: "Pouvez-vous dÃƒÆ’Ã‚Â©crire en quelques phrases l'activitÃƒÆ’Ã‚Â© principale de Spart et vos services proposÃƒÆ’Ã‚Â©s aux PME ?",
+        label: "Pouvez-vous décrire en quelques phrases l'activité principale de Spart et vos services proposés aux PME ?",
         type: "textarea",
-        placeholder: "DÃƒÆ’Ã‚Â©crivez votre activitÃƒÆ’Ã‚Â©...",
+        placeholder: "Décrivez votre activité...",
         required: true,
       },
       {
         id: "q1_2",
-        label: "Combien de personnes composent votre ÃƒÆ’Ã‚Â©quipe au total ?",
+        label: "Combien de personnes composent votre équipe au total ?",
         type: "select",
         options: ["1-5", "6-10", "11-20", "21-50", "50+"],
         required: true,
       },
       {
         id: "q1_3",
-        label: "Combien de clients et prospects gÃƒÆ’Ã‚Â©rez-vous actuellement (approximativement) ?",
+        label: "Combien de clients et prospects gérez-vous actuellement (approximativement) ?",
         type: "select",
         options: [
           "Moins de 100",
@@ -55,13 +55,13 @@ const sections: Section[] = [
       },
       {
         id: "q1_4",
-        label: "Quelle est la taille de votre ÃƒÆ’Ã‚Â©quipe commerciale (nombre de personnes) ?",
+        label: "Quelle est la taille de votre équipe commerciale (nombre de personnes) ?",
         type: "text",
         placeholder: "Ex : 8 commerciaux",
       },
       {
         id: "q1_5",
-        label: "Quels sont les diffÃƒÆ’Ã‚Â©rents rÃƒÆ’Ã‚Â´les au sein de votre ÃƒÆ’Ã‚Â©quipe qui utiliseront le CRM ?",
+        label: "Quels sont les différents rôles au sein de votre équipe qui utiliseront le CRM ?",
         type: "checkbox",
         options: [
           "Commerciaux / BizDev",
@@ -80,26 +80,26 @@ const sections: Section[] = [
     description:
       "Pour comprendre comment vous travaillez aujourd'hui et identifier les points de friction.",
     pourquoi:
-      "Comprendre l'existant est essentiel pour identifier les points de douleur, planifier la migration des donnÃƒÆ’Ã‚Â©es et assurer la compatibilitÃƒÆ’Ã‚Â© avec l'ÃƒÆ’Ã‚Â©cosystÃƒÆ’Ã‚Â¨me Microsoft 365.",
+      "Comprendre l'existant est essentiel pour identifier les points de douleur, planifier la migration des données et assurer la compatibilité avec l'écosystème Microsoft 365.",
     questions: [
       {
         id: "q2_1",
-        label: "Quels outils utilisez-vous actuellement pour gÃƒÆ’Ã‚Â©rer vos clients et prospects ?",
+        label: "Quels outils utilisez-vous actuellement pour gérer vos clients et prospects ?",
         type: "checkbox",
         options: [
           "Fichiers Excel / Google Sheets",
           "Emails (Outlook / Gmail)",
           "CRM existant (Salesforce, HubSpot...)",
-          "Outils internes personnalisÃƒÆ’Ã‚Â©s",
+          "Outils internes personnalisés",
           "Carnets / notes papier",
           "Autre",
         ],
       },
       {
         id: "q2_2",
-        label: "Quelles sont les principales difficultÃƒÆ’Ã‚Â©s que vous rencontrez avec votre systÃƒÆ’Ã‚Â¨me actuel ?",
+        label: "Quelles sont les principales difficultés que vous rencontrez avec votre système actuel ?",
         type: "textarea",
-        placeholder: "Ex : perte d'informations, doublons, manque de visibilitÃƒÆ’Ã‚Â©...",
+        placeholder: "Ex : perte d'informations, doublons, manque de visibilité...",
         required: true,
       },
       {
@@ -129,27 +129,27 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "3. Objectifs et indicateurs de rÃƒÆ’Ã‚Â©ussite",
+    title: "3. Objectifs et indicateurs de réussite",
     description:
-      "Pour dÃƒÆ’Ã‚Â©finir les rÃƒÆ’Ã‚Â©sultats attendus et mesurer le succÃƒÆ’Ã‚Â¨s du projet.",
+      "Pour définir les résultats attendus et mesurer le succès du projet.",
     pourquoi:
-      "DÃƒÆ’Ã‚Â©finir des objectifs mesurables permet de valider le succÃƒÆ’Ã‚Â¨s du projet via des KPIs concrets et d'orienter la priorisation MoSCoW du backlog.",
+      "Définir des objectifs mesurables permet de valider le succès du projet via des KPIs concrets et d'orienter la priorisation MoSCoW du backlog.",
     questions: [
       {
         id: "q3_1",
         label: "Quels sont vos 3 objectifs principaux avec ce CRM ?",
         type: "textarea",
-        placeholder: "Ex : centraliser les donnÃƒÆ’Ã‚Â©es, suivre le pipeline en temps rÃƒÆ’Ã‚Â©el...",
+        placeholder: "Ex : centraliser les données, suivre le pipeline en temps réel...",
         required: true,
       },
       {
         id: "q3_2",
-        label: "Comment mesurerez-vous le succÃƒÆ’Ã‚Â¨s du CRM ? Quels KPIs sont importants pour vous ?",
+        label: "Comment mesurerez-vous le succès du CRM ? Quels KPIs sont importants pour vous ?",
         type: "checkbox",
         options: [
-          "Taux d'adoption par les ÃƒÆ’Ã‚Â©quipes",
-          "Pipeline commercial ÃƒÆ’Ã‚Â  jour en temps rÃƒÆ’Ã‚Â©el",
-          "RÃƒÆ’Ã‚Â©duction du temps de prÃƒÆ’Ã‚Â©paration des rÃƒÆ’Ã‚Â©unions",
+          "Taux d'adoption par les équipes",
+          "Pipeline commercial à jour en temps réel",
+          "Réduction du temps de préparation des réunions",
           "Taux de conversion prospects/clients",
           "Satisfaction des utilisateurs internes",
           "Autre",
@@ -157,20 +157,20 @@ const sections: Section[] = [
       },
       {
         id: "q3_3",
-        label: "ÃƒÆ’Ã¢â€šÂ¬ quoi ressemblerait le CRM idÃƒÆ’Ã‚Â©al pour votre ÃƒÆ’Ã‚Â©quipe ?",
+        label: "À quoi ressemblerait le CRM idéal pour votre équipe ?",
         type: "textarea",
-        placeholder: "DÃƒÆ’Ã‚Â©crivez votre vision...",
+        placeholder: "Décrivez votre vision...",
       },
       {
         id: "q3_4",
-        label: "Sur une ÃƒÆ’Ã‚Â©chelle de 1 ÃƒÆ’Ã‚Â  5, quelle importance accordez-vous ÃƒÆ’Ã‚Â  chacune de ces fonctionnalitÃƒÆ’Ã‚Â©s ?",
+        label: "Sur une échelle de 1 à 5, quelle importance accordez-vous à chacune de ces fonctionnalités ?",
         type: "scale",
         options: [
           "Fiches clients et prospects",
           "Pipeline commercial visuel (Kanban)",
-          "TÃƒÆ’Ã‚Â¢ches et rappels automatiques",
+          "Tâches et rappels automatiques",
           "Tableaux de bord et reporting",
-          "IntÃƒÆ’Ã‚Â©grations email et agenda",
+          "Intégrations email et agenda",
         ],
       },
     ],
@@ -178,26 +178,26 @@ const sections: Section[] = [
   {
     title: "4. Contraintes et ressources",
     description:
-      "Pour dimensionner le projet de maniÃƒÆ’Ã‚Â¨re rÃƒÆ’Ã‚Â©aliste et planifier les livrables.",
+      "Pour dimensionner le projet de manière réaliste et planifier les livrables.",
     pourquoi:
-      "Ces informations conditionnent le planning, le pÃƒÆ’Ã‚Â©rimÃƒÆ’Ã‚Â¨tre du MVP et les choix techniques (budget, RGPD, migration, ressources disponibles).",
+      "Ces informations conditionnent le planning, le périmètre du MVP et les choix techniques (budget, RGPD, migration, ressources disponibles).",
     questions: [
       {
         id: "q4_1",
-        label: "Quel budget avez-vous prÃƒÆ’Ã‚Â©vu pour ce projet (mÃƒÆ’Ã‚Âªme une fourchette approximative) ?",
+        label: "Quel budget avez-vous prévu pour ce projet (même une fourchette approximative) ?",
         type: "select",
         options: [
           "Moins de 50 000 EUR",
           "50 000 - 100 000 EUR",
           "100 000 - 150 000 EUR",
           "Plus de 150 000 EUR",
-          "ÃƒÆ’Ã¢â€šÂ¬ dÃƒÆ’Ã‚Â©finir",
+          "À définir",
         ],
         required: true,
       },
       {
         id: "q4_2",
-        label: "Avez-vous une date souhaitÃƒÆ’Ã‚Â©e pour la mise en service d'une premiÃƒÆ’Ã‚Â¨re version (MVP) ?",
+        label: "Avez-vous une date souhaitée pour la mise en service d'une première version (MVP) ?",
         type: "text",
         placeholder: "Ex : d'ici 3 mois, septembre 2025...",
       },
@@ -210,23 +210,23 @@ const sections: Section[] = [
       },
       {
         id: "q4_4",
-        label: "Y a-t-il des donnÃƒÆ’Ã‚Â©es existantes ÃƒÆ’Ã‚Â  migrer vers le nouveau CRM ?",
+        label: "Y a-t-il des données existantes à migrer vers le nouveau CRM ?",
         type: "select",
         options: [
-          "Oui, beaucoup de donnÃƒÆ’Ã‚Â©es (Excel, ERP, emails)",
+          "Oui, beaucoup de données (Excel, ERP, emails)",
           "Oui, quelques fichiers Excel",
-          "Non, on part de zÃƒÆ’Ã‚Â©ro",
+          "Non, on part de zéro",
           "Je ne sais pas encore",
         ],
       },
       {
         id: "q4_5",
-        label: "Avez-vous des exigences en matiÃƒÆ’Ã‚Â¨re de sÃƒÆ’Ã‚Â©curitÃƒÆ’Ã‚Â© ou de conformitÃƒÆ’Ã‚Â© RGPD ?",
+        label: "Avez-vous des exigences en matière de sécurité ou de conformité RGPD ?",
         type: "select",
         options: [
           "Oui, c'est prioritaire",
           "Oui, mais standard",
-          "Pas de contrainte particuliÃƒÆ’Ã‚Â¨re",
+          "Pas de contrainte particulière",
           "Je ne sais pas",
         ],
       },
@@ -235,40 +235,40 @@ const sections: Section[] = [
   {
     title: "5. Vision et positionnement",
     description:
-      "Pour comprendre votre vision ÃƒÆ’Ã‚Â  long terme et ÃƒÆ’Ã‚Â©viter les erreurs de conception.",
+      "Pour comprendre votre vision à long terme et éviter les erreurs de conception.",
     pourquoi:
-      "Anticiper l'ÃƒÆ’Ã‚Â©volution du produit permet d'ÃƒÆ’Ã‚Â©viter des erreurs d'architecture et de concevoir un CRM ÃƒÆ’Ã‚Â©volutif alignÃƒÆ’Ã‚Â© avec la stratÃƒÆ’Ã‚Â©gie de Spart.",
+      "Anticiper l'évolution du produit permet d'éviter des erreurs d'architecture et de concevoir un CRM évolutif aligné avec la stratégie de Spart.",
     questions: [
       {
         id: "q5_1",
-        label: "Qu'est-ce que vous voulez absolument ÃƒÆ’Ã‚Â©viter dans ce CRM ?",
+        label: "Qu'est-ce que vous voulez absolument éviter dans ce CRM ?",
         type: "textarea",
         placeholder: "Ex : un outil trop complexe, trop de clics pour saisir une info...",
       },
       {
         id: "q5_2",
-        label: "Le CRM est-il destinÃƒÆ’Ã‚Â© ÃƒÆ’Ã‚Â  rester un outil interne ou pourrait-il ÃƒÆ’Ã‚Âªtre proposÃƒÆ’Ã‚Â© ÃƒÆ’Ã‚Â  vos clients PME ?",
+        label: "Le CRM est-il destiné à rester un outil interne ou pourrait-il être proposé à vos clients PME ?",
         type: "select",
         options: [
           "Outil strictement interne",
-          "Pourrait ÃƒÆ’Ã‚Âªtre proposÃƒÆ’Ã‚Â© aux clients ÃƒÆ’Ã‚Â  terme",
-          "Pas encore dÃƒÆ’Ã‚Â©fini",
+          "Pourrait être proposé aux clients à terme",
+          "Pas encore défini",
         ],
       },
       {
         id: "q5_3",
-        label: "Comment chaque rÃƒÆ’Ã‚Â´le devrait-il voir les donnÃƒÆ’Ã‚Â©es ? (chacun voit tout, ou vision restreinte)",
+        label: "Comment chaque rôle devrait-il voir les données ? (chacun voit tout, ou vision restreinte)",
         type: "select",
         options: [
-          "Chacun voit uniquement ses propres donnÃƒÆ’Ã‚Â©es",
-          "Vision par ÃƒÆ’Ã‚Â©quipe",
+          "Chacun voit uniquement ses propres données",
+          "Vision par équipe",
           "Tout le monde voit tout",
-          "Cela dÃƒÆ’Ã‚Â©pend du rÃƒÆ’Ã‚Â´le (ÃƒÆ’Ã‚Â  dÃƒÆ’Ã‚Â©finir ensemble)",
+          "Cela dépend du rôle (à définir ensemble)",
         ],
       },
       {
         id: "q5_4",
-        label: "Y a-t-il autre chose que vous souhaiteriez nous partager et que nous n'avons pas abordÃƒÆ’Ã‚Â© ?",
+        label: "Y a-t-il autre chose que vous souhaiteriez nous partager et que nous n'avons pas abordé ?",
         type: "textarea",
         placeholder: "Champ libre...",
       },
@@ -583,7 +583,7 @@ export default function QuestionnairePage() {
             Questionnaire de recueil de besoins
           </h1>
           <p className="text-[#64748b] mt-2">
-            Livrable 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Document envoyÃƒÆ’Ã‚Â© au client Spart pour clarifier le brief initial
+            Livrable 1 — Document envoyé au client Spart pour clarifier le brief initial
           </p>
         </div>
 
@@ -604,20 +604,20 @@ export default function QuestionnairePage() {
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-[#1e293b] mb-2">
-            Merci pour vos rÃƒÆ’Ã‚Â©ponses !
+            Merci pour vos réponses !
           </h2>
           <p className="text-[#64748b] mb-4">
-            Votre questionnaire a ÃƒÆ’Ã‚Â©tÃƒÆ’Ã‚Â© soumis avec succÃƒÆ’Ã‚Â¨s.
-            Vous avez rÃƒÆ’Ã‚Â©pondu ÃƒÆ’Ã‚Â  {answered} question{answered > 1 ? "s" : ""} sur {total}.
+            Votre questionnaire a été soumis avec succès.
+            Vous avez répondu à {answered} question{answered > 1 ? "s" : ""} sur {total}.
           </p>
           <p className="text-sm text-[#94a3b8] mb-6">
-            Nous analyserons vos rÃƒÆ’Ã‚Â©ponses et reviendrons vers vous rapidement
-            pour la prochaine ÃƒÆ’Ã‚Â©tape du projet.
+            Nous analyserons vos réponses et reviendrons vers vous rapidement
+            pour la prochaine étape du projet.
           </p>
           <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg p-4 inline-block">
             <p className="text-sm text-[#166534]">
-              Un rÃƒÆ’Ã‚Â©capitulatif vous sera envoyÃƒÆ’Ã‚Â© par email. Vos rÃƒÆ’Ã‚Â©ponses sont
-              sauvegardÃƒÆ’Ã‚Â©es localement et peuvent ÃƒÆ’Ã‚Âªtre consultÃƒÆ’Ã‚Â©es ÃƒÆ’Ã‚Â  tout moment.
+              Un récapitulatif vous sera envoyé par email. Vos réponses sont
+              sauvegardées localement et peuvent être consultées à tout moment.
             </p>
           </div>
           <div className="mt-6 flex items-center justify-center gap-3 flex-wrap">
@@ -662,25 +662,25 @@ export default function QuestionnairePage() {
           Questionnaire de recueil de besoins
         </h1>
         <p className="text-[#64748b] mt-2">
-          Livrable 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Document envoyÃƒÆ’Ã‚Â© au client Spart pour clarifier le brief initial
+          Livrable 1 — Document envoyé au client Spart pour clarifier le brief initial
         </p>
       </div>
 
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-base font-semibold mb-2">Introduction</h2>
         <p className="text-sm text-[#475569] leading-relaxed">
-          Bonjour et merci de prendre le temps de rÃƒÆ’Ã‚Â©pondre ÃƒÆ’Ã‚Â  ce questionnaire.
-          Je suis Thomas Bordier, dÃƒÆ’Ã‚Â©veloppeur Low-Code freelance, en charge du
-          dÃƒÆ’Ã‚Â©veloppement de votre CRM sur-mesure. Ce questionnaire a pour
-          objectif de recueillir toutes les informations nÃƒÆ’Ã‚Â©cessaires pour
-          comprendre votre activitÃƒÆ’Ã‚Â© et vos besoins rÃƒÆ’Ã‚Â©els, prÃƒÆ’Ã‚Â©parer un backlog
-          produit complet, planifier les livraisons par ÃƒÆ’Ã‚Â©tapes et dÃƒÆ’Ã‚Â©finir les
-          prioritÃƒÆ’Ã‚Â©s fonctionnelles dÃƒÆ’Ã‚Â¨s le dÃƒÆ’Ã‚Â©part.
+          Bonjour et merci de prendre le temps de répondre à ce questionnaire.
+          Je suis Thomas Bordier, développeur Low-Code freelance, en charge du
+          développement de votre CRM sur-mesure. Ce questionnaire a pour
+          objectif de recueillir toutes les informations nécessaires pour
+          comprendre votre activité et vos besoins réels, préparer un backlog
+          produit complet, planifier les livraisons par étapes et définir les
+          priorités fonctionnelles dès le départ.
         </p>
         <p className="text-sm text-[#475569] mt-2">
-          <strong>Temps estimÃƒÆ’Ã‚Â© :</strong> 15 ÃƒÆ’Ã‚Â  20 minutes. Vos rÃƒÆ’Ã‚Â©ponses
-          serviront directement ÃƒÆ’Ã‚Â  concevoir un produit adaptÃƒÆ’Ã‚Â© ÃƒÆ’Ã‚Â  vos besoins
-          mÃƒÆ’Ã‚Â©tier.
+          <strong>Temps estimé :</strong> 15 à 20 minutes. Vos réponses
+          serviront directement à concevoir un produit adapté à vos besoins
+          métier.
         </p>
       </div>
 
@@ -792,7 +792,7 @@ export default function QuestionnairePage() {
                   onChange={(e) => handleInputChange(q.id, e.target.value)}
                   className="w-full border border-[#e2e8f0] rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6]"
                 >
-                  <option value="">-- SÃƒÆ’Ã‚Â©lectionnez --</option>
+                  <option value="">-- Sélectionnez --</option>
                   {q.options?.map((opt) => (
                     <option key={opt} value={opt}>
                       {opt}
@@ -864,7 +864,7 @@ export default function QuestionnairePage() {
         {isLastSection && (
           <div className="mt-6 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
             <h3 className="text-sm font-semibold text-[#334155] mb-2">
-              RÃƒÆ’Ã‚Â©capitulatif avant soumission
+              Récapitulatif avant soumission
             </h3>
             <div className="flex items-center gap-3">
               <div className="flex-1 bg-[#e2e8f0] rounded-full h-2">
@@ -874,18 +874,18 @@ export default function QuestionnairePage() {
                 />
               </div>
               <span className="text-sm text-[#475569] whitespace-nowrap">
-                {answered} / {total} questions rÃƒÆ’Ã‚Â©pondues
+                {answered} / {total} questions répondues
               </span>
             </div>
             {answered < total && (
               <p className="text-xs text-[#94a3b8] mt-2">
-                Certaines questions n'ont pas encore ÃƒÆ’Ã‚Â©tÃƒÆ’Ã‚Â© complÃƒÆ’Ã‚Â©tÃƒÆ’Ã‚Â©es.
-                Vous pouvez tout de mÃƒÆ’Ã‚Âªme soumettre le questionnaire.
+                Certaines questions n'ont pas encore été complétées.
+                Vous pouvez tout de même soumettre le questionnaire.
               </p>
             )}
             {answered === total && (
               <p className="text-xs text-[#22c55e] mt-2">
-                Toutes les questions ont ÃƒÆ’Ã‚Â©tÃƒÆ’Ã‚Â© complÃƒÆ’Ã‚Â©tÃƒÆ’Ã‚Â©es. Vous pouvez soumettre le questionnaire.
+                Toutes les questions ont été complétées. Vous pouvez soumettre le questionnaire.
               </p>
             )}
           </div>
@@ -946,3 +946,5 @@ export default function QuestionnairePage() {
     </div>
   );
 }
+
+
