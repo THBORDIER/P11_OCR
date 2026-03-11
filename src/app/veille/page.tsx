@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-/* ───────────────────────── Types ───────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 type Source = { nom: string; url: string };
 type Theme = {
   theme: string;
@@ -19,33 +19,33 @@ type Categorie = {
   items: Theme[];
 };
 
-/* ───────────────────────── Données ───────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ DonnÃ©es â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const categories: Categorie[] = [
   {
-    titre: "Écosystème des plateformes Low-Code",
-    miseAJour: "Février 2026",
+    titre: "Ã‰cosystÃ¨me des plateformes Low-Code",
+    miseAJour: "FÃ©vrier 2026",
     items: [
       {
-        theme: "Nouvelles fonctionnalités des outils Low-Code",
+        theme: "Nouvelles fonctionnalitÃ©s des outils Low-Code",
         description:
-          "Annonces, mises à jour officielles des plateformes comme WeWeb, Xano, Bubble, FlutterFlow, Retool.",
+          "Annonces, mises Ã  jour officielles des plateformes comme WeWeb, Xano, Bubble, FlutterFlow, Retool.",
         sources: [
           { nom: "WeWeb Blog", url: "https://www.weweb.io/blog" },
           { nom: "Xano Community", url: "https://community.xano.com" },
-          { nom: "YouTube - WeWeb", url: "https://www.youtube.com/@weweb_io" },
+          { nom: "YouTube - WeWeb", url: "https://www.youtube.com/@weweb" },
         ],
         avantages:
-          "Permet de rester informé des nouvelles capacités et d'anticiper les évolutions techniques pour les projets clients.",
+          "Permet de rester informÃ© des nouvelles capacitÃ©s et d'anticiper les Ã©volutions techniques pour les projets clients.",
         consultation:
           "Newsletter hebdomadaire WeWeb + check Xano Community chaque lundi matin.",
         utiliseDansProjet: true,
         apprentissage:
-          "Découverte du système de composants réutilisables WeWeb 2.0, appliqué pour structurer les vues Contact et Pipeline de SpartCRM.",
+          "DÃ©couverte du systÃ¨me de composants rÃ©utilisables WeWeb 2.0, appliquÃ© pour structurer les vues Contact et Pipeline de SpartCRM.",
       },
       {
-        theme: "Évolutions des bonnes pratiques de développement Low-Code",
+        theme: "Ã‰volutions des bonnes pratiques de dÃ©veloppement Low-Code",
         description:
-          "Recommandations pour structurer les projets, organiser les workflows et assurer la maintenabilité.",
+          "Recommandations pour structurer les projets, organiser les workflows et assurer la maintenabilitÃ©.",
         sources: [
           {
             nom: "No-Code / Low-Code France (Slack)",
@@ -58,34 +58,34 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Évite les anti-patterns et améliore la qualité des livrables Low-Code.",
+          "Ã‰vite les anti-patterns et amÃ©liore la qualitÃ© des livrables Low-Code.",
         consultation: "Veille passive via Slack + lecture Reddit 1x/semaine.",
       },
       {
-        theme: "Nouvelles bibliothèques, plugins et intégrations",
+        theme: "Nouvelles bibliothÃ¨ques, plugins et intÃ©grations",
         description:
           "Extensions, connecteurs natifs et APIs externes pour enrichir les applications Low-Code.",
         sources: [
           { nom: "Product Hunt", url: "https://www.producthunt.com" },
           {
             nom: "WeWeb Marketplace",
-            url: "https://www.weweb.io/marketplace",
+            url: "https://www.weweb.io/templates",
           },
           { nom: "RapidAPI Hub", url: "https://rapidapi.com/hub" },
         ],
         avantages:
-          "Découvrir des outils qui font gagner du temps et enrichissent les projets sans développement custom.",
+          "DÃ©couvrir des outils qui font gagner du temps et enrichissent les projets sans dÃ©veloppement custom.",
         consultation:
           "Product Hunt Daily Digest (email quotidien) + check marketplace mensuel.",
       },
       {
-        theme: "Sécurité des applications Low-Code",
+        theme: "SÃ©curitÃ© des applications Low-Code",
         description:
-          "Menaces et bonnes pratiques pour protéger les données, gérer les rôles et assurer la conformité RGPD.",
+          "Menaces et bonnes pratiques pour protÃ©ger les donnÃ©es, gÃ©rer les rÃ´les et assurer la conformitÃ© RGPD.",
         sources: [
           {
             nom: "OWASP Low-Code/No-Code Security",
-            url: "https://owasp.org/www-project-top-10-low-code-no-code-security-risks/",
+            url: "https://owasp.org/www-project-citizen-development-top10-security-risks/",
           },
           { nom: "CNIL - RGPD", url: "https://www.cnil.fr" },
           {
@@ -94,17 +94,17 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Garantir la sécurité des applications déployées et la conformité réglementaire.",
+          "Garantir la sÃ©curitÃ© des applications dÃ©ployÃ©es et la conformitÃ© rÃ©glementaire.",
         consultation:
           "Veille mensuelle OWASP + check CNIL lors de chaque nouveau projet.",
         utiliseDansProjet: true,
         apprentissage:
-          "Application des recommandations OWASP pour le contrôle d'accès par rôles (RBAC) dans SpartCRM. Vérification RGPD pour le stockage des données contacts.",
+          "Application des recommandations OWASP pour le contrÃ´le d'accÃ¨s par rÃ´les (RBAC) dans SpartCRM. VÃ©rification RGPD pour le stockage des donnÃ©es contacts.",
       },
       {
         theme: "Performance des applications Low-Code",
         description:
-          "Recommandations pour optimiser la vitesse, les requêtes API et les bases de données.",
+          "Recommandations pour optimiser la vitesse, les requÃªtes API et les bases de donnÃ©es.",
         sources: [
           { nom: "Web.dev (Google)", url: "https://web.dev" },
           {
@@ -112,17 +112,17 @@ const categories: Categorie[] = [
             url: "https://docs.xano.com",
           },
           {
-            nom: "YouTube - Nocodelytics",
-            url: "https://www.youtube.com/@nocodelytics",
+            nom: "YouTube - Nocodelytics (recherche)",
+            url: "https://www.youtube.com/results?search_query=nocodelytics",
           },
         ],
         avantages:
-          "Livrer des applications rapides et améliorer l'expérience utilisateur finale.",
+          "Livrer des applications rapides et amÃ©liorer l'expÃ©rience utilisateur finale.",
         consultation:
-          "Check web.dev lors du lancement d'un projet + vidéo Nocodelytics 1x/mois.",
+          "Check web.dev lors du lancement d'un projet + vidÃ©o Nocodelytics 1x/mois.",
         utiliseDansProjet: true,
         apprentissage:
-          "Adoption de la pagination côté serveur (Xano) et du lazy loading pour les listes de contacts dans SpartCRM, suite aux benchmarks web.dev.",
+          "Adoption de la pagination cÃ´tÃ© serveur (Xano) et du lazy loading pour les listes de contacts dans SpartCRM, suite aux benchmarks web.dev.",
       },
     ],
   },
@@ -131,9 +131,9 @@ const categories: Categorie[] = [
     miseAJour: "Janvier 2026",
     items: [
       {
-        theme: "Études de cas IA dans le développement Low-Code",
+        theme: "Ã‰tudes de cas IA dans le dÃ©veloppement Low-Code",
         description:
-          "Exemples concrets d'intégration de GPT ou autres IA pour automatiser des tâches ou améliorer l'UX.",
+          "Exemples concrets d'intÃ©gration de GPT ou autres IA pour automatiser des tÃ¢ches ou amÃ©liorer l'UX.",
         sources: [
           {
             nom: "AI News (The Rundown)",
@@ -149,14 +149,14 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Identifier des cas d'usage concrets pour proposer des fonctionnalités IA aux clients.",
+          "Identifier des cas d'usage concrets pour proposer des fonctionnalitÃ©s IA aux clients.",
         consultation:
-          "Newsletter The Rundown (quotidienne) + 1 vidéo/semaine.",
+          "Newsletter The Rundown (quotidienne) + 1 vidÃ©o/semaine.",
       },
       {
-        theme: "Impact de l'IA sur le métier de développeur Low-Code",
+        theme: "Impact de l'IA sur le mÃ©tier de dÃ©veloppeur Low-Code",
         description:
-          "Impact des avancées IA sur les compétences attendues et l'évolution du rôle du développeur.",
+          "Impact des avancÃ©es IA sur les compÃ©tences attendues et l'Ã©volution du rÃ´le du dÃ©veloppeur.",
         sources: [
           {
             nom: "Gartner Insights",
@@ -164,7 +164,7 @@ const categories: Categorie[] = [
           },
           {
             nom: "Forrester Blog",
-            url: "https://www.forrester.com/blogs/category/low-code/",
+            url: "https://www.forrester.com/blogs/",
           },
           {
             nom: "LinkedIn - Low Code Leaders",
@@ -172,7 +172,7 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Anticiper les évolutions du métier et adapter ses compétences en conséquence.",
+          "Anticiper les Ã©volutions du mÃ©tier et adapter ses compÃ©tences en consÃ©quence.",
         consultation: "Rapport Gartner annuel + veille LinkedIn passive.",
       },
       {
@@ -191,22 +191,22 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Proposer des workflows automatisés aux clients pour réduire les tâches manuelles.",
-        consultation: "Blog Make et n8n bi-mensuel + vidéos à la demande.",
+          "Proposer des workflows automatisÃ©s aux clients pour rÃ©duire les tÃ¢ches manuelles.",
+        consultation: "Blog Make et n8n bi-mensuel + vidÃ©os Ã  la demande.",
         utiliseDansProjet: true,
         apprentissage:
-          "Choix de n8n comme outil d'automatisation pour les notifications CRM (relances automatiques, alertes pipeline) grâce à son modèle open-source et sa compatibilité Xano.",
+          "Choix de n8n comme outil d'automatisation pour les notifications CRM (relances automatiques, alertes pipeline) grÃ¢ce Ã  son modÃ¨le open-source et sa compatibilitÃ© Xano.",
       },
     ],
   },
   {
-    titre: "Technologies utilisées dans les applications",
-    miseAJour: "Février 2026",
+    titre: "Technologies utilisÃ©es dans les applications",
+    miseAJour: "FÃ©vrier 2026",
     items: [
       {
-        theme: "Intégration de paiements et transactions",
+        theme: "IntÃ©gration de paiements et transactions",
         description:
-          "APIs Stripe, PayPal pour gérer les paiements, abonnements et webhooks sécurisés.",
+          "APIs Stripe, PayPal pour gÃ©rer les paiements, abonnements et webhooks sÃ©curisÃ©s.",
         sources: [
           { nom: "Stripe Blog", url: "https://stripe.com/blog" },
           {
@@ -216,12 +216,12 @@ const categories: Categorie[] = [
           { nom: "Dev.to - #payments", url: "https://dev.to/t/payments" },
         ],
         avantages:
-          "Rester à jour sur les fonctionnalités de paiement pour les intégrer efficacement.",
+          "Rester Ã  jour sur les fonctionnalitÃ©s de paiement pour les intÃ©grer efficacement.",
         consultation:
-          "Changelog Stripe à chaque projet e-commerce + blog mensuel.",
+          "Changelog Stripe Ã  chaque projet e-commerce + blog mensuel.",
       },
       {
-        theme: "Fonctionnalités d'emailing et de communication",
+        theme: "FonctionnalitÃ©s d'emailing et de communication",
         description:
           "Outils et bonnes pratiques pour les emails transactionnels et notifications.",
         sources: [
@@ -236,35 +236,35 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Implémenter des systèmes de notifications et d'emailing fiables et performants.",
-        consultation: "Check documentation à chaque intégration email.",
+          "ImplÃ©menter des systÃ¨mes de notifications et d'emailing fiables et performants.",
+        consultation: "Check documentation Ã  chaque intÃ©gration email.",
         utiliseDansProjet: true,
         apprentissage:
-          "Intégration de Brevo pour les emails transactionnels de SpartCRM (confirmation de compte, notifications de deals).",
+          "IntÃ©gration de Brevo pour les emails transactionnels de SpartCRM (confirmation de compte, notifications de deals).",
       },
       {
         theme: "Gestion des utilisateurs et authentification",
         description:
-          "Solutions pour l'authentification avancée, les rôles et la personnalisation UX.",
+          "Solutions pour l'authentification avancÃ©e, les rÃ´les et la personnalisation UX.",
         sources: [
           { nom: "Auth0 Blog", url: "https://auth0.com/blog" },
           {
             nom: "WeWeb Auth Documentation",
-            url: "https://docs.weweb.io/auth",
+            url: "https://docs.weweb.io",
           },
         ],
         avantages:
-          "Sécuriser les applications et proposer des expériences de connexion modernes (SSO, OAuth).",
+          "SÃ©curiser les applications et proposer des expÃ©riences de connexion modernes (SSO, OAuth).",
         consultation:
           "Documentation Auth0 lors de la mise en place de l'auth sur un projet.",
         utiliseDansProjet: true,
         apprentissage:
-          "Utilisation du système d'authentification natif WeWeb + Xano Auth pour gérer les rôles (admin, commercial, manager) dans SpartCRM.",
+          "Utilisation du systÃ¨me d'authentification natif WeWeb + Xano Auth pour gÃ©rer les rÃ´les (admin, commercial, manager) dans SpartCRM.",
       },
       {
-        theme: "Gestion des bases de données et workflows",
+        theme: "Gestion des bases de donnÃ©es et workflows",
         description:
-          "Mises à jour sur Xano, Airtable, Firebase pour structurer les données.",
+          "Mises Ã  jour sur Xano, Airtable, Firebase pour structurer les donnÃ©es.",
         sources: [
           { nom: "Xano Changelog", url: "https://xano.com/changelog" },
           {
@@ -273,24 +273,24 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Exploiter les nouvelles fonctionnalités BDD pour optimiser les performances.",
+          "Exploiter les nouvelles fonctionnalitÃ©s BDD pour optimiser les performances.",
         consultation:
-          "Changelog Xano à chaque mise à jour.",
+          "Changelog Xano Ã  chaque mise Ã  jour.",
         utiliseDansProjet: true,
         apprentissage:
-          "Adoption des filtres natifs Xano plutôt qu'un endpoint custom pour les requêtes de recherche contacts, réduisant le temps de développement de 40%.",
+          "Adoption des filtres natifs Xano plutÃ´t qu'un endpoint custom pour les requÃªtes de recherche contacts, rÃ©duisant le temps de dÃ©veloppement de 40%.",
       },
     ],
   },
   {
     titre: "Gestion de projet",
-    miseAJour: "Février 2026",
+    miseAJour: "FÃ©vrier 2026",
     items: [
       {
         theme:
           "Product management et priorisation du backlog en Low-Code",
         description:
-          "Méthodes pour organiser les fonctionnalités, définir les priorités et planifier les livraisons.",
+          "MÃ©thodes pour organiser les fonctionnalitÃ©s, dÃ©finir les prioritÃ©s et planifier les livraisons.",
         sources: [
           {
             nom: "Scrum.org Blog",
@@ -306,23 +306,23 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Améliorer la gestion de projet et la collaboration avec les clients.",
+          "AmÃ©liorer la gestion de projet et la collaboration avec les clients.",
         consultation:
-          "Articles Mind the Product hebdo + vidéos Scrum Life à la demande.",
+          "Articles Mind the Product hebdo + vidÃ©os Scrum Life Ã  la demande.",
         utiliseDansProjet: true,
         apprentissage:
-          "Adoption de la méthode MoSCoW pour la priorisation du backlog SpartCRM et découpage en 5 sprints de 2 semaines.",
+          "Adoption de la mÃ©thode MoSCoW pour la priorisation du backlog SpartCRM et dÃ©coupage en 5 sprints de 2 semaines.",
       },
     ],
   },
   {
     titre: "Analyse concurrentielle CRM",
-    miseAJour: "Février 2026",
+    miseAJour: "FÃ©vrier 2026",
     items: [
       {
         theme: "Analyse des CRM concurrents (SaaS)",
         description:
-          "Benchmark des CRM leaders du marché (HubSpot, Pipedrive, Salesforce, Zoho) pour identifier leurs forces, faiblesses et justifier le développement d'un CRM sur-mesure.",
+          "Benchmark des CRM leaders du marchÃ© (HubSpot, Pipedrive, Salesforce, Zoho) pour identifier leurs forces, faiblesses et justifier le dÃ©veloppement d'un CRM sur-mesure.",
         sources: [
           { nom: "HubSpot Blog", url: "https://blog.hubspot.com" },
           { nom: "Pipedrive Blog", url: "https://www.pipedrive.com/en/blog" },
@@ -332,12 +332,12 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Justifier le choix du sur-mesure et identifier les fonctionnalités clés à reproduire ou améliorer.",
+          "Justifier le choix du sur-mesure et identifier les fonctionnalitÃ©s clÃ©s Ã  reproduire ou amÃ©liorer.",
         consultation:
           "Analyse G2 trimestrielle + tests gratuits des concurrents lors du cadrage.",
         utiliseDansProjet: true,
         apprentissage:
-          "L'analyse HubSpot/Pipedrive a révélé que les CRM SaaS sont surdimensionnés pour les TPE. SpartCRM se concentre sur 3 modules essentiels (Contacts, Pipeline, Activités) pour une adoption rapide.",
+          "L'analyse HubSpot/Pipedrive a rÃ©vÃ©lÃ© que les CRM SaaS sont surdimensionnÃ©s pour les TPE. SpartCRM se concentre sur 3 modules essentiels (Contacts, Pipeline, ActivitÃ©s) pour une adoption rapide.",
       },
       {
         theme: "CRM open-source et alternatives Low-Code",
@@ -346,8 +346,8 @@ const categories: Categorie[] = [
         sources: [
           { nom: "Twenty CRM (GitHub)", url: "https://github.com/twentyhq/twenty" },
           {
-            nom: "SuiteCRM Blog",
-            url: "https://suitecrm.com/suitecrm-blog/",
+            nom: "SuiteCRM Resources",
+            url: "https://suitecrm.com/resources/",
           },
           {
             nom: "Notion Templates - CRM",
@@ -355,12 +355,12 @@ const categories: Categorie[] = [
           },
         ],
         avantages:
-          "Évaluer les approches alternatives et s'inspirer des meilleures UX du marché.",
+          "Ã‰valuer les approches alternatives et s'inspirer des meilleures UX du marchÃ©.",
         consultation:
           "Veille GitHub (stars/releases) mensuelle + tests Notion/Airtable templates.",
         utiliseDansProjet: true,
         apprentissage:
-          "L'UX de Twenty CRM (kanban pipeline) a inspiré le design du pipeline commercial de SpartCRM. Le modèle Notion CRM a validé le besoin d'une vue simplifiée pour les TPE.",
+          "L'UX de Twenty CRM (kanban pipeline) a inspirÃ© le design du pipeline commercial de SpartCRM. Le modÃ¨le Notion CRM a validÃ© le besoin d'une vue simplifiÃ©e pour les TPE.",
       },
     ],
   },
@@ -369,23 +369,23 @@ const categories: Categorie[] = [
 const articlesRecents = [
   {
     titre:
-      "WeWeb 2.0 : les nouvelles fonctionnalités qui changent la donne pour les développeurs Low-Code",
+      "WeWeb 2.0 : les nouvelles fonctionnalitÃ©s qui changent la donne pour les dÃ©veloppeurs Low-Code",
     source: "WeWeb Blog",
-    date: "18 février 2026",
+    date: "18 fÃ©vrier 2026",
     url: "https://www.weweb.io/blog",
     categorie: "Low-Code",
   },
   {
     titre:
-      "Comment l'IA générative transforme le développement d'applications CRM en 2026",
+      "Comment l'IA gÃ©nÃ©rative transforme le dÃ©veloppement d'applications CRM en 2026",
     source: "Gartner Insights",
-    date: "5 février 2026",
+    date: "5 fÃ©vrier 2026",
     url: "https://www.gartner.com/en/topics/low-code",
     categorie: "IA",
   },
   {
     titre:
-      "Xano dévoile son nouveau moteur de requêtes : performances multipliées par 3",
+      "Xano dÃ©voile son nouveau moteur de requÃªtes : performances multipliÃ©es par 3",
     source: "Xano Community",
     date: "22 janvier 2026",
     url: "https://community.xano.com",
@@ -393,7 +393,7 @@ const articlesRecents = [
   },
   {
     titre:
-      "RGPD et Low-Code : les 10 erreurs les plus fréquentes à éviter en 2026",
+      "RGPD et Low-Code : les 10 erreurs les plus frÃ©quentes Ã  Ã©viter en 2026",
     source: "CNIL - Guide pratique",
     date: "10 janvier 2026",
     url: "https://www.cnil.fr",
@@ -409,9 +409,9 @@ const articlesRecents = [
   },
   {
     titre:
-      "Stripe lance de nouvelles APIs pour simplifier l'intégration des paiements récurrents",
+      "Stripe lance de nouvelles APIs pour simplifier l'intÃ©gration des paiements rÃ©currents",
     source: "Stripe Blog",
-    date: "12 décembre 2025",
+    date: "12 dÃ©cembre 2025",
     url: "https://stripe.com/blog",
     categorie: "Technologies",
   },
@@ -419,7 +419,7 @@ const articlesRecents = [
     titre:
       "HubSpot vs Pipedrive en 2026 : quel CRM choisir pour une startup ?",
     source: "G2 Blog",
-    date: "28 février 2026",
+    date: "28 fÃ©vrier 2026",
     url: "https://www.g2.com/categories/crm",
     categorie: "CRM",
   },
@@ -427,21 +427,21 @@ const articlesRecents = [
     titre:
       "Twenty CRM atteint 10k stars GitHub : l'alternative open-source qui monte",
     source: "GitHub Trending",
-    date: "15 février 2026",
+    date: "15 fÃ©vrier 2026",
     url: "https://github.com/twentyhq/twenty",
     categorie: "CRM",
   },
   {
     titre:
-      "Auth0 simplifie l'intégration SSO pour les applications Low-Code",
+      "Auth0 simplifie l'intÃ©gration SSO pour les applications Low-Code",
     source: "Auth0 Blog",
-    date: "8 février 2026",
+    date: "8 fÃ©vrier 2026",
     url: "https://auth0.com/blog",
     categorie: "Technologies",
   },
   {
     titre:
-      "Scrum pour les projets Low-Code : adapter la méthodologie aux cycles courts",
+      "Scrum pour les projets Low-Code : adapter la mÃ©thodologie aux cycles courts",
     source: "Scrum.org",
     date: "20 janvier 2026",
     url: "https://www.scrum.org/resources/blog",
@@ -449,9 +449,9 @@ const articlesRecents = [
   },
   {
     titre:
-      "Brevo déploie son API v4 : emails transactionnels plus rapides et webhooks améliorés",
+      "Brevo dÃ©ploie son API v4 : emails transactionnels plus rapides et webhooks amÃ©liorÃ©s",
     source: "Brevo Blog",
-    date: "5 décembre 2025",
+    date: "5 dÃ©cembre 2025",
     url: "https://www.brevo.com/blog/",
     categorie: "Technologies",
   },
@@ -460,17 +460,17 @@ const articlesRecents = [
 const outilsVeille = [
   {
     nom: "Feedly",
-    usage: "Agrégation des flux RSS (blogs WeWeb, Xano, Stripe, n8n, Scrum.org)",
+    usage: "AgrÃ©gation des flux RSS (blogs WeWeb, Xano, Stripe, n8n, Scrum.org)",
     url: "https://feedly.com",
   },
   {
     nom: "Pocket",
-    usage: "Sauvegarde et lecture différée des articles pertinents",
+    usage: "Sauvegarde et lecture diffÃ©rÃ©e des articles pertinents",
     url: "https://getpocket.com",
   },
   {
     nom: "Google Alerts",
-    usage: "Alertes sur les mots-clés 'Low-Code CRM', 'WeWeb update', 'Xano changelog'",
+    usage: "Alertes sur les mots-clÃ©s 'Low-Code CRM', 'WeWeb update', 'Xano changelog'",
     url: "https://www.google.com/alerts",
   },
   {
@@ -485,7 +485,7 @@ const outilsVeille = [
   },
 ];
 
-/* ───────────────────────── Helpers ───────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const catColors: Record<string, string> = {
   "Low-Code": "bg-[#dbeafe] text-[#1d4ed8]",
   IA: "bg-[#fae8ff] text-[#9333ea]",
@@ -495,7 +495,7 @@ const catColors: Record<string, string> = {
   CRM: "bg-[#ffe4e6] text-[#be123c]",
 };
 
-/* ───────────────────────── Component ───────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 export default function VeillePage() {
   const [tableOpen, setTableOpen] = useState(true);
 
@@ -518,27 +518,27 @@ export default function VeillePage() {
 
   return (
     <div>
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-[#1e293b]">
           Tableau de veille technologique
         </h1>
         <p className="text-[#64748b] mt-2">
-          Livrable 6 — Système de veille métier et technique pour le
+          Livrable 6 â€” SystÃ¨me de veille mÃ©tier et technique pour le
           domaine Low-Code / CRM
         </p>
       </div>
 
-      {/* ── Dashboard global ── */}
+      {/* â”€â”€ Dashboard global â”€â”€ */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-4 text-center">
           <p className="text-2xl font-bold text-[#3b82f6]">{totalThemes}</p>
-          <p className="text-xs text-[#64748b] mt-1">Thèmes surveillés</p>
+          <p className="text-xs text-[#64748b] mt-1">ThÃ¨mes surveillÃ©s</p>
         </div>
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-4 text-center">
           <p className="text-2xl font-bold text-[#22c55e]">{themesUtilises}</p>
           <p className="text-xs text-[#64748b] mt-1">
-            Appliqués au projet
+            AppliquÃ©s au projet
           </p>
         </div>
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-4 text-center">
@@ -552,9 +552,9 @@ export default function VeillePage() {
           <p className="text-xs text-[#64748b] mt-1">Articles lus</p>
         </div>
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-4 text-center col-span-2 md:col-span-1">
-          <p className="text-sm font-bold text-[#1e293b]">Février 2026</p>
+          <p className="text-sm font-bold text-[#1e293b]">FÃ©vrier 2026</p>
           <p className="text-xs text-[#64748b] mt-1">
-            Dernière mise à jour
+            DerniÃ¨re mise Ã  jour
           </p>
           <p className="text-[10px] text-[#94a3b8] mt-0.5">
             Prochaine revue : Mars 2026
@@ -562,30 +562,30 @@ export default function VeillePage() {
         </div>
       </div>
 
-      {/* ── Objectif ── */}
+      {/* â”€â”€ Objectif â”€â”€ */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-base font-semibold mb-2">Objectif de la veille</h2>
         <p className="text-sm text-[#475569]">
           Maintenir une veille active sur les technologies Low-Code, les outils
           CRM, l'IA et l'automatisation, ainsi que les bonnes pratiques de
-          gestion de projet. Cette veille permet de rester compétitif,
-          d'anticiper les évolutions du marché et de proposer des solutions à
+          gestion de projet. Cette veille permet de rester compÃ©titif,
+          d'anticiper les Ã©volutions du marchÃ© et de proposer des solutions Ã 
           jour aux clients.
         </p>
       </div>
 
-      {/* ── Tableau synthétique récapitulatif ── */}
+      {/* â”€â”€ Tableau synthÃ©tique rÃ©capitulatif â”€â”€ */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] mb-6 overflow-hidden">
         <button
           onClick={() => setTableOpen(!tableOpen)}
           className="w-full flex items-center justify-between p-4 hover:bg-[#f8fafc] transition-colors text-left"
         >
           <h2 className="text-base font-semibold text-[#1e293b] flex items-center gap-2">
-            <span className="text-lg">&#128202;</span> Tableau récapitulatif des
-            thèmes
+            <span className="text-lg">&#128202;</span> Tableau rÃ©capitulatif des
+            thÃ¨mes
           </h2>
           <span className="text-[#94a3b8] text-sm">
-            {tableOpen ? "▲ Réduire" : "▼ Déplier"}
+            {tableOpen ? "â–² RÃ©duire" : "â–¼ DÃ©plier"}
           </span>
         </button>
         {tableOpen && (
@@ -597,16 +597,16 @@ export default function VeillePage() {
                     #
                   </th>
                   <th className="text-left px-4 py-2.5 font-semibold text-[#475569] text-xs">
-                    Thème
+                    ThÃ¨me
                   </th>
                   <th className="text-left px-4 py-2.5 font-semibold text-[#475569] text-xs">
-                    Catégorie
+                    CatÃ©gorie
                   </th>
                   <th className="text-left px-4 py-2.5 font-semibold text-[#475569] text-xs">
                     Sources
                   </th>
                   <th className="text-left px-4 py-2.5 font-semibold text-[#475569] text-xs">
-                    Fréquence
+                    FrÃ©quence
                   </th>
                   <th className="text-center px-4 py-2.5 font-semibold text-[#475569] text-xs">
                     Projet
@@ -655,7 +655,7 @@ export default function VeillePage() {
                       {t.utiliseDansProjet ? (
                         <span
                           className="inline-block text-xs"
-                          title="Utilisé dans SpartCRM"
+                          title="UtilisÃ© dans SpartCRM"
                         >
                           &#127919;
                         </span>
@@ -671,7 +671,7 @@ export default function VeillePage() {
         )}
       </div>
 
-      {/* ── Catégories détaillées ── */}
+      {/* â”€â”€ CatÃ©gories dÃ©taillÃ©es â”€â”€ */}
       {(() => {
         let runningCounter = 0;
         return categories.map((cat, ci) => (
@@ -682,7 +682,7 @@ export default function VeillePage() {
                 {cat.titre}
               </h2>
               <span className="text-xs text-[#94a3b8] bg-[#f1f5f9] px-3 py-1 rounded-full">
-                Dernière mise à jour : {cat.miseAJour}
+                DerniÃ¨re mise Ã  jour : {cat.miseAJour}
               </span>
             </div>
             <div className="space-y-4">
@@ -702,11 +702,11 @@ export default function VeillePage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs font-bold text-[#3b82f6]">
-                            Thème {currentNumber}
+                            ThÃ¨me {currentNumber}
                           </span>
                           {item.utiliseDansProjet && (
                             <span className="text-[10px] bg-[#f0fdf4] text-[#15803d] px-2 py-0.5 rounded-full font-medium">
-                              &#127919; Utilisé dans le projet
+                              &#127919; UtilisÃ© dans le projet
                             </span>
                           )}
                         </div>
@@ -761,7 +761,7 @@ export default function VeillePage() {
                     {item.apprentissage && (
                       <div className="mt-4 bg-[#f0fdf4] border border-[#bbf7d0] rounded-md p-3">
                         <h4 className="text-xs font-bold text-[#15803d] uppercase mb-1">
-                          &#128161; Apprentissage appliqué à SpartCRM
+                          &#128161; Apprentissage appliquÃ© Ã  SpartCRM
                         </h4>
                         <p className="text-sm text-[#166534]">
                           {item.apprentissage}
@@ -776,7 +776,7 @@ export default function VeillePage() {
         ));
       })()}
 
-      {/* ── Synthèse des apprentissages ── */}
+      {/* â”€â”€ SynthÃ¨se des apprentissages â”€â”€ */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-[#1e293b] mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#22c55e]"></span>
@@ -788,32 +788,32 @@ export default function VeillePage() {
               {
                 decision: "Stack technique WeWeb + Xano",
                 justification:
-                  "La veille sur les plateformes Low-Code a confirmé que le couple WeWeb (front) + Xano (back) est le plus adapté pour un CRM sur-mesure : flexibilité front-end, API robuste, sécurité RBAC native.",
+                  "La veille sur les plateformes Low-Code a confirmÃ© que le couple WeWeb (front) + Xano (back) est le plus adaptÃ© pour un CRM sur-mesure : flexibilitÃ© front-end, API robuste, sÃ©curitÃ© RBAC native.",
               },
               {
-                decision: "3 modules essentiels (Contacts, Pipeline, Activités)",
+                decision: "3 modules essentiels (Contacts, Pipeline, ActivitÃ©s)",
                 justification:
-                  "L'analyse concurrentielle a montré que les CRM SaaS sont surdimensionnés pour les TPE. SpartCRM se concentre sur l'essentiel pour maximiser l'adoption.",
+                  "L'analyse concurrentielle a montrÃ© que les CRM SaaS sont surdimensionnÃ©s pour les TPE. SpartCRM se concentre sur l'essentiel pour maximiser l'adoption.",
               },
               {
                 decision: "Automatisation des relances via n8n",
                 justification:
-                  "La comparaison n8n vs Make a orienté le choix vers n8n (open-source, self-hosted) pour les workflows de notifications et relances automatiques.",
+                  "La comparaison n8n vs Make a orientÃ© le choix vers n8n (open-source, self-hosted) pour les workflows de notifications et relances automatiques.",
               },
               {
                 decision: "Authentification WeWeb Auth + Xano RBAC",
                 justification:
-                  "La veille sur Auth0 et Supabase a permis de valider que le système natif WeWeb/Xano couvre les besoins (rôles admin/commercial/manager) sans dépendance externe.",
+                  "La veille sur Auth0 et Supabase a permis de valider que le systÃ¨me natif WeWeb/Xano couvre les besoins (rÃ´les admin/commercial/manager) sans dÃ©pendance externe.",
               },
               {
                 decision: "Pagination serveur + lazy loading",
                 justification:
-                  "Les bonnes pratiques web.dev et les tips Xano ont guidé l'optimisation des performances pour les listes de contacts volumineuses.",
+                  "Les bonnes pratiques web.dev et les tips Xano ont guidÃ© l'optimisation des performances pour les listes de contacts volumineuses.",
               },
               {
-                decision: "Méthode MoSCoW + sprints de 2 semaines",
+                decision: "MÃ©thode MoSCoW + sprints de 2 semaines",
                 justification:
-                  "La veille Scrum/Product Management a validé cette approche pour un projet Low-Code où les cycles de développement sont plus courts qu'en code traditionnel.",
+                  "La veille Scrum/Product Management a validÃ© cette approche pour un projet Low-Code oÃ¹ les cycles de dÃ©veloppement sont plus courts qu'en code traditionnel.",
               },
             ].map((item, idx) => (
               <div
@@ -832,15 +832,15 @@ export default function VeillePage() {
         </div>
       </div>
 
-      {/* ── Articles récents ── */}
+      {/* â”€â”€ Articles rÃ©cents â”€â”€ */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-[#1e293b] mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
-          Articles récents ({articlesRecents.length})
+          Articles rÃ©cents ({articlesRecents.length})
         </h2>
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-5">
           <p className="text-sm text-[#64748b] mb-4">
-            Sélection d'articles et publications récents en lien avec la
+            SÃ©lection d'articles et publications rÃ©cents en lien avec la
             veille technologique Low-Code, CRM et IA.
           </p>
           <div className="space-y-3">
@@ -890,11 +890,11 @@ export default function VeillePage() {
         </div>
       </div>
 
-      {/* ── Outils de veille utilisés ── */}
+      {/* â”€â”€ Outils de veille utilisÃ©s â”€â”€ */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-[#1e293b] mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#8b5cf6]"></span>
-          Outils de veille utilisés
+          Outils de veille utilisÃ©s
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           {outilsVeille.map((outil, idx) => (
