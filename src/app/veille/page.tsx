@@ -495,6 +495,40 @@ const catColors: Record<string, string> = {
   CRM: "bg-[#ffe4e6] text-[#be123c]",
 };
 
+/* ───────────────────────── Synthèse décisions ───────────────────────── */
+const syntheseDecisions = [
+  {
+    decision: "Stack technique WeWeb + Xano",
+    justification:
+      "La veille sur les plateformes Low-Code a confirmé que le couple WeWeb (front) + Xano (back) est le plus adapté pour un CRM sur-mesure : flexibilité front-end, API robuste, sécurité RBAC native.",
+  },
+  {
+    decision: "3 modules essentiels (Contacts, Pipeline, Activités)",
+    justification:
+      "L'analyse concurrentielle a montré que les CRM SaaS sont surdimensionnés pour les TPE. SpartCRM se concentre sur l'essentiel pour maximiser l'adoption.",
+  },
+  {
+    decision: "Automatisation des relances via n8n",
+    justification:
+      "La comparaison n8n vs Make a orienté le choix vers n8n (open-source, self-hosted) pour les workflows de notifications et relances automatiques.",
+  },
+  {
+    decision: "Authentification WeWeb Auth + Xano RBAC",
+    justification:
+      "La veille sur Auth0 et Supabase a permis de valider que le système natif WeWeb/Xano couvre les besoins (rôles admin/commercial/manager) sans dépendance externe.",
+  },
+  {
+    decision: "Pagination serveur + lazy loading",
+    justification:
+      "Les bonnes pratiques web.dev et les tips Xano ont guidé l'optimisation des performances pour les listes de contacts volumineuses.",
+  },
+  {
+    decision: "Méthode MoSCoW + sprints de 2 semaines",
+    justification:
+      "La veille Scrum/Product Management a validé cette approche pour un projet Low-Code où les cycles de développement sont plus courts qu'en code traditionnel.",
+  },
+];
+
 /* ───────────────────────── Component ───────────────────────── */
 export default function VeillePage() {
   const [tableOpen, setTableOpen] = useState(true);
@@ -516,17 +550,226 @@ export default function VeillePage() {
     0
   );
 
+  /* ── Export PDF ── */
+  const exportPdf = async () => {
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+    const marginX = 40;
+    const marginTop = 44;
+    const lineHeight = 14;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const maxWidth = pageWidth - marginX * 2;
+    const pageBottom = pageHeight - 40;
+
+    let y = marginTop;
+
+    const checkPage = (needed = lineHeight) => {
+      if (y + needed > pageBottom) {
+        doc.addPage();
+        y = marginTop;
+      }
+    };
+
+    const writeLines = (
+      input: string,
+      font: "normal" | "bold" = "normal",
+      size = 10
+    ) => {
+      doc.setFont("helvetica", font);
+      doc.setFontSize(size);
+      const wrapped = doc.splitTextToSize(input, maxWidth) as string[];
+      for (const line of wrapped) {
+        checkPage();
+        doc.text(line, marginX, y);
+        y += lineHeight;
+      }
+    };
+
+    const writeLinesIndent = (
+      input: string,
+      indent = 15,
+      font: "normal" | "bold" = "normal",
+      size = 10
+    ) => {
+      doc.setFont("helvetica", font);
+      doc.setFontSize(size);
+      const wrapped = doc.splitTextToSize(
+        input,
+        maxWidth - indent
+      ) as string[];
+      for (const line of wrapped) {
+        checkPage();
+        doc.text(line, marginX + indent, y);
+        y += lineHeight;
+      }
+    };
+
+    const drawHr = () => {
+      checkPage();
+      doc.setDrawColor(200);
+      doc.line(marginX, y, pageWidth - marginX, y);
+      y += 8;
+    };
+
+    // ── Titre
+    writeLines("Tableau de veille technologique - SpartCRM", "bold", 16);
+    y += 2;
+    writeLines(
+      `Genere le ${new Date().toLocaleDateString("fr-FR")} | ${totalThemes} themes | ${themesUtilises} appliques au projet | ${totalSources} sources`,
+      "normal",
+      9
+    );
+    y += 10;
+    drawHr();
+
+    // ── Tableau récapitulatif
+    writeLines("TABLEAU RECAPITULATIF", "bold", 13);
+    y += 4;
+
+    // En-tete tableau
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(241, 245, 249);
+    checkPage(18);
+    doc.rect(marginX, y - 10, maxWidth, 16, "F");
+    doc.text("#", marginX + 4, y);
+    doc.text("Theme", marginX + 24, y);
+    doc.text("Categorie", marginX + 250, y);
+    doc.text("Sources", marginX + 370, y);
+    doc.text("Projet", marginX + 480, y);
+    y += 12;
+
+    // Lignes
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    for (const t of allThemes) {
+      checkPage(14);
+      doc.text(String(t.numero), marginX + 4, y);
+      const themeTrunc =
+        t.theme.length > 42 ? t.theme.slice(0, 39) + "..." : t.theme;
+      doc.text(themeTrunc, marginX + 24, y);
+      const catTrunc =
+        t.categorie.length > 20
+          ? t.categorie.slice(0, 17) + "..."
+          : t.categorie;
+      doc.text(catTrunc, marginX + 250, y);
+      doc.text(String(t.sources.length), marginX + 370, y);
+      doc.text(t.utiliseDansProjet ? "Oui" : "-", marginX + 480, y);
+      y += 12;
+    }
+
+    y += 10;
+    drawHr();
+
+    // ── Détail par catégorie
+    writeLines("DETAIL PAR CATEGORIE", "bold", 13);
+    y += 6;
+
+    for (const cat of categories) {
+      checkPage(30);
+      writeLines(`${cat.titre}  (MAJ: ${cat.miseAJour})`, "bold", 11);
+      y += 2;
+
+      for (const item of cat.items) {
+        checkPage(40);
+        const prefix = item.utiliseDansProjet ? "[PROJET] " : "";
+        writeLines(`${prefix}${item.theme}`, "bold", 10);
+
+        writeLinesIndent(`Description: ${item.description}`);
+
+        writeLinesIndent(
+          `Sources: ${item.sources.map((s) => `${s.nom} (${s.url})`).join(" | ")}`
+        );
+
+        writeLinesIndent(`Avantages: ${item.avantages}`);
+        writeLinesIndent(`Consultation: ${item.consultation}`);
+
+        if (item.apprentissage) {
+          doc.setTextColor(21, 128, 61);
+          writeLinesIndent(
+            `-> Apprentissage SpartCRM: ${item.apprentissage}`,
+            15,
+            "bold"
+          );
+          doc.setTextColor(0, 0, 0);
+        }
+
+        y += 6;
+      }
+
+      y += 4;
+    }
+
+    drawHr();
+
+    // ── Synthèse des apprentissages
+    writeLines("SYNTHESE : CE QUE J'EN RETIRE POUR SPARTCRM", "bold", 13);
+    y += 6;
+
+    for (const item of syntheseDecisions) {
+      checkPage(30);
+      doc.setTextColor(21, 128, 61);
+      writeLines(`> ${item.decision}`, "bold", 10);
+      doc.setTextColor(0, 0, 0);
+      writeLinesIndent(item.justification);
+      y += 6;
+    }
+
+    drawHr();
+
+    // ── Articles récents
+    writeLines("ARTICLES RECENTS", "bold", 13);
+    y += 4;
+
+    for (const article of articlesRecents) {
+      checkPage(20);
+      writeLines(`- ${article.titre}`, "normal", 9);
+      writeLinesIndent(
+        `${article.source} | ${article.date} | ${article.categorie}`,
+        15,
+        "normal",
+        8
+      );
+      y += 2;
+    }
+
+    drawHr();
+
+    // ── Outils de veille
+    writeLines("OUTILS DE VEILLE UTILISES", "bold", 13);
+    y += 4;
+
+    for (const outil of outilsVeille) {
+      checkPage(16);
+      writeLines(`- ${outil.nom}: ${outil.usage}`, "normal", 9);
+    }
+
+    doc.save(
+      `veille-technologique-spartcrm-${new Date().toISOString().slice(0, 10)}.pdf`
+    );
+  };
+
   return (
     <div>
       {/* ── Header ── */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#1e293b]">
-          Tableau de veille technologique
-        </h1>
-        <p className="text-[#64748b] mt-2">
-          Livrable 6 — Système de veille métier et technique pour le
-          domaine Low-Code / CRM
-        </p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-[#1e293b]">
+            Tableau de veille technologique
+          </h1>
+          <p className="text-[#64748b] mt-2">
+            Livrable 6 — Système de veille métier et technique pour le
+            domaine Low-Code / CRM
+          </p>
+        </div>
+        <button
+          onClick={exportPdf}
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#3b82f6] text-white text-sm font-medium rounded-lg hover:bg-[#2563eb] transition-colors shadow-sm"
+        >
+          <span>&#128196;</span> Exporter PDF
+        </button>
       </div>
 
       {/* ── Dashboard global ── */}
@@ -784,38 +1027,7 @@ export default function VeillePage() {
         </h2>
         <div className="bg-gradient-to-br from-[#f0fdf4] to-[#ecfdf5] rounded-lg border border-[#bbf7d0] p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              {
-                decision: "Stack technique WeWeb + Xano",
-                justification:
-                  "La veille sur les plateformes Low-Code a confirmé que le couple WeWeb (front) + Xano (back) est le plus adapté pour un CRM sur-mesure : flexibilité front-end, API robuste, sécurité RBAC native.",
-              },
-              {
-                decision: "3 modules essentiels (Contacts, Pipeline, Activités)",
-                justification:
-                  "L'analyse concurrentielle a montré que les CRM SaaS sont surdimensionnés pour les TPE. SpartCRM se concentre sur l'essentiel pour maximiser l'adoption.",
-              },
-              {
-                decision: "Automatisation des relances via n8n",
-                justification:
-                  "La comparaison n8n vs Make a orienté le choix vers n8n (open-source, self-hosted) pour les workflows de notifications et relances automatiques.",
-              },
-              {
-                decision: "Authentification WeWeb Auth + Xano RBAC",
-                justification:
-                  "La veille sur Auth0 et Supabase a permis de valider que le système natif WeWeb/Xano couvre les besoins (rôles admin/commercial/manager) sans dépendance externe.",
-              },
-              {
-                decision: "Pagination serveur + lazy loading",
-                justification:
-                  "Les bonnes pratiques web.dev et les tips Xano ont guidé l'optimisation des performances pour les listes de contacts volumineuses.",
-              },
-              {
-                decision: "Méthode MoSCoW + sprints de 2 semaines",
-                justification:
-                  "La veille Scrum/Product Management a validé cette approche pour un projet Low-Code où les cycles de développement sont plus courts qu'en code traditionnel.",
-              },
-            ].map((item, idx) => (
+            {syntheseDecisions.map((item, idx) => (
               <div
                 key={idx}
                 className="bg-white rounded-md border border-[#d1fae5] p-4"
