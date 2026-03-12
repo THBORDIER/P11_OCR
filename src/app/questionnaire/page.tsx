@@ -571,6 +571,177 @@ export default function QuestionnairePage() {
     void downloadPdf(FAKE_FORM_DATA, "questionnaire-spartcrm-fake", "Questionnaire fictif - SpartCRM");
   }, [downloadPdf]);
 
+  const downloadBlankPdf = useCallback(async () => {
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+    const marginX = 40;
+    const marginTop = 44;
+    const lineHeight = 14;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const maxWidth = pageWidth - marginX * 2;
+    const pageBottom = pageHeight - 50;
+
+    let y = marginTop;
+
+    const checkPage = (needed = lineHeight) => {
+      if (y + needed > pageBottom) {
+        doc.addPage();
+        y = marginTop;
+      }
+    };
+
+    const writeLines = (
+      input: string,
+      font: "normal" | "bold" = "normal",
+      size = 10
+    ) => {
+      doc.setFont("helvetica", font);
+      doc.setFontSize(size);
+      const wrapped = doc.splitTextToSize(input, maxWidth) as string[];
+      for (const line of wrapped) {
+        checkPage();
+        doc.text(line, marginX, y);
+        y += lineHeight;
+      }
+    };
+
+    const drawBlankLines = (count: number) => {
+      for (let i = 0; i < count; i++) {
+        checkPage(16);
+        doc.setDrawColor(200);
+        doc.line(marginX + 10, y, pageWidth - marginX, y);
+        y += 18;
+      }
+    };
+
+    const drawCheckboxes = (options: string[]) => {
+      for (const opt of options) {
+        checkPage(16);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.rect(marginX + 10, y - 8, 10, 10);
+        doc.text(opt, marginX + 26, y);
+        y += 16;
+      }
+    };
+
+    const drawScaleRow = (label: string) => {
+      checkPage(20);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.text(label, marginX + 10, y);
+      // Draw 5 circles for scale 1-5
+      const scaleX = marginX + 300;
+      for (let i = 1; i <= 5; i++) {
+        doc.circle(scaleX + i * 30, y - 3, 6);
+        doc.setFontSize(8);
+        doc.text(String(i), scaleX + i * 30 - 2.5, y - 0.5);
+      }
+      y += 18;
+    };
+
+    // ── Titre
+    writeLines("Questionnaire de recueil de besoins - SpartCRM", "bold", 16);
+    y += 2;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text("Document a remplir par le client | Projet SpartCRM - CRM sur-mesure", marginX, y);
+    doc.setTextColor(0);
+    y += 20;
+
+    // ── Intro
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(80);
+    const intro = doc.splitTextToSize(
+      "Merci de prendre le temps de remplir ce questionnaire. Vos reponses nous permettront de concevoir un CRM parfaitement adapte a vos besoins. Temps estime : 15 a 20 minutes.",
+      maxWidth
+    ) as string[];
+    for (const line of intro) {
+      checkPage();
+      doc.text(line, marginX, y);
+      y += 12;
+    }
+    doc.setTextColor(0);
+    y += 10;
+
+    // ── Sections
+    let globalQ = 0;
+    for (const sec of sections) {
+      checkPage(40);
+
+      // Section header with background
+      doc.setFillColor(241, 245, 249);
+      doc.rect(marginX - 5, y - 12, maxWidth + 10, 32, "F");
+      writeLines(sec.title, "bold", 13);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      const descWrapped = doc.splitTextToSize(sec.description, maxWidth) as string[];
+      for (const line of descWrapped) {
+        checkPage();
+        doc.text(line, marginX, y);
+        y += 12;
+      }
+      doc.setTextColor(0);
+      y += 8;
+
+      for (const q of sec.questions) {
+        globalQ++;
+        checkPage(40);
+
+        // Question label
+        writeLines(`Q${globalQ}. ${q.label}`, "bold", 10);
+        y += 2;
+
+        if (q.type === "checkbox" && q.options) {
+          drawCheckboxes(q.options);
+        } else if (q.type === "select" && q.options) {
+          drawCheckboxes(q.options);
+        } else if (q.type === "scale" && q.options) {
+          // Scale header
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8);
+          doc.setTextColor(120);
+          doc.text("(1 = Peu important, 5 = Indispensable)", marginX + 10, y);
+          doc.setTextColor(0);
+          y += 14;
+          for (const opt of q.options) {
+            drawScaleRow(opt);
+          }
+        } else if (q.type === "textarea") {
+          drawBlankLines(4);
+        } else {
+          // text
+          drawBlankLines(2);
+        }
+
+        y += 8;
+      }
+
+      y += 10;
+    }
+
+    // Footer
+    checkPage(30);
+    doc.setDrawColor(200);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 14;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("Merci pour vos reponses !", marginX, y);
+    y += 12;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100);
+    doc.text("Ce document est strictement confidentiel. Projet SpartCRM - Thomas Bordier", marginX, y);
+
+    doc.save(`questionnaire-spartcrm-vierge-${new Date().toISOString().slice(0, 10)}.pdf`);
+  }, []);
+
   const getAnsweredCount = (): { answered: number; total: number } => getAnsweredCountFromData(formData);
 
   // Submitted confirmation screen
@@ -645,6 +816,12 @@ export default function QuestionnairePage() {
             >
               Fake (.pdf)
             </button>
+            <button
+              onClick={downloadBlankPdf}
+              className="px-6 py-2 rounded-lg border border-[#64748b] text-[#64748b] text-sm hover:bg-[#f1f5f9]"
+            >
+              Vierge (.pdf)
+            </button>
           </div>
         </div>
       </div>
@@ -688,12 +865,20 @@ export default function QuestionnairePage() {
         <p className="text-sm text-[#1e40af]">
           Besoin d'un export de demonstration ? Generez le questionnaire fictif en PDF a tout moment.
         </p>
-        <button
-          onClick={downloadFakePdf}
-          className="px-4 py-2 rounded-lg bg-[#1d4ed8] text-white text-sm hover:bg-[#1e40af]"
-        >
-          Exporter fake (.pdf)
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={downloadBlankPdf}
+            className="px-4 py-2 rounded-lg bg-white text-[#1d4ed8] border border-[#1d4ed8] text-sm hover:bg-[#eff6ff]"
+          >
+            PDF vierge (client)
+          </button>
+          <button
+            onClick={downloadFakePdf}
+            className="px-4 py-2 rounded-lg bg-[#1d4ed8] text-white text-sm hover:bg-[#1e40af]"
+          >
+            Exporter fake (.pdf)
+          </button>
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -922,6 +1107,13 @@ export default function QuestionnairePage() {
               title="Telecharger le questionnaire fictif en PDF"
             >
               Fake (.pdf)
+            </button>
+            <button
+              onClick={downloadBlankPdf}
+              className="px-4 py-2 rounded-lg border border-[#64748b] text-[#64748b] text-sm hover:bg-[#f1f5f9]"
+              title="Telecharger le questionnaire vierge en PDF"
+            >
+              Vierge (.pdf)
             </button>
             {currentSection < sections.length - 1 ? (
               <button
