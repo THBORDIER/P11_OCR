@@ -190,6 +190,7 @@ const backlog: UserStory[] = [
     criteres: [
       "La carte affiche : entreprise, contact assigné, montant, date, probabilité, prochaine action",
       "Menu contextuel pour modifier ou supprimer",
+      "L'historique des modifications de l'opportunité est visible (changements d'étape, de montant)",
     ],
     estimation: 3,
     priorite: "Must",
