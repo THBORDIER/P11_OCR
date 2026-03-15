@@ -1,223 +1,87 @@
 import Link from "next/link";
-import { projectConfig } from "@/config/project.config";
+import { projects } from "@/config/project.config";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#1e293b]">
-          Cadrage du projet {projectConfig.name}
-        </h1>
-        <p className="text-[#64748b] mt-2">
-          {projectConfig.author} — {projectConfig.organization}
-        </p>
-      </div>
-
-      {/* Contexte */}
-      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-8">
-        <h2 className="text-lg font-semibold mb-3">Contexte</h2>
-        <p className="text-sm text-[#475569] leading-relaxed">
-          {projectConfig.context.summary}
-        </p>
-        <div className="grid grid-cols-4 gap-4 mt-4">
-          {projectConfig.context.kpis.map((kpi) => (
-            <div
-              key={kpi.label}
-              className="bg-[#f1f5f9] rounded p-3 text-center"
-            >
-              <div
-                className="text-2xl font-bold"
-                style={{ color: kpi.color }}
-              >
-                {kpi.value}
-              </div>
-              <div className="text-xs text-[#64748b]">{kpi.label}</div>
-            </div>
-          ))}
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-8">
+      <div className="max-w-4xl w-full">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-[#1e293b] mb-3">
+            Portail Cadrage Projets
+          </h1>
+          <p className="text-[#64748b] text-lg">
+            Sélectionnez un projet pour accéder à ses livrables de cadrage.
+          </p>
         </div>
-      </div>
 
-      {/* Stack technique */}
-      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-8">
-        <h2 className="text-lg font-semibold text-[#1e293b] mb-3">
-          Stack technique retenue
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {projectConfig.stack.map((tech) => (
-            <div key={tech.name} className="bg-[#f1f5f9] rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className="text-lg font-bold"
-                  style={{ color: tech.tagColor.text }}
-                >
-                  {tech.name}
-                </span>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full font-medium"
-                  style={{
-                    backgroundColor: tech.tagColor.bg,
-                    color: tech.tagColor.text,
-                  }}
-                >
-                  {tech.tag}
-                </span>
-              </div>
-              <p className="text-sm text-[#475569] leading-relaxed">
-                {tech.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Méthodologie */}
-      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-8">
-        <h2 className="text-lg font-semibold text-[#1e293b] mb-3">
-          Méthodologie
-        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="font-semibold text-[#1e293b] mb-2 flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#dbeafe] text-[#3b82f6] text-xs font-bold">
-                S
-              </span>
-              Framework {projectConfig.methodology.framework}
-            </h3>
-            <p className="text-sm text-[#475569] leading-relaxed">
-              {projectConfig.methodology.frameworkDescription}
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold text-[#1e293b] mb-2 flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#fef3c7] text-[#f59e0b] text-xs font-bold">
-                M
-              </span>
-              Priorisation {projectConfig.methodology.prioritization}
-            </h3>
-            <p className="text-sm text-[#475569] leading-relaxed">
-              {projectConfig.methodology.prioritizationDescription}
-            </p>
-            <div className="grid grid-cols-2 gap-2 mt-3">
-              {[
+          {projects.map((project) => (
+            <Link
+              key={project.id}
+              href={`/${project.id}`}
+              className="group bg-white rounded-xl border-2 border-[#e2e8f0] p-8 hover:shadow-lg transition-all hover:border-transparent"
+              style={
                 {
-                  label: "Must Have",
-                  color: "#dc2626",
-                  desc: "Indispensable au MVP",
-                },
-                {
-                  label: "Should Have",
-                  color: "#f59e0b",
-                  desc: "Important, intégré si possible",
-                },
-                {
-                  label: "Could Have",
-                  color: "#3b82f6",
-                  desc: "Confort, si reste du budget",
-                },
-                {
-                  label: "Won't Have",
-                  color: "#64748b",
-                  desc: "Hors périmètre v1",
-                },
-              ].map((p) => (
-                <div
-                  key={p.label}
-                  className="bg-[#f1f5f9] rounded p-2 text-center"
-                >
-                  <div
-                    className="text-xs font-bold"
-                    style={{ color: p.color }}
-                  >
-                    {p.label}
-                  </div>
-                  <div className="text-xs text-[#475569] mt-0.5">
-                    {p.desc}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Phases du projet */}
-      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-8">
-        <h2 className="text-lg font-semibold text-[#1e293b] mb-4">
-          Phases du projet
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {projectConfig.phases.map((phase, index) => (
-            <div key={phase.label} className="relative">
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className="inline-flex items-center justify-center w-7 h-7 rounded-full text-white text-xs font-bold"
-                  style={{ backgroundColor: phase.color }}
-                >
-                  {index + 1}
-                </span>
-                <span className="font-semibold text-[#1e293b]">
-                  {phase.label}
-                </span>
-              </div>
-              <div
-                className="text-xs font-medium mb-1 px-2 py-0.5 rounded-full inline-block text-white"
-                style={{ backgroundColor: phase.color }}
-              >
-                {phase.duration}
-              </div>
-              <p className="text-sm text-[#475569] mt-2 leading-relaxed">
-                {phase.detail}
-              </p>
-              {index < projectConfig.phases.length - 1 && (
-                <div className="hidden md:block absolute top-3.5 -right-2 text-[#cbd5e1] text-lg">
-                  &rarr;
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex gap-1 rounded-full overflow-hidden h-2">
-          {projectConfig.phases.map((phase) => (
-            <div
-              key={phase.label}
-              className="flex-1"
-              style={{ backgroundColor: phase.color }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Livrables */}
-      <h2 className="text-lg font-semibold mb-4">Livrables du projet</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {projectConfig.deliverables.map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            className="bg-white rounded-lg border border-[#e2e8f0] p-5 hover:border-[#3b82f6] hover:shadow-md transition-all"
-          >
-            <div className="text-xs font-medium text-[#3b82f6] mb-1">
-              {l.status}
-            </div>
-            <h3 className="font-semibold text-[#1e293b] mb-2">{l.title}</h3>
-            <p className="text-sm text-[#64748b]">{l.desc}</p>
-          </Link>
-        ))}
-      </div>
-
-      {/* Compétences */}
-      <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mt-8">
-        <h2 className="text-lg font-semibold mb-3">Compétences visées</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {projectConfig.skills.map((c) => (
-            <div
-              key={c}
-              className="flex items-start gap-2 text-sm text-[#475569]"
+                  "--hover-border": project.color,
+                } as React.CSSProperties
+              }
             >
-              <span className="text-[#22c55e] mt-0.5">&#10003;</span>
-              <span>{c}</span>
-            </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg"
+                  style={{ backgroundColor: project.color }}
+                >
+                  {project.name[0]}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-[#1e293b] group-hover:text-[#1e293b]">
+                    {project.name}
+                  </h2>
+                  <p className="text-xs text-[#94a3b8]">{project.subtitle}</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-[#475569] mb-4 leading-relaxed">
+                {project.description}
+              </p>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {project.context.kpis.map((kpi) => (
+                  <span
+                    key={kpi.label}
+                    className="text-xs bg-[#f1f5f9] text-[#475569] px-2 py-1 rounded-full"
+                  >
+                    {kpi.label}: <strong>{kpi.value}</strong>
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#94a3b8]">
+                  {project.author} — {project.organization}
+                </span>
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: project.color }}
+                >
+                  Ouvrir &rarr;
+                </span>
+              </div>
+            </Link>
           ))}
+        </div>
+
+        <div className="text-center mt-12 text-sm text-[#94a3b8]">
+          <p>
+            Pour ajouter un projet, créez un fichier dans{" "}
+            <code className="bg-[#f1f5f9] px-2 py-0.5 rounded text-[#475569]">
+              src/config/projects/
+            </code>{" "}
+            et importez-le dans{" "}
+            <code className="bg-[#f1f5f9] px-2 py-0.5 rounded text-[#475569]">
+              project.config.ts
+            </code>
+          </p>
         </div>
       </div>
     </div>
