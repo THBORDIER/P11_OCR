@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* ── Thème par défaut — Modifiez ces variables pour personnaliser les couleurs ── */
 :root {
   --background: #f8fafc;
   --foreground: #1e293b;

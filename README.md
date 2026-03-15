@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Template de Cadrage Projet
 
-## Getting Started
+Template Next.js réutilisable pour structurer et présenter le cadrage de n'importe quel projet de développement. Basé sur la méthodologie Agile/Scrum avec priorisation MoSCoW.
 
-First, run the development server:
+## Pages incluses
+
+| Page | Description |
+|------|-------------|
+| **Accueil** | Dashboard avec contexte, stack, méthodologie, phases et livrables |
+| **Questionnaire** | Formulaire interactif de recueil de besoins client (avec sauvegarde localStorage) |
+| **Analyse** | Synthèse des retours client avec indicateurs, verbatims et matrice impact/effort |
+| **Roadmap** | Plan de construction phase par phase avec MVP et plan de contingence |
+| **Product Backlog** | Backlog complet avec User Stories, critères d'acceptation, filtres par epic/priorité |
+| **Sprint Backlog** | Vue Kanban multi-sprint avec progression et statuts cliquables |
+| **Recettage** | Grille de recette interactive avec cycle de statuts et filtres par sprint |
+| **Veille** | Tableau de veille technologique et métier organisé par catégories |
+| **Communication** | Plan de communication avec parties prenantes, cérémonies et escalade |
+
+## Démarrage rapide
 
 ```bash
+# Installer les dépendances
+npm install
+
+# Lancer en mode développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build pour la production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Personnalisation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Configuration centrale
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Modifiez le fichier `src/config/project.config.ts` pour personnaliser :
 
-## Learn More
+- **Identité** : nom du projet, auteur, organisation
+- **Contexte** : description, KPIs, stack technique
+- **Méthodologie** : framework (Scrum, Kanban...), priorisation
+- **Phases** : planning du projet avec couleurs
+- **Livrables** : liste et descriptions des livrables
+- **Navigation** : items du menu latéral
+- **Compétences** : objectifs pédagogiques visés
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Contenu des pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Chaque page contient ses données directement dans le fichier, marquées par un commentaire :
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  PERSONNALISEZ vos données ci-dessous                       ║
+// ╚══════════════════════════════════════════════════════════════╝
+```
 
-## Deploy on Vercel
+Remplacez les données d'exemple par les vôtres :
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Questionnaire** (`src/app/questionnaire/page.tsx`) : sections et questions
+- **Analyse** (`src/app/analyse/page.tsx`) : stats, verbatims, décisions
+- **Roadmap** (`src/app/roadmap/page.tsx`) : phases, MVP, risques
+- **Product Backlog** (`src/app/product-backlog/page.tsx`) : User Stories
+- **Sprint Backlog** (`src/app/sprint-backlog/page.tsx`) : sprints et tâches
+- **Recettage** (`src/app/recettage/page.tsx`) : lignes de test
+- **Veille** (`src/app/veille/page.tsx`) : catégories et sources
+- **Communication** (`src/app/communication/page.tsx`) : parties prenantes, cérémonies
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 3. Thème visuel
+
+Modifiez les variables CSS dans `src/app/globals.css` :
+
+```css
+:root {
+  --primary: #3b82f6;    /* Couleur principale */
+  --accent: #f59e0b;     /* Couleur d'accent */
+  --success: #22c55e;    /* Couleur succès */
+  --danger: #ef4444;     /* Couleur erreur */
+}
+```
+
+## Stack technique
+
+- **Next.js 16** + **React 19** + **TypeScript 5**
+- **Tailwind CSS 4** pour le styling
+- **ESLint 9** pour la qualité de code
+- Pas de base de données — données en localStorage pour la persistance côté client
+
+## Fonctionnalités interactives
+
+- **Questionnaire** : sauvegarde automatique des réponses en localStorage
+- **Recettage** : clic sur les statuts pour les faire cycler (À tester → En cours → OK → KO → À retester)
+- **Sprint Backlog** : vue Kanban avec statuts cliquables et progression
+- **Product Backlog** : filtres par epic et priorité, détail extensible des US
+
+## Déploiement
+
+Compatible avec Vercel, Netlify, ou tout hébergeur supportant Next.js :
+
+```bash
+npm run build
+npm start
+```
