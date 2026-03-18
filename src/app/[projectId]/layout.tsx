@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { projects, getProjectOrThrow } from "@/config/project.config";
 import { notFound } from "next/navigation";
+import SidebarNav from "./sidebar-nav";
 
 export async function generateStaticParams() {
   return projects.map((p) => ({ projectId: p.id }));
@@ -51,18 +52,7 @@ export default async function ProjectLayout({
           <h1 className="text-xl font-bold text-white">{project.name}</h1>
           <p className="text-xs text-[#94a3b8] mt-1">{project.subtitle}</p>
         </div>
-        <nav className="flex-1 py-4">
-          {project.navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-6 py-3 text-sm hover:bg-[#334155] transition-colors"
-            >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+        <SidebarNav items={project.navItems} />
         <div className="p-4 border-t border-[#334155] text-xs text-[#64748b]">
           {project.author} — {project.organization}
         </div>
