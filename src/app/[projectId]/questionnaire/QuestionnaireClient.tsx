@@ -4,6 +4,140 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AiGenerateButton from "@/components/AiGenerateButton";
 
+// ── Respondents Panel — shows client responses ──────────────
+
+interface RespondentData {
+  id: string;
+  name: string;
+  email?: string;
+  role?: string;
+  _count: { responses: number };
+  createdAt: string;
+}
+
+function RespondentsPanel({ projectId, sections }: { projectId: string; sections: Section[] }) {
+  const [respondents, setRespondents] = useState<RespondentData[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [responses, setResponses] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/projects/${projectId}/questionnaire`)
+      .then((r) => r.json())
+      .then((data) => {
+        setRespondents(data.respondents || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [projectId]);
+
+  const loadResponses = async (respondentId: string) => {
+    if (selectedId === respondentId) {
+      setSelectedId(null);
+      return;
+    }
+    setSelectedId(respondentId);
+    const res = await fetch(`/api/projects/${projectId}/questionnaire?respondentId=${respondentId}`);
+    const data = await res.json();
+    setResponses(data);
+  };
+
+  if (loading) return null;
+  if (respondents.length === 0) {
+    return (
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+        <p className="text-sm text-amber-800 font-medium">Aucune réponse reçue</p>
+        <p className="text-xs text-amber-600 mt-1">
+          Envoyez le lien du questionnaire au client pour commencer à recevoir des réponses.
+        </p>
+      </div>
+    );
+  }
+
+  // Build question map for labels
+  const questionMap = new Map<string, string>();
+  for (const s of sections) {
+    for (const q of s.questions) {
+      questionMap.set(q.id, q.label);
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 mb-6">
+      <h2 className="text-base font-semibold text-[#1e293b] mb-1">
+        Réponses reçues
+      </h2>
+      <p className="text-xs text-[#94a3b8] mb-4">
+        {respondents.length} répondant{respondents.length > 1 ? "s" : ""} — Cliquez pour voir les réponses
+      </p>
+
+      <div className="space-y-2">
+        {respondents.map((r) => (
+          <div key={r.id}>
+            <button
+              onClick={() => loadResponses(r.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
+                selectedId === r.id
+                  ? "bg-[#eff6ff] border border-[#3b82f6]"
+                  : "bg-[#f8fafc] hover:bg-[#f1f5f9] border border-transparent"
+              }`}
+            >
+              <div className="w-9 h-9 rounded-full bg-[#3b82f6] flex items-center justify-center text-white text-sm font-bold shrink-0">
+                {r.name[0].toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[#1e293b] truncate">{r.name}</p>
+                <p className="text-xs text-[#94a3b8]">
+                  {r.role || "—"}{r.email ? ` · ${r.email}` : ""} · {r._count.responses} réponses
+                </p>
+              </div>
+              <span className="text-xs text-[#94a3b8] shrink-0">
+                {new Date(r.createdAt).toLocaleDateString("fr-FR")}
+              </span>
+              <svg
+                className={`w-4 h-4 text-[#94a3b8] transition-transform ${selectedId === r.id ? "rotate-180" : ""}`}
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Expanded responses */}
+            {selectedId === r.id && (
+              <div className="mt-2 ml-12 space-y-3 pb-2">
+                {sections.map((section) => {
+                  const sectionResponses = section.questions.filter((q) => responses[q.id]);
+                  if (sectionResponses.length === 0) return null;
+                  return (
+                    <div key={section.title}>
+                      <p className="text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-1.5">
+                        {section.title}
+                      </p>
+                      {sectionResponses.map((q) => (
+                        <div key={q.id} className="mb-2">
+                          <p className="text-xs text-[#94a3b8]">{q.label}</p>
+                          <p className="text-sm text-[#1e293b] bg-[#f8fafc] rounded px-3 py-1.5 mt-0.5">
+                            {responses[q.id]}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+                {Object.keys(responses).length === 0 && (
+                  <p className="text-xs text-[#94a3b8] italic">Aucune réponse enregistrée</p>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main types ──────────────────────────────────────────────
+
 interface Question {
   id: string;
   label: string;
@@ -642,6 +776,9 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
           )}
         </div>
       </div>
+
+      {/* Respondents responses viewer */}
+      {isOwner && <RespondentsPanel projectId={projectId} sections={sections} />}
 
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
         <h2 className="text-base font-semibold mb-2">Introduction</h2>

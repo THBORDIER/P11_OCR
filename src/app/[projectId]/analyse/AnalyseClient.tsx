@@ -135,9 +135,9 @@ export default function AnalyseClient({
           {isOwner && (
             <div className="flex items-center gap-2">
               <AiGenerateButton
-                type="personas"
+                type="analyse"
                 projectId={projectId}
-                label="Générer avec l'IA"
+                label="Analyser les retours"
                 onGenerated={async (items) => {
                   for (const item of items) {
                     await fetch(`${apiBase}/personas`, {
