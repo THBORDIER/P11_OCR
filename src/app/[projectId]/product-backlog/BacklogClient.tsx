@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 import AiGenerateButton from "@/components/AiGenerateButton";
+import SendPageButton from "@/components/SendPageButton";
 
 interface UserStory {
   id: string;
@@ -285,6 +286,7 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <SendPageButton projectId={projectId} pageType="backlog" />
           {backlog.length > 0 && (
             <button
               onClick={() => {

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 import AiGenerateButton from "@/components/AiGenerateButton";
+import SendPageButton from "@/components/SendPageButton";
 
 interface Task {
   id: string;
@@ -134,6 +135,7 @@ export default function SprintClient({ sprints, projectId, usDescriptions, isOwn
               }}
             />
           )}
+          <SendPageButton projectId={projectId} pageType="sprints" />
         </div>
         <div className="bg-white rounded-xl border border-[#e2e8f0] p-12 text-center">
           <p className="text-[#64748b] text-lg mb-2">Aucun sprint défini</p>
@@ -522,6 +524,7 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
             </button>
           </div>
         )}
+        <SendPageButton projectId={projectId} pageType="sprints" />
       </div>
 
       {/* Sprint selector tabs */}

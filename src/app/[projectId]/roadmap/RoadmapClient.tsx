@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 import AiGenerateButton from "@/components/AiGenerateButton";
+import SendPageButton from "@/components/SendPageButton";
 
 interface Phase {
   id: number;
@@ -166,6 +167,7 @@ export default function RoadmapClient({
             </button>
           </div>
         )}
+        <SendPageButton projectId={projectId} pageType="roadmap" />
       </div>
 
       {phases.length === 0 ? (

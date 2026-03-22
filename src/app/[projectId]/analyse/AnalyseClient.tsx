@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 import AiGenerateButton from "@/components/AiGenerateButton";
+import SendPageButton from "@/components/SendPageButton";
 
 interface Persona {
   id: number;
@@ -164,6 +165,7 @@ export default function AnalyseClient({
               </button>
             </div>
           )}
+          <SendPageButton projectId={projectId} pageType="analyse" />
         </div>
         <p className="text-sm text-[#64748b] mb-4">
           Profils types representatifs des futurs utilisateurs du projet, construits a partir des entretiens et du questionnaire.

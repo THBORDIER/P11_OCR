@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 import AiGenerateButton from "@/components/AiGenerateButton";
+import SendPageButton from "@/components/SendPageButton";
 
 interface RecettageRow {
   id: string;
@@ -245,6 +246,7 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
             </button>
           </div>
         )}
+        <SendPageButton projectId={projectId} pageType="recettage" />
       </div>
 
       <div className="bg-[#fffbeb] border border-[#fde68a] rounded-lg p-5 mb-6">
