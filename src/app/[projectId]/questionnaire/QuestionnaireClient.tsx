@@ -71,7 +71,7 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
         }),
       });
     }
-    router.refresh();
+    window.location.reload();
   };
 
   // Empty state
