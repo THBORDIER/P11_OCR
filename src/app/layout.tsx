@@ -3,9 +3,9 @@ import Providers from "@/components/Providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Portail Cadrage Projets",
+  title: "DevTracker — Suivi de projets",
   description:
-    "Plateforme multi-projets pour structurer et piloter le cadrage de vos projets.",
+    "Outil de suivi de projets de développement : backlog, sprints, roadmap, questionnaire client, recettage.",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body>
+      <body className="antialiased text-[#1e293b]">
         <Providers>{children}</Providers>
       </body>
     </html>
