@@ -478,11 +478,12 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
     setModalOpen(true);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function openEdit(
     title: string,
     fields: FieldConfig[],
     endpoint: string,
-    item: Record<string, unknown>,
+    item: any,
   ) {
     setModalTitle(title);
     setModalFields(fields);

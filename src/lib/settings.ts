@@ -20,12 +20,8 @@ export async function getGlobalSettings() {
   return settings;
 }
 
-export async function updateGlobalSettings(data: {
-  ollamaUrl?: string;
-  ollamaModel?: string;
-  cliBridgeEnabled?: boolean;
-  cliProviders?: unknown;
-}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function updateGlobalSettings(data: any) {
   return prisma.globalSettings.upsert({
     where: { id: SETTINGS_ID },
     update: data,
