@@ -61,7 +61,8 @@ export function executeCliBackground(
   const cwd = ensureProjectDir(projectSlug);
   const args: string[] = [];
 
-  if (command === "claude") args.push("--print");
+  // For background coding: use --print + --dangerously-skip-permissions so Claude creates files
+  if (command === "claude") args.push("--print", "--dangerously-skip-permissions");
   else if (command === "codex") args.push("--quiet");
 
   const child = spawn(command, args, {
