@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
           { href: `/${id}/roadmap`, label: "Roadmap", icon: "🗺️", order: 4 },
           { href: `/${id}/product-backlog`, label: "Product Backlog", icon: "📦", order: 5 },
           { href: `/${id}/sprint-backlog`, label: "Sprint Backlog", icon: "🏃", order: 6 },
-          { href: `/${id}/veille`, label: "Veille", icon: "📡", order: 7 },
+          { href: `/${id}/github`, label: "GitHub", icon: "🔗", order: 7 },
           { href: `/${id}/communication`, label: "Communication", icon: "💬", order: 8 },
           { href: `/${id}/settings`, label: "Paramètres", icon: "⚙️", order: 9 },
         ],
