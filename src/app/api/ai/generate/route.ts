@@ -3,32 +3,32 @@ import { prisma } from "@/lib/prisma";
 import { generateWithOllama, isOllamaAvailable } from "@/lib/ollama";
 
 const PROMPTS: Record<string, (ctx: string) => string> = {
-  "user-stories": (ctx) => `Tu es un Product Owner expert. Génère 5 User Stories au format JSON pour ce projet :
+  "user-stories": (ctx) => `Tu es un Product Owner expert. Génère les User Stories nécessaires et suffisantes pour ce projet. Adapte le nombre à la complexité du projet (un projet simple = peu de US, un projet complexe = plus de US).
 ${ctx}
 Retourne un JSON : { "items": [{ "epic": "...", "titre": "...", "enTantQue": "...", "jeSouhaite": "...", "afinDe": "...", "criteres": ["..."], "estimation": 5, "priorite": "Must", "sprint": "Sprint 1", "valeur": "Haute" }] }`,
 
-  questionnaire: (ctx) => `Tu es un consultant en cadrage de projets. Génère un questionnaire client structuré en 3-4 sections avec 3-5 questions par section pour ce projet :
+  questionnaire: (ctx) => `Tu es un consultant en cadrage de projets. Génère un questionnaire client adapté à ce projet. Choisis le nombre de sections et de questions en fonction de la complexité. Un projet simple = questionnaire court, un projet complexe = plus de sections.
 ${ctx}
 Retourne un JSON : { "items": [{ "sectionTitle": "Contexte et objectifs", "sectionDescription": "Comprendre le contexte business", "questions": [{ "label": "Décrivez votre activité", "type": "textarea", "required": true }, { "label": "Budget estimé ?", "type": "select", "options": ["< 5k", "5-15k", "15-50k", "> 50k"], "required": false }] }] }
 Types possibles : "textarea", "text", "select" (avec options[]), "checkbox" (avec options[])`,
 
-  sprints: (ctx) => `Tu es un Scrum Master expert. Génère 3-4 sprints avec des tâches pour ce projet :
+  sprints: (ctx) => `Tu es un Scrum Master expert. Génère les sprints nécessaires avec leurs tâches pour ce projet. Adapte le nombre de sprints et de tâches à la taille du projet et aux User Stories existantes.
 ${ctx}
 Retourne un JSON : { "items": [{ "name": "Sprint 1", "goal": "MVP — fonctionnalités de base", "startDate": "2026-04-01", "endDate": "2026-04-14", "tasks": [{ "title": "Tâche 1", "status": "A faire", "userStory": "" }] }] }`,
 
-  "test-cases": (ctx) => `Tu es un QA engineer. Génère 5 cas de test pour ce projet :
+  "test-cases": (ctx) => `Tu es un QA engineer. Génère les cas de test nécessaires pour couvrir les fonctionnalités de ce projet. Adapte le nombre à la complexité et aux User Stories existantes.
 ${ctx}
 Retourne un JSON : { "items": [{ "us": "...", "sprint": "Sprint 1", "etape": "...", "action": "...", "attendu": "...", "obtenu": "", "statut": "A tester" }] }`,
 
-  personas: (ctx) => `Tu es un UX researcher. Génère 3 personas utilisateurs pour ce projet :
+  personas: (ctx) => `Tu es un UX researcher. Génère les personas utilisateurs pertinents pour ce projet. Adapte le nombre au contexte (un projet avec un seul type d'utilisateur = 1-2 personas, un projet multi-utilisateurs = plus).
 ${ctx}
 Retourne un JSON : { "items": [{ "initials": "AB", "nom": "...", "age": 35, "role": "...", "contexte": "...", "besoinPrincipal": "...", "frustration": "...", "objectif": "..." }] }`,
 
-  phases: (ctx) => `Tu es un chef de projet Agile. Génère 4-6 phases/sprints pour ce projet :
+  phases: (ctx) => `Tu es un chef de projet Agile. Génère les phases nécessaires pour ce projet. Adapte le nombre au périmètre : un petit projet = 2-3 phases, un projet ambitieux = plus. Utilise les User Stories et personas pour structurer les phases.
 ${ctx}
 Retourne un JSON : { "items": [{ "phase": "Phase 0", "title": "...", "objectif": "...", "fonctionnalites": ["..."], "horsPerimetre": ["..."], "utilisateurs": ["..."], "dependances": ["..."], "ressources": "...", "periode": "Semaine 1-2", "budget": "...", "color": "border-l-[#3b82f6]", "bg": "bg-[#eff6ff]" }] }`,
 
-  analyse: (ctx) => `Tu es un consultant UX/Product senior. Analyse les retours du questionnaire ci-dessous et génère des personas utilisateurs réalistes.
+  analyse: (ctx) => `Tu es un consultant UX/Product senior. Analyse les retours du questionnaire ci-dessous et génère des personas utilisateurs réalistes. Adapte le nombre de personas aux profils identifiés dans les réponses.
 ${ctx}
 Retourne un JSON : { "items": [{ "initials": "AB", "nom": "Prénom Nom", "age": 35, "role": "...", "contexte": "...", "besoinPrincipal": "...", "frustration": "...", "objectif": "..." }] }`,
 };
