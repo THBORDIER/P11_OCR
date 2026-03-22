@@ -1,5 +1,5 @@
 import { spawn, execFile } from "node:child_process";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir, platform } from "node:os";
 
@@ -82,11 +82,16 @@ export function executeCliPrompt(
     });
 
     child.on("close", (code) => {
-      resolve({
+      const result = {
         response: stdout.trim(),
         error: stderr.trim() || undefined,
         exitCode: code,
-      });
+      };
+
+      // Save exchange to documentation folder
+      saveExchange(command, prompt, result, cwd);
+
+      resolve(result);
     });
 
     child.on("error", (err) => {
@@ -97,6 +102,58 @@ export function executeCliPrompt(
     child.stdin.write(prompt);
     child.stdin.end();
   });
+}
+
+/**
+ * Save a CLI exchange (prompt + response) as a Markdown file.
+ */
+function saveExchange(
+  provider: string,
+  prompt: string,
+  result: { response: string; error?: string; exitCode: number | null },
+  projectDir: string
+) {
+  try {
+    const docsDir = join(projectDir, "documentation");
+    if (!existsSync(docsDir)) {
+      mkdirSync(docsDir, { recursive: true });
+    }
+
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const filename = `${timestamp}_${provider}.md`;
+
+    const content = [
+      `# Échange CLI — ${provider}`,
+      "",
+      `> ${now.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} à ${now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`,
+      `> Exit code: ${result.exitCode}`,
+      "",
+      "---",
+      "",
+      "## Prompt",
+      "",
+      "```",
+      prompt,
+      "```",
+      "",
+      "## Réponse",
+      "",
+      result.response || "*(Pas de réponse)*",
+      "",
+      ...(result.error
+        ? ["## Erreurs", "", "```", result.error, "```", ""]
+        : []),
+      "---",
+      "",
+      `*Généré automatiquement par DevTracker — provider: ${provider}*`,
+      "",
+    ].join("\n");
+
+    writeFileSync(join(docsDir, filename), content, "utf-8");
+  } catch {
+    // Don't fail the response if saving fails
+  }
 }
 
 /**
