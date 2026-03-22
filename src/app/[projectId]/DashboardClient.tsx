@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -173,6 +173,84 @@ const projectFields: FieldConfig[] = [
 ];
 
 // ── Main component ──────────────────────────────────────────
+
+// ── Activity Feed ────────────────────────────────────────
+interface ActivityItem {
+  id: number;
+  type: string;
+  source: string;
+  title: string;
+  message: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+const activityIcons: Record<string, string> = {
+  commit: "🔨",
+  pr_merged: "🟣",
+  pr_opened: "🟢",
+  pr_closed: "🔴",
+  issue_opened: "📋",
+  issue_closed: "✅",
+  task_updated: "📝",
+  us_validated: "✓",
+  email_sent: "📧",
+};
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "à l'instant";
+  if (mins < 60) return `il y a ${mins}min`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `il y a ${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `il y a ${days}j`;
+}
+
+function ActivityFeed({ projectId }: { projectId: string }) {
+  const [logs, setLogs] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/projects/${projectId}/activity`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => setLogs(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [projectId]);
+
+  if (loading) return null;
+  if (logs.length === 0) return null;
+
+  return (
+    <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-8">
+      <h2 className="text-lg font-semibold text-[#1e293b] mb-4 flex items-center gap-2">
+        <span>⚡</span> Activité récente
+      </h2>
+      <div className="space-y-3 max-h-80 overflow-y-auto">
+        {logs.slice(0, 20).map((log) => (
+          <div key={log.id} className="flex items-start gap-3 text-sm">
+            <span className="text-base mt-0.5 shrink-0">
+              {activityIcons[log.type] || "📌"}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[#1e293b] font-medium truncate">{log.title}</p>
+              <p className="text-xs text-[#94a3b8]">
+                {log.message} · {timeAgo(log.createdAt)}
+              </p>
+            </div>
+            {log.metadata && typeof (log.metadata as Record<string, unknown>).sha === "string" ? (
+              <span className="font-mono text-xs text-[#3b82f6] bg-[#eff6ff] px-2 py-0.5 rounded shrink-0">
+                {(log.metadata as Record<string, string>).sha}
+              </span>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface DashboardClientProps {
   initialProject: Project;
@@ -581,6 +659,9 @@ export default function DashboardClient({ initialProject, isOwner }: DashboardCl
           </div>
         )}
       </div>
+
+      {/* Activity Feed */}
+      <ActivityFeed projectId={project.id} />
 
       {/* CRUD Modal */}
       <CrudModal

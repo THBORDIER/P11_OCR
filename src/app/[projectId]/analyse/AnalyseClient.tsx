@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
+import AiGenerateButton from "@/components/AiGenerateButton";
 
 interface Persona {
   id: number;
@@ -132,12 +133,29 @@ export default function AnalyseClient({
             Personas utilisateurs
           </h2>
           {isOwner && (
-            <button
-              onClick={openCreate}
-              className="px-4 py-2 bg-[#3b82f6] text-white text-sm font-medium rounded-lg hover:bg-[#2563eb] transition-colors"
-            >
-              + Persona
-            </button>
+            <div className="flex items-center gap-2">
+              <AiGenerateButton
+                type="personas"
+                projectId={projectId}
+                label="Générer avec l'IA"
+                onGenerated={async (items) => {
+                  for (const item of items) {
+                    await fetch(`${apiBase}/personas`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(item),
+                    });
+                  }
+                  router.refresh();
+                }}
+              />
+              <button
+                onClick={openCreate}
+                className="px-4 py-2 bg-[#3b82f6] text-white text-sm font-medium rounded-lg hover:bg-[#2563eb] transition-colors"
+              >
+                + Persona
+              </button>
+            </div>
           )}
         </div>
         <p className="text-sm text-[#64748b] mb-4">

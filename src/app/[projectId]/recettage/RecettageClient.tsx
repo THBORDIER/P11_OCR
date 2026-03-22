@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
+import AiGenerateButton from "@/components/AiGenerateButton";
 
 interface RecettageRow {
   id: string;
@@ -198,15 +199,32 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
           </p>
         </div>
         {isOwner && (
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-[#3b82f6] text-white rounded-lg text-sm font-medium hover:bg-[#2563eb] transition-colors shadow-sm"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Cas de test
-          </button>
+          <div className="flex items-center gap-2">
+            <AiGenerateButton
+              type="test-cases"
+              projectId={projectId}
+              label="Générer avec l'IA"
+              onGenerated={async (items) => {
+                for (const item of items) {
+                  await fetch(`/api/projects/${projectId}/recettage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(item),
+                  });
+                }
+                router.refresh();
+              }}
+            />
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-2 px-4 py-2 bg-[#3b82f6] text-white rounded-lg text-sm font-medium hover:bg-[#2563eb] transition-colors shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Cas de test
+            </button>
+          </div>
         )}
       </div>
 
