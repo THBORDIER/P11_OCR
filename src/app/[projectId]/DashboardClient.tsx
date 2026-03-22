@@ -177,6 +177,7 @@ const projectFields: FieldConfig[] = [
 function ProjectChecklist({
   projectId,
   hasContext,
+  hasRespondents,
   hasPersonas,
   hasUS,
   hasSprints,
@@ -184,7 +185,7 @@ function ProjectChecklist({
 }: {
   projectId: string;
   hasContext: boolean;
-  hasQuestionnaire: boolean;
+  hasRespondents: boolean;
   hasPersonas: boolean;
   hasUS: boolean;
   hasSprints: boolean;
@@ -192,7 +193,7 @@ function ProjectChecklist({
 }) {
   const steps = [
     { label: "Cadrage initial", href: `/${projectId}/onboarding`, done: hasContext, desc: "Décrivez le projet, les contraintes et la stack" },
-    { label: "Questionnaire client", href: `/${projectId}/questionnaire`, done: hasContext, desc: "Envoyez le questionnaire au client" },
+    { label: "Questionnaire client", href: `/${projectId}/questionnaire`, done: hasRespondents, desc: "Envoyez le questionnaire au client et attendez ses réponses" },
     { label: "Analyser les retours", href: `/${projectId}/analyse`, done: hasPersonas, desc: "Générez des personas depuis les réponses" },
     { label: "Product Backlog", href: `/${projectId}/product-backlog`, done: hasUS, desc: "Créez ou générez les User Stories" },
     { label: "Sprints", href: `/${projectId}/sprint-backlog`, done: hasSprints, desc: "Organisez les tâches en sprints" },
@@ -486,8 +487,8 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
         <ProjectChecklist
           projectId={project.id}
           hasContext={!!project.contextSummary}
-          hasQuestionnaire={autoStats.userStories.total >= 0} // sections exist from creation
-          hasPersonas={autoStats.userStories.total >= 0 && project.personas?.length > 0}
+          hasRespondents={(project._count?.respondents || 0) > 0}
+          hasPersonas={(project._count?.personas || 0) > 0}
           hasUS={autoStats.userStories.total > 0}
           hasSprints={autoStats.tasks.total > 0}
           hasTests={autoStats.tests.total > 0}

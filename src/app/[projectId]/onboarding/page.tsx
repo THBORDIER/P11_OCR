@@ -3,18 +3,108 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+// Tooltip component
+function Tooltip({ text }: { text: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <span className="relative inline-block ml-1">
+      <button
+        type="button"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow(!show)}
+        className="w-4 h-4 rounded-full bg-[#e2e8f0] text-[#64748b] text-[10px] font-bold inline-flex items-center justify-center hover:bg-[#cbd5e1] transition-colors"
+      >
+        ?
+      </button>
+      {show && (
+        <div className="absolute z-20 bottom-6 left-1/2 -translate-x-1/2 w-56 bg-[#1e293b] text-white text-xs rounded-lg p-2.5 shadow-lg">
+          {text}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e293b]" />
+        </div>
+      )}
+    </span>
+  );
+}
+
+// Selectable chip with optional "custom" free text
+function ChipSelector({
+  options,
+  value,
+  onChange,
+  freeText,
+  freeTextValue,
+  onFreeTextChange,
+  freeTextPlaceholder,
+}: {
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+  freeText?: boolean;
+  freeTextValue?: string;
+  onFreeTextChange?: (v: string) => void;
+  freeTextPlaceholder?: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onChange(opt)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              value === opt
+                ? "bg-[#3b82f6] text-white shadow-sm"
+                : "bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]"
+            }`}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+      {freeText && (
+        <input
+          type="text"
+          value={freeTextValue || ""}
+          onChange={(e) => {
+            onFreeTextChange?.(e.target.value);
+            if (e.target.value) onChange("");
+          }}
+          placeholder={freeTextPlaceholder}
+          className="w-full px-4 py-2 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+        />
+      )}
+    </div>
+  );
+}
+
 const STACK_OPTIONS = [
-  { category: "Frontend", items: ["React", "Next.js", "Vue.js", "Angular", "Svelte", "HTML/CSS", "Tailwind CSS", "Bootstrap"] },
-  { category: "Backend", items: ["Node.js", "Express", "NestJS", "Django", "Flask", "Laravel", "Spring Boot", "Ruby on Rails", "FastAPI"] },
-  { category: "Base de données", items: ["PostgreSQL", "MySQL", "MongoDB", "Redis", "SQLite", "Firebase", "Supabase"] },
-  { category: "Mobile", items: ["React Native", "Flutter", "Swift", "Kotlin", "Ionic"] },
-  { category: "DevOps", items: ["Docker", "Kubernetes", "CI/CD", "AWS", "GCP", "Azure", "Vercel", "Netlify"] },
-  { category: "Autre", items: ["GraphQL", "REST API", "WebSocket", "Stripe", "Auth0", "Prisma", "TypeScript"] },
+  {
+    category: "Technologies web",
+    tooltip: "Langages et frameworks pour construire votre application web (site, webapp, API...)",
+    items: ["React", "Next.js", "Vue.js", "Angular", "Svelte", "HTML/CSS", "Tailwind CSS", "Node.js", "Express", "Django", "Flask", "Laravel", "Spring Boot", "Ruby on Rails", "FastAPI", "NestJS"],
+  },
+  {
+    category: "Base de données",
+    tooltip: "Où sont stockées les données de votre application (utilisateurs, produits, commandes...)",
+    items: ["PostgreSQL", "MySQL", "MongoDB", "Redis", "SQLite", "Firebase", "Supabase"],
+  },
+  {
+    category: "Mobile",
+    tooltip: "Si votre projet inclut une application mobile (iPhone, Android)",
+    items: ["React Native", "Flutter", "Swift (iOS)", "Kotlin (Android)", "Ionic", "PWA"],
+  },
+  {
+    category: "Hébergement & outils",
+    tooltip: "Où votre application sera hébergée et les services utilisés",
+    items: ["Vercel", "Netlify", "AWS", "OVH", "Docker", "Heroku", "GCP", "Azure"],
+  },
 ];
 
-const BUDGET_OPTIONS = ["< 5k €", "5k - 15k €", "15k - 50k €", "50k - 100k €", "> 100k €", "Non défini"];
-const TIMELINE_OPTIONS = ["< 1 mois", "1-3 mois", "3-6 mois", "6-12 mois", "> 12 mois", "Non défini"];
-const TEAM_OPTIONS = ["Solo", "2-3 personnes", "4-6 personnes", "7-10 personnes", "> 10 personnes"];
+const BUDGET_OPTIONS = ["Gratuit / Open source", "< 1k €", "1k - 5k €", "5k - 15k €", "15k - 50k €", "> 50k €"];
+const TIMELINE_OPTIONS = ["< 1 mois", "1-3 mois", "3-6 mois", "6-12 mois", "> 12 mois"];
+const TEAM_OPTIONS = ["Solo", "2-3 personnes", "4-6 personnes", "> 6 personnes"];
 
 export default function OnboardingPage() {
   const params = useParams();
@@ -23,6 +113,7 @@ export default function OnboardingPage() {
 
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   // Step 1: Context
   const [context, setContext] = useState("");
@@ -31,7 +122,9 @@ export default function OnboardingPage() {
 
   // Step 2: Constraints
   const [budget, setBudget] = useState("");
+  const [budgetCustom, setBudgetCustom] = useState("");
   const [timeline, setTimeline] = useState("");
+  const [timelineCustom, setTimelineCustom] = useState("");
   const [team, setTeam] = useState("");
   const [constraints, setConstraints] = useState("");
 
@@ -45,21 +138,22 @@ export default function OnboardingPage() {
     );
   };
 
+  const effectiveBudget = budgetCustom || budget;
+  const effectiveTimeline = timelineCustom || timeline;
+
   const handleFinish = async () => {
     setSaving(true);
 
-    // Build context summary
     const summary = [
       context && `Contexte : ${context}`,
       objectives && `Objectifs : ${objectives}`,
       targetUsers && `Utilisateurs cibles : ${targetUsers}`,
-      budget && budget !== "Non défini" && `Budget : ${budget}`,
-      timeline && timeline !== "Non défini" && `Délai : ${timeline}`,
+      effectiveBudget && `Budget : ${effectiveBudget}`,
+      effectiveTimeline && `Délai : ${effectiveTimeline}`,
       team && `Équipe : ${team}`,
       constraints && `Contraintes : ${constraints}`,
     ].filter(Boolean).join("\n");
 
-    // Update project
     await fetch(`/api/projects/${projectId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -86,12 +180,11 @@ export default function OnboardingPage() {
       });
     }
 
-    // Create KPIs from structured data
+    // Create KPIs
     const kpis = [
-      budget && budget !== "Non défini" && { label: "Budget", value: budget, color: "#f59e0b" },
-      timeline && timeline !== "Non défini" && { label: "Délai", value: timeline, color: "#3b82f6" },
+      effectiveBudget && { label: "Budget", value: effectiveBudget, color: "#f59e0b" },
+      effectiveTimeline && { label: "Délai", value: effectiveTimeline, color: "#3b82f6" },
       team && { label: "Équipe", value: team, color: "#8b5cf6" },
-      allStack.length > 0 && { label: "Technologies", value: String(allStack.length), color: "#22c55e" },
     ].filter(Boolean) as { label: string; value: string; color: string }[];
 
     for (let i = 0; i < kpis.length; i++) {
@@ -102,8 +195,63 @@ export default function OnboardingPage() {
       });
     }
 
-    router.push(`/${projectId}`);
+    setSaving(false);
+    setFinished(true);
   };
+
+  // Step 4: Post-cadrage — generate with AI or go to dashboard
+  if (finished) {
+    return (
+      <div className="max-w-2xl mx-auto py-6">
+        <div className="bg-white rounded-xl border border-[#e2e8f0] p-8 shadow-sm text-center">
+          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-2xl mx-auto mb-4">
+            &#10003;
+          </div>
+          <h1 className="text-2xl font-bold text-[#1e293b] mb-2">
+            Cadrage terminé !
+          </h1>
+          <p className="text-[#64748b] mb-8">
+            Les informations de votre projet ont été enregistrées. Vous pouvez maintenant :
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <a
+              href={`/${projectId}/questionnaire`}
+              className="block bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-5 hover:shadow-md hover:border-[#3b82f6] transition-all text-left"
+            >
+              <div className="text-2xl mb-2">📋</div>
+              <h3 className="font-semibold text-[#1e293b] mb-1">Envoyer le questionnaire</h3>
+              <p className="text-xs text-[#64748b]">Envoyez le lien au client pour recueillir ses besoins</p>
+            </a>
+            <a
+              href={`/${projectId}/analyse`}
+              className="block bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-5 hover:shadow-md hover:border-[#8b5cf6] transition-all text-left"
+            >
+              <div className="text-2xl mb-2">&#9889;</div>
+              <h3 className="font-semibold text-[#1e293b] mb-1">Générer avec l'IA</h3>
+              <p className="text-xs text-[#64748b]">Générez des personas, US et phases depuis le contexte (Ollama ou copier/coller)</p>
+            </a>
+            <a
+              href={`/${projectId}/product-backlog`}
+              className="block bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-5 hover:shadow-md hover:border-[#22c55e] transition-all text-left"
+            >
+              <div className="text-2xl mb-2">📦</div>
+              <h3 className="font-semibold text-[#1e293b] mb-1">Écrire le backlog</h3>
+              <p className="text-xs text-[#64748b]">Créez manuellement les User Stories du projet</p>
+            </a>
+            <a
+              href={`/${projectId}`}
+              className="block bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-5 hover:shadow-md hover:border-[#f59e0b] transition-all text-left"
+            >
+              <div className="text-2xl mb-2">&#127968;</div>
+              <h3 className="font-semibold text-[#1e293b] mb-1">Aller au dashboard</h3>
+              <p className="text-xs text-[#64748b]">Voir la vue d'ensemble et la checklist de suivi</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const totalSteps = 3;
 
@@ -125,7 +273,7 @@ export default function OnboardingPage() {
               {s < step ? "✓" : s}
             </div>
             <span className={`text-sm ${s === step ? "text-[#1e293b] font-medium" : "text-[#94a3b8]"}`}>
-              {s === 1 ? "Contexte" : s === 2 ? "Contraintes" : "Stack technique"}
+              {s === 1 ? "Contexte" : s === 2 ? "Contraintes" : "Technologies"}
             </span>
             {s < totalSteps && <div className={`w-8 h-0.5 ${s < step ? "bg-emerald-300" : "bg-[#e2e8f0]"}`} />}
           </div>
@@ -137,9 +285,9 @@ export default function OnboardingPage() {
           Cadrage initial
         </h1>
         <p className="text-sm text-[#94a3b8] mb-8">
-          {step === 1 && "Décrivez votre projet pour générer automatiquement le questionnaire et les premières US."}
-          {step === 2 && "Définissez les contraintes pour adapter le planning et les priorités."}
-          {step === 3 && "Sélectionnez les technologies pour pré-configurer la stack."}
+          {step === 1 && "Décrivez votre projet. Ces informations serviront de contexte pour l'IA."}
+          {step === 2 && "Tout est optionnel. Sélectionnez un bouton ou tapez librement."}
+          {step === 3 && "Optionnel. Sélectionnez les technologies utilisées ou tapez-les."}
         </p>
 
         {/* Step 1: Contexte */}
@@ -153,8 +301,9 @@ export default function OnboardingPage() {
                 value={context}
                 onChange={(e) => setContext(e.target.value)}
                 rows={4}
-                placeholder="Ex : Refonte d'une plateforme e-commerce B2C avec panier, paiement Stripe, gestion des stocks et tableau de bord admin. L'objectif est de remplacer la solution Shopify actuelle par une solution custom..."
+                placeholder="Ex : Application de gestion de stock pour une boulangerie. Le gérant doit pouvoir suivre les entrées/sorties de matières premières et les produits finis..."
                 className="w-full px-4 py-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] resize-none"
+                autoFocus
               />
             </div>
             <div>
@@ -165,7 +314,7 @@ export default function OnboardingPage() {
                 value={objectives}
                 onChange={(e) => setObjectives(e.target.value)}
                 rows={3}
-                placeholder="Ex : Réduire les coûts d'exploitation de 30%, améliorer le taux de conversion, offrir une meilleure expérience mobile..."
+                placeholder="Ex : Gagner du temps sur l'inventaire, éviter les ruptures, avoir un historique..."
                 className="w-full px-4 py-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] resize-none"
               />
             </div>
@@ -176,7 +325,7 @@ export default function OnboardingPage() {
               <input
                 value={targetUsers}
                 onChange={(e) => setTargetUsers(e.target.value)}
-                placeholder="Ex : PME du secteur retail, 50-200 employés, non techniques"
+                placeholder="Ex : Le gérant et les employés de la boulangerie"
                 className="w-full px-4 py-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
               />
             </div>
@@ -187,83 +336,85 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-2">Budget estimé</label>
-              <div className="flex flex-wrap gap-2">
-                {BUDGET_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => setBudget(opt)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      budget === opt
-                        ? "bg-[#3b82f6] text-white shadow-sm"
-                        : "bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-2">
+                Budget estimé
+                <Tooltip text="Le budget global du projet, incluant développement, hébergement et maintenance. Sélectionnez une fourchette ou tapez un montant libre." />
+              </label>
+              <ChipSelector
+                options={BUDGET_OPTIONS}
+                value={budget}
+                onChange={(v) => { setBudget(v); setBudgetCustom(""); }}
+                freeText
+                freeTextValue={budgetCustom}
+                onFreeTextChange={(v) => { setBudgetCustom(v); if (v) setBudget(""); }}
+                freeTextPlaceholder="Ou tapez un montant libre : 3000 €, bénévole, à définir..."
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-2">Délai souhaité</label>
-              <div className="flex flex-wrap gap-2">
-                {TIMELINE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => setTimeline(opt)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      timeline === opt
-                        ? "bg-[#3b82f6] text-white shadow-sm"
-                        : "bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-2">
+                Délai souhaité
+                <Tooltip text="Le temps disponible entre le début du projet et la première livraison utilisable." />
+              </label>
+              <ChipSelector
+                options={TIMELINE_OPTIONS}
+                value={timeline}
+                onChange={(v) => { setTimeline(v); setTimelineCustom(""); }}
+                freeText
+                freeTextValue={timelineCustom}
+                onFreeTextChange={(v) => { setTimelineCustom(v); if (v) setTimeline(""); }}
+                freeTextPlaceholder="Ou tapez librement : 6 semaines, pas de deadline..."
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-2">Taille de l'équipe</label>
-              <div className="flex flex-wrap gap-2">
-                {TEAM_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => setTeam(opt)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      team === opt
-                        ? "bg-[#3b82f6] text-white shadow-sm"
-                        : "bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-2">
+                Taille de l'équipe
+                <Tooltip text="Le nombre de personnes qui travailleront sur le projet (développeurs, designers, chefs de projet...)." />
+              </label>
+              <ChipSelector
+                options={TEAM_OPTIONS}
+                value={team}
+                onChange={setTeam}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-[#1e293b] mb-1.5">
                 Contraintes particulières
+                <Tooltip text="Tout ce qui limite ou conditionne le projet : réglementation (RGPD), accessibilité, hébergement spécifique, compatibilité navigateur..." />
               </label>
               <textarea
                 value={constraints}
                 onChange={(e) => setConstraints(e.target.value)}
                 rows={3}
-                placeholder="Ex : RGPD, accessibilité WCAG, hébergement en France, compatibilité IE11..."
+                placeholder="Ex : Doit fonctionner hors-ligne, données sensibles, hébergement en France..."
                 className="w-full px-4 py-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] resize-none"
               />
             </div>
           </div>
         )}
 
-        {/* Step 3: Stack */}
+        {/* Step 3: Technologies */}
         {step === 3 && (
           <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-[#1e293b] mb-1.5">
+                Technologies libres
+              </label>
+              <input
+                value={customStack}
+                onChange={(e) => setCustomStack(e.target.value)}
+                placeholder="Tapez vos technologies séparées par des virgules : WordPress, Figma, Notion..."
+                className="w-full px-4 py-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                autoFocus
+              />
+              <p className="text-xs text-[#94a3b8] mt-1">Ou sélectionnez dans les catégories ci-dessous (tout est optionnel)</p>
+            </div>
+
             {STACK_OPTIONS.map((cat) => (
               <div key={cat.category}>
-                <label className="block text-sm font-medium text-[#1e293b] mb-2">{cat.category}</label>
+                <label className="block text-sm font-medium text-[#1e293b] mb-2">
+                  {cat.category}
+                  <Tooltip text={cat.tooltip} />
+                </label>
                 <div className="flex flex-wrap gap-2">
                   {cat.items.map((item) => (
                     <button
@@ -282,21 +433,13 @@ export default function OnboardingPage() {
                 </div>
               </div>
             ))}
-            <div>
-              <label className="block text-sm font-medium text-[#1e293b] mb-1.5">
-                Autres technologies
-              </label>
-              <input
-                value={customStack}
-                onChange={(e) => setCustomStack(e.target.value)}
-                placeholder="Séparées par des virgules : Elasticsearch, RabbitMQ..."
-                className="w-full px-4 py-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
-              />
-            </div>
-            {selectedStack.length > 0 && (
+
+            {(selectedStack.length > 0 || customStack) && (
               <div className="bg-[#f8fafc] rounded-lg p-3 border border-[#e2e8f0]">
                 <p className="text-xs text-[#94a3b8] mb-1">Stack sélectionnée :</p>
-                <p className="text-sm text-[#1e293b] font-medium">{selectedStack.join(", ")}</p>
+                <p className="text-sm text-[#1e293b] font-medium">
+                  {[...selectedStack, ...customStack.split(",").map((s) => s.trim()).filter(Boolean)].join(", ")}
+                </p>
               </div>
             )}
           </div>
