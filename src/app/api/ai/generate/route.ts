@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateWithOllama, isOllamaAvailable } from "@/lib/ollama";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const PROMPTS: Record<string, (ctx: string) => string> = {
   "user-stories": (ctx) => `Tu es un Product Owner expert. Génère les User Stories nécessaires et suffisantes pour ce projet. Adapte le nombre à la complexité du projet.
@@ -44,6 +45,12 @@ Retourne un JSON : { "items": [{ "initials": "AB", "nom": "Prénom Nom", "age": 
 };
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 AI generations per minute per IP
+  const ip = getClientIp(request.headers);
+  if (!checkRateLimit(`ai:${ip}`, 10)) {
+    return NextResponse.json({ error: "Trop de requêtes IA. Réessayez dans une minute." }, { status: 429 });
+  }
+
   const { type, projectId, model, getPromptOnly } = await request.json();
 
   if (!PROMPTS[type]) {

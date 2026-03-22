@@ -17,9 +17,18 @@ export async function requireProjectOwner(projectId: string) {
     return { error: "NOT_FOUND" as const, user: null };
   }
 
-  // Anonymous projects (no userId) are editable by everyone
+  // Only the demo project (p11-spartcrm) is allowed to be anonymous
+  // All other projects require an authenticated owner
   if (!project.userId) {
+    if (projectId === "p11-spartcrm") {
+      const user = await getAuthenticatedUser();
+      return { error: null, user };
+    }
+    // Legacy anonymous project — require auth to edit
     const user = await getAuthenticatedUser();
+    if (!user) {
+      return { error: "UNAUTHORIZED" as const, user: null };
+    }
     return { error: null, user };
   }
 

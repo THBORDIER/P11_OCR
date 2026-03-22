@@ -20,6 +20,14 @@ function slugify(text: string): string {
 export async function POST(request: NextRequest) {
   const session = await auth();
 
+  // Authentication required to create projects
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Authentification requise pour créer un projet" },
+      { status: 401 }
+    );
+  }
+
   const body = await request.json();
   const { name, subtitle, description, color, organization, githubRepo } = body;
 
@@ -66,7 +74,7 @@ export async function POST(request: NextRequest) {
       methodologyPrioritization: "MoSCoW",
       methodologyPrioritizationDescription:
         "Chaque fonctionnalité est classée Must / Should / Could / Won't pour garantir que le MVP livre un maximum de valeur.",
-      userId: session?.user?.id || undefined,
+      userId: session.user.id,
       // Navigation par défaut
       navItems: {
         create: [

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getQuestionnaireResponses, saveQuestionnaireResponse, getRespondents, createRespondent } from "@/lib/data";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function GET(
   request: NextRequest,
@@ -49,6 +50,13 @@ export async function POST(
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   const { projectId } = await params;
+
+  // Rate limit: 10 respondent creations per minute per IP
+  const ip = getClientIp(request.headers);
+  if (!checkRateLimit(`respondent:${ip}`, 10)) {
+    return NextResponse.json({ error: "Trop de requêtes. Réessayez dans une minute." }, { status: 429 });
+  }
+
   const { name, email, role } = await request.json();
 
   if (!name?.trim()) {

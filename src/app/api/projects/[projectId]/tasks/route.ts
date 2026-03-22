@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireProjectOwner } from "@/lib/auth-helpers";
+import { pick, ALLOWED_FIELDS } from "@/lib/sanitize";
 
 export async function GET(
   req: NextRequest,
@@ -35,11 +36,12 @@ export async function POST(
       }
     );
 
-  const data = await req.json();
+  const raw = await req.json();
+  const data = pick(raw, [...ALLOWED_FIELDS.task]);
   // Tasks belong to a Sprint, not directly to Project.
   // sprintId must be provided in the request body.
   const item = await prisma.task.create({
-    data,
+    data: data as Parameters<typeof prisma.task.create>[0]["data"],
   });
   return NextResponse.json(item, { status: 201 });
 }
