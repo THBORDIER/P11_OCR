@@ -13,9 +13,18 @@ ${ctx}
 Retourne un JSON : { "items": [{ "sectionTitle": "Contexte et objectifs", "sectionDescription": "Comprendre le contexte business", "questions": [{ "label": "Décrivez votre activité", "type": "textarea", "required": true }, { "label": "Budget estimé ?", "type": "select", "options": ["< 5k", "5-15k", "15-50k", "> 50k"], "required": false }] }] }
 Types possibles : "textarea", "text", "select" (avec options[]), "checkbox" (avec options[])`,
 
-  sprints: (ctx) => `Tu es un Scrum Master expert. Génère les sprints nécessaires avec leurs tâches pour ce projet. Adapte le nombre de sprints et de tâches à la taille du projet et aux User Stories existantes.
+  sprints: (ctx) => `Tu es un Scrum Master expert. Génère les sprints nécessaires avec leurs tâches pour ce projet.
+
+Règles :
+- Adapte le nombre de sprints et de tâches à la taille du projet
+- Respecte les priorités MoSCoW des User Stories : les "Must" dans les premiers sprints, "Should" ensuite, "Could" en dernier
+- Estime chaque tâche en heures ou jours (ex: "2h", "0.5j", "1j") selon sa complexité réelle
+- Varie les types de tâches : Dev, Design, Test, Config, Doc
+- Le champ "userStory" doit correspondre EXACTEMENT au titre d'une User Story existante (ou vide si transversale)
+- Chaque sprint doit avoir un objectif clair et une charge équilibrée
+
 ${ctx}
-Retourne un JSON : { "items": [{ "name": "Sprint 1", "goal": "MVP — fonctionnalités de base", "startDate": "2026-04-01", "endDate": "2026-04-14", "tasks": [{ "title": "Tâche 1", "status": "A faire", "userStory": "" }] }] }`,
+Retourne un JSON : { "items": [{ "name": "Sprint 1", "goal": "MVP — fonctionnalités de base", "startDate": "2026-04-01", "endDate": "2026-04-14", "tasks": [{ "title": "Tâche 1", "status": "A faire", "userStory": "Titre exact de l'US", "estimation": "2h", "type": "Dev" }] }] }`,
 
   "test-cases": (ctx) => `Tu es un QA engineer. Génère les cas de test nécessaires pour couvrir les fonctionnalités de ce projet. Adapte le nombre à la complexité et aux User Stories existantes.
 ${ctx}
@@ -112,8 +121,24 @@ Contexte : ${project.contextSummary}`;
   // User Stories — for phases, sprints, test-cases
   if (["phases", "sprints", "test-cases"].includes(type) && project.userStories.length > 0) {
     context += `\n\nUser Stories du backlog (${project.userStories.length}) :`;
-    for (const us of project.userStories.slice(0, 15)) {
-      context += `\n- [${us.priorite}] ${us.titre} : "${us.enTantQue}, ${us.jeSouhaite}, ${us.afinDe}" (${us.estimation} pts)`;
+    for (const us of project.userStories.slice(0, 20)) {
+      context += `\n- [${us.priorite}] ${us.titre} : "${us.enTantQue}, ${us.jeSouhaite}, ${us.afinDe}" (${us.estimation} pts, sprint: ${us.sprint || "non assigné"})`;
+    }
+
+    // For sprints: show US distribution by sprint from backlog
+    if (type === "sprints") {
+      const bySprint = new Map<string, typeof project.userStories>();
+      for (const us of project.userStories) {
+        const key = us.sprint || "Non assigné";
+        if (!bySprint.has(key)) bySprint.set(key, []);
+        bySprint.get(key)!.push(us);
+      }
+      context += `\n\nRépartition des US par sprint (depuis le backlog) :`;
+      for (const [sprint, uss] of bySprint) {
+        const totalPts = uss.reduce((s, u) => s + (parseInt(String(u.estimation)) || 0), 0);
+        context += `\n- ${sprint} : ${uss.length} US, ${totalPts} pts — ${uss.map(u => `"${u.titre}" [${u.priorite}]`).join(", ")}`;
+      }
+      context += `\nIMPORTANT : Utilise cette répartition pour structurer les sprints. Le champ "userStory" de chaque tâche doit correspondre EXACTEMENT au titre d'une US ci-dessus.`;
     }
   }
 

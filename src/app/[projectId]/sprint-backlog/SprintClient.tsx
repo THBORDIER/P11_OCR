@@ -92,7 +92,7 @@ export default function SprintClient({ sprints, projectId, usDescriptions, isOwn
               label="Générer des sprints"
               onGenerated={async (items) => {
                 for (const item of items) {
-                  const s = item as { name?: string; goal?: string; startDate?: string; endDate?: string; tasks?: { title: string; status?: string; userStory?: string }[] };
+                  const s = item as { name?: string; goal?: string; startDate?: string; endDate?: string; tasks?: { title: string; status?: string; userStory?: string; estimation?: string; type?: string }[] };
                   const sprintId = `${projectId}:${(s.name || "Sprint").toLowerCase().replace(/\s+/g, "-")}`;
                   await fetch(`/api/projects/${projectId}/sprints`, {
                     method: "POST",
@@ -117,7 +117,7 @@ export default function SprintClient({ sprints, projectId, usDescriptions, isOwn
                       body: JSON.stringify({
                         id: taskId, sprintId,
                         userStory: t.userStory || "", titre: t.title,
-                        description: "", type: "Dev", estimation: "0.5j",
+                        description: "", type: t.type || "Dev", estimation: t.estimation || "2h",
                         status: t.status || "A faire", assignee: "",
                       }),
                     });
@@ -452,7 +452,7 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
                 }
 
                 for (const item of items) {
-                  const s = item as { name?: string; goal?: string; startDate?: string; endDate?: string; tasks?: { title: string; status?: string; userStory?: string }[] };
+                  const s = item as { name?: string; goal?: string; startDate?: string; endDate?: string; tasks?: { title: string; status?: string; userStory?: string; estimation?: string; type?: string }[] };
                   const sprintId = `${projectId}:${(s.name || "Sprint").toLowerCase().replace(/\s+/g, "-")}`;
                   const res = await fetch(`/api/projects/${projectId}/sprints`, {
                     method: "POST",
@@ -485,8 +485,8 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
                         userStory: t.userStory || "",
                         titre: t.title,
                         description: "",
-                        type: "Dev",
-                        estimation: "0.5j",
+                        type: t.type || "Dev",
+                        estimation: t.estimation || "2h",
                         status: t.status || "A faire",
                         assignee: "",
                       }),
