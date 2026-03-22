@@ -591,16 +591,10 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
               Telecharger (.pdf)
             </button>
             <button
-              onClick={downloadFakePdf}
-              className="px-6 py-2 rounded-lg border border-[#0ea5e9] text-[#0ea5e9] text-sm hover:bg-[#e0f2fe]"
-            >
-              Fake (.pdf)
-            </button>
-            <button
               onClick={downloadBlankPdf}
               className="px-6 py-2 rounded-lg border border-[#64748b] text-[#64748b] text-sm hover:bg-[#f1f5f9]"
             >
-              Vierge (.pdf)
+              PDF vierge
             </button>
           </div>
         </div>
@@ -700,12 +694,6 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
             className="px-4 py-2 rounded-lg bg-white text-[#1d4ed8] border border-[#1d4ed8] text-sm hover:bg-[#eff6ff]"
           >
             PDF vierge
-          </button>
-          <button
-            onClick={downloadFakePdf}
-            className="px-4 py-2 rounded-lg bg-[#1d4ed8] text-white text-sm hover:bg-[#1e40af]"
-          >
-            PDF exemple
           </button>
         </div>
       </div>
@@ -931,18 +919,11 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
               Telecharger (.pdf)
             </button>
             <button
-              onClick={downloadFakePdf}
-              className="px-4 py-2 rounded-lg border border-[#0ea5e9] text-[#0ea5e9] text-sm hover:bg-[#e0f2fe]"
-              title="Telecharger le questionnaire fictif en PDF"
-            >
-              Fake (.pdf)
-            </button>
-            <button
               onClick={downloadBlankPdf}
               className="px-4 py-2 rounded-lg border border-[#64748b] text-[#64748b] text-sm hover:bg-[#f1f5f9]"
               title="Telecharger le questionnaire vierge en PDF"
             >
-              Vierge (.pdf)
+              PDF vierge
             </button>
             {currentSection < sections.length - 1 ? (
               <button

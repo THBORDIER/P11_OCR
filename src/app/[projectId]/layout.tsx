@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getProject, getProjects } from "@/lib/data";
 import { notFound } from "next/navigation";
+import AuthHeader from "@/components/AuthHeader";
 
 export async function generateStaticParams() {
   const projects = await getProjects();
@@ -34,18 +35,23 @@ export default async function ProjectLayout({
 
   return (
     <div className="flex min-h-screen bg-[#f8fafc]">
-      <aside className="w-60 bg-[#0f172a] text-[#e2e8f0] flex flex-col fixed h-full shadow-xl">
+      <aside className="w-60 bg-[#0f172a] text-[#e2e8f0] flex flex-col fixed h-full shadow-xl z-10">
+        {/* Back to projects */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 px-5 py-3 text-xs text-[#94a3b8] hover:text-white hover:bg-[#1e293b] transition-all border-b border-[#1e293b]"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Tous les projets
+        </Link>
+
         {/* Project header */}
         <div className="p-5 border-b border-[#1e293b]">
-          <Link
-            href="/"
-            className="text-[10px] text-[#475569] hover:text-[#94a3b8] transition-colors mb-3 block uppercase tracking-wider font-medium"
-          >
-            &larr; Projets
-          </Link>
           <div className="flex items-center gap-2.5">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0"
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0"
               style={{ backgroundColor: project.color }}
             >
               {project.name[0]}
@@ -76,7 +82,22 @@ export default async function ProjectLayout({
           <p className="truncate">{project.author}{project.organization ? ` · ${project.organization}` : ""}</p>
         </div>
       </aside>
-      <main className="flex-1 ml-60 p-8 min-h-screen">{children}</main>
+
+      <div className="flex-1 ml-60 flex flex-col min-h-screen">
+        {/* Top bar with auth */}
+        <header className="flex items-center justify-between px-6 py-2.5 border-b border-[#e2e8f0] bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+          <div className="flex items-center gap-1.5 text-xs text-[#94a3b8] min-w-0">
+            <Link href="/" className="hover:text-[#1e293b] transition-colors shrink-0">DevTracker</Link>
+            <span>/</span>
+            <span className="text-[#1e293b] font-medium truncate">{project.name}</span>
+          </div>
+          <div className="shrink-0 ml-3">
+            <AuthHeader />
+          </div>
+        </header>
+
+        <main className="flex-1 p-8">{children}</main>
+      </div>
     </div>
   );
 }
