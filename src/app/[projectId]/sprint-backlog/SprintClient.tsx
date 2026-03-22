@@ -229,12 +229,14 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
     ? currentTasks
     : currentTasks.filter((t) => t.status === statusFilter);
 
-  const grouped = sprint.userStories.concat(["Transversal"]).map((us) => ({
+  // Group tasks by their userStory field (dynamic, not from sprint.userStories)
+  const usSet = new Set(filtered.map((t) => t.userStory || "Transversal"));
+  const grouped = Array.from(usSet).map((us) => ({
     us,
-    tasks: filtered.filter((t) => t.userStory === us),
+    tasks: filtered.filter((t) => (t.userStory || "Transversal") === us),
   })).filter((g) => g.tasks.length > 0);
 
-  const totalHeures = currentTasks.reduce((sum, t) => sum + parseInt(t.estimation), 0);
+  const totalHeures = currentTasks.reduce((sum, t) => sum + parseFloat(t.estimation) || 0, 0);
 
   const statusCounts = {
     "A faire": currentTasks.filter((t) => t.status === "A faire").reduce((s, t) => s + parseInt(t.estimation), 0),
