@@ -528,7 +528,15 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
               projectId={projectId}
               sprintId={selectedSprint}
               sprintName={displayId(selectedSprint).replace("sprint-", "Sprint ")}
-              todoCount={currentTasks.filter((t) => t.status === "A faire").length}
+              todoCount={currentTasks.filter((t: Task) => t.status === "A faire").length}
+              tasks={currentTasks.filter((t: Task) => t.status === "A faire").map((t: Task) => ({
+                id: t.id,
+                titre: t.titre,
+                status: t.status,
+                type: t.type,
+                estimation: t.estimation,
+                userStory: t.userStory,
+              }))}
             />
             <DevServerButton projectId={projectId} />
           </div>

@@ -44,6 +44,29 @@ function ensureProjectDir(projectSlug?: string): string {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
+  // Ensure .claudeignore exists to prevent reading node_modules/.next
+  const ignoreFile = join(dir, ".claudeignore");
+  if (!existsSync(ignoreFile)) {
+    writeFileSync(ignoreFile, [
+      "node_modules/",
+      ".next/",
+      ".git/",
+      "dist/",
+      "build/",
+      "*.lock",
+      "package-lock.json",
+    ].join("\n"), "utf-8");
+  }
+  // Ensure .gitignore exists
+  const gitignoreFile = join(dir, ".gitignore");
+  if (!existsSync(gitignoreFile)) {
+    writeFileSync(gitignoreFile, [
+      "node_modules/",
+      ".next/",
+      "dist/",
+      ".env",
+    ].join("\n"), "utf-8");
+  }
   return dir;
 }
 
@@ -62,7 +85,8 @@ export function executeCliBackground(
   const args: string[] = [];
 
   // For background coding: use --print + --dangerously-skip-permissions so Claude creates files
-  if (command === "claude") args.push("--print", "--dangerously-skip-permissions");
+  // --output-format text avoids symlink issues on Windows
+  if (command === "claude") args.push("--print", "--dangerously-skip-permissions", "--output-format", "text");
   else if (command === "codex") args.push("--quiet");
 
   const child = spawn(command, args, {

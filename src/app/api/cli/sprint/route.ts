@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { projectId, sprintId, provider } = await request.json();
+  const { projectId, sprintId, provider, mode, taskId, taskTitle, taskType, taskEstimation, taskUserStory } = await request.json();
 
   if (!projectId || !sprintId || !provider) {
     return NextResponse.json({ error: "projectId, sprintId et provider requis" }, { status: 400 });
@@ -30,19 +30,9 @@ export async function POST(request: NextRequest) {
   const running = getRunningJob(projectId, "sprint");
   if (running) {
     return NextResponse.json(
-      { error: "Un sprint est déjà en cours d'exécution", jobId: running.id },
+      { error: "Un job est déjà en cours d'exécution", jobId: running.id },
       { status: 409 }
     );
-  }
-
-  // Load sprint + tasks + project context
-  const sprint = await prisma.sprint.findUnique({
-    where: { id: sprintId },
-    include: { tasks: true },
-  });
-
-  if (!sprint) {
-    return NextResponse.json({ error: "Sprint introuvable" }, { status: 404 });
   }
 
   const project = await prisma.project.findUnique({
@@ -54,13 +44,93 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Projet introuvable" }, { status: 404 });
   }
 
+  const stack = project.stackItems.map((s) => s.name).join(", ") || "Non spécifiée";
+
+  // ===== MODE: Single task =====
+  if (mode === "task" && taskId) {
+    const prompt = `Tu es un développeur expérimenté travaillant sur le projet "${project.name}".
+Stack technique: ${stack}
+Description: ${project.description || "Pas de description"}
+
+Tu travailles dans le répertoire courant. Le projet est peut-être déjà initialisé.
+Si le projet n'existe pas encore, initialise-le (npm init, git init, créer les fichiers de base).
+Si le projet existe, continue le développement.
+
+== Tâche à implémenter ==
+- Titre: ${taskTitle}
+- Type: ${taskType || "Dev"}
+- Estimation: ${taskEstimation || "Non estimée"}
+${taskUserStory ? `- User Story: ${taskUserStory}` : ""}
+
+Instructions:
+1. Implémente UNIQUEMENT cette tâche
+2. Écris du code propre, fonctionnel et bien structuré
+3. Fais un git commit avec le message: "${taskTitle}"
+4. NE TOUCHE PAS aux fichiers node_modules/, .next/, .git/
+5. Quand c'est terminé, affiche EXACTEMENT: TASK_DONE
+`;
+
+    // Mark task as "En cours"
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { status: "En cours" },
+    });
+
+    const jobId = createJob("sprint", projectId, {
+      sprintId,
+      provider,
+      taskIds: [taskId],
+      mode: "task",
+      taskTitle,
+    });
+
+    const child = executeCliBackground(
+      provider,
+      prompt,
+      projectId,
+      (line) => appendOutput(jobId, line),
+      async (code, stderr) => {
+        finishJob(jobId, code, stderr || undefined);
+
+        const job = getJob(jobId);
+        const fullOutput = job ? job.output.join("\n") : "";
+
+        if (code === 0 || fullOutput.includes("TASK_DONE")) {
+          await prisma.task.update({
+            where: { id: taskId },
+            data: { status: "Termine" },
+          });
+        } else {
+          // Error — put back to "A faire"
+          await prisma.task.update({
+            where: { id: taskId },
+            data: { status: "A faire" },
+          });
+        }
+      }
+    );
+
+    const job = getJob(jobId);
+    if (job) job.process = child;
+
+    return NextResponse.json({ jobId, taskCount: 1 }, { status: 202 });
+  }
+
+  // ===== MODE: Full sprint =====
+  const sprint = await prisma.sprint.findUnique({
+    where: { id: sprintId },
+    include: { tasks: true },
+  });
+
+  if (!sprint) {
+    return NextResponse.json({ error: "Sprint introuvable" }, { status: 404 });
+  }
+
   const todoTasks = sprint.tasks.filter((t) => t.status === "A faire" || t.status === "En cours");
   if (todoTasks.length === 0) {
     return NextResponse.json({ error: "Aucune tâche à faire dans ce sprint" }, { status: 400 });
   }
 
-  // Build coding prompt
-  const stack = project.stackItems.map((s) => s.name).join(", ") || "Non spécifiée";
   const taskList = todoTasks
     .map((t) => `- [${t.id.split(":").pop()}] ${t.titre} (${t.type}, estimation: ${t.estimation})\n  ${t.description || "Pas de description supplémentaire"}${t.userStory ? `\n  User Story: ${t.userStory}` : ""}`)
     .join("\n");
@@ -81,10 +151,11 @@ Instructions:
 1. Implémente chaque tâche dans l'ordre indiqué
 2. Écris du code propre, fonctionnel et bien structuré
 3. Fais un git commit après chaque tâche terminée avec le message: "[ID] Titre de la tâche"
-4. Si une tâche n'est pas claire, fais au mieux avec le contexte disponible
-5. Quand tout est terminé, affiche sur la dernière ligne EXACTEMENT ce JSON:
+4. NE TOUCHE PAS aux fichiers node_modules/, .next/, .git/
+5. Si une tâche n'est pas claire, fais au mieux avec le contexte disponible
+6. Quand tout est terminé, affiche sur la dernière ligne EXACTEMENT ce JSON:
    {"completed": [${todoTasks.map((t) => `"${t.id.split(":").pop()}"`).join(", ")}], "status": "done"}
-6. Si certaines tâches échouent, indique:
+7. Si certaines tâches échouent, indique:
    {"completed": ["T-xxx"], "failed": ["T-yyy"], "status": "partial"}
 `;
 
@@ -95,7 +166,6 @@ Instructions:
     data: { status: "En cours" },
   });
 
-  // Create job
   const jobId = createJob("sprint", projectId, {
     sprintId,
     provider,
@@ -103,18 +173,14 @@ Instructions:
     sprintName: sprint.nom,
   });
 
-  // Launch background process
   const child = executeCliBackground(
     provider,
     prompt,
     projectId,
-    (line) => {
-      appendOutput(jobId, line);
-    },
+    (line) => appendOutput(jobId, line),
     async (code, stderr) => {
       finishJob(jobId, code, stderr || undefined);
 
-      // Parse final JSON to determine completed tasks
       const job = getJob(jobId);
       if (!job) return;
 
@@ -144,20 +210,17 @@ Instructions:
             });
           }
         } catch {
-          // JSON parse failed — fallback
+          // JSON parse failed
         }
       } else if (code === 0) {
-        // No JSON but success — mark all as Termine
         await prisma.task.updateMany({
           where: { id: { in: taskIds } },
           data: { status: "Termine" },
         });
       }
-      // If error, tasks stay "En cours"
     }
   );
 
-  // Store process reference for kill
   const job = getJob(jobId);
   if (job) job.process = child;
 
