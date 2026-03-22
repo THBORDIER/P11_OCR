@@ -160,12 +160,14 @@ export default function AiGenerateButton({
         });
         const cliData = await cliRes.json();
         if (!cliRes.ok) {
+          // If CLI fails, fallback to manual with error message
           setError(cliData.error || "Erreur CLI");
+          setManualPrompt(promptData.prompt);
           return;
         }
 
         // Parse CLI output — extract JSON from response
-        const output = cliData.output || cliData.result || "";
+        const output = cliData.response || cliData.output || cliData.result || "";
         const jsonMatch = output.match(/\{[\s\S]*"items"[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);
@@ -176,9 +178,8 @@ export default function AiGenerateButton({
             const parsed = JSON.parse(output);
             setPreview(parsed.items || (Array.isArray(parsed) ? parsed : [parsed]));
           } catch {
-            setError("La réponse CLI ne contient pas de JSON valide. Essayez le mode manuel.");
+            setError("La réponse CLI ne contient pas de JSON valide. Essayez le mode Copier/Coller.");
             setManualPrompt(promptData.prompt);
-            setShowManual(true);
           }
         }
       }

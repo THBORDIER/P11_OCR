@@ -29,24 +29,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "prompt requis" }, { status: 400 });
   }
 
-  // Check settings
+  // Resolve command — use provider name as command directly if not in settings
   const settings = await getGlobalSettings();
-  if (!settings.cliBridgeEnabled) {
-    return NextResponse.json(
-      { error: "CLI désactivé. Activez-le dans Paramètres > CLI." },
-      { status: 400 }
-    );
-  }
-
-  // Resolve command from providers config
   const providers = (settings.cliProviders || []) as { name: string; command: string; enabled: boolean }[];
   const providerConfig = providers.find((p) => p.name === provider);
-  if (!providerConfig || !providerConfig.enabled) {
-    return NextResponse.json(
-      { error: `Provider "${provider}" désactivé ou non configuré.` },
-      { status: 400 }
-    );
-  }
+  const command = providerConfig?.command || provider;
 
   // Check if tool is installed
   const available = await detectProviders();
@@ -60,7 +47,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await executeCliPrompt(providerConfig.command, prompt, projectSlug);
+    const result = await executeCliPrompt(command, prompt, projectSlug);
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json(

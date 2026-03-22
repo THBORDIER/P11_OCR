@@ -4,8 +4,8 @@ const SETTINGS_ID = "default";
 
 const DEFAULT_PROVIDERS = [
   { name: "claude", command: "claude", enabled: true },
-  { name: "gemini", command: "gemini", enabled: false },
-  { name: "codex", command: "codex", enabled: false },
+  { name: "gemini", command: "gemini", enabled: true },
+  { name: "codex", command: "codex", enabled: true },
 ];
 
 export async function getGlobalSettings() {
