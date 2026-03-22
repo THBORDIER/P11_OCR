@@ -172,6 +172,86 @@ const projectFields: FieldConfig[] = [
   { name: "methodologyPrioritizationDescription", label: "Description de la priorisation", type: "textarea" },
 ];
 
+// ── Project Checklist ────────────────────────────────────────
+
+function ProjectChecklist({
+  projectId,
+  hasContext,
+  hasPersonas,
+  hasUS,
+  hasSprints,
+  hasTests,
+}: {
+  projectId: string;
+  hasContext: boolean;
+  hasQuestionnaire: boolean;
+  hasPersonas: boolean;
+  hasUS: boolean;
+  hasSprints: boolean;
+  hasTests: boolean;
+}) {
+  const steps = [
+    { label: "Cadrage initial", href: `/${projectId}/onboarding`, done: hasContext, desc: "Décrivez le projet, les contraintes et la stack" },
+    { label: "Questionnaire client", href: `/${projectId}/questionnaire`, done: hasContext, desc: "Envoyez le questionnaire au client" },
+    { label: "Analyser les retours", href: `/${projectId}/analyse`, done: hasPersonas, desc: "Générez des personas depuis les réponses" },
+    { label: "Product Backlog", href: `/${projectId}/product-backlog`, done: hasUS, desc: "Créez ou générez les User Stories" },
+    { label: "Sprints", href: `/${projectId}/sprint-backlog`, done: hasSprints, desc: "Organisez les tâches en sprints" },
+    { label: "Recettage", href: `/${projectId}/recettage`, done: hasTests, desc: "Créez les cas de test" },
+  ];
+
+  const completed = steps.filter((s) => s.done).length;
+  const allDone = completed === steps.length;
+
+  if (allDone) return null;
+
+  return (
+    <div className="bg-gradient-to-r from-[#eff6ff] to-[#f0fdf4] rounded-xl border border-[#dbeafe] p-6 mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base font-semibold text-[#1e293b]">
+          Démarrage du projet
+        </h2>
+        <span className="text-xs font-medium text-[#3b82f6] bg-white px-2 py-1 rounded-full">
+          {completed}/{steps.length} étapes
+        </span>
+      </div>
+      <div className="space-y-2">
+        {steps.map((step, i) => (
+          <a
+            key={i}
+            href={step.href}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
+              step.done
+                ? "bg-white/50 text-[#94a3b8]"
+                : i === completed
+                ? "bg-white shadow-sm border border-[#e2e8f0] text-[#1e293b] hover:shadow-md"
+                : "text-[#94a3b8]"
+            }`}
+          >
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+              step.done
+                ? "bg-emerald-100 text-emerald-600"
+                : i === completed
+                ? "bg-[#3b82f6] text-white"
+                : "bg-[#f1f5f9] text-[#cbd5e1]"
+            }`}>
+              {step.done ? "✓" : i + 1}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-medium ${step.done ? "line-through" : ""}`}>{step.label}</p>
+              {i === completed && !step.done && (
+                <p className="text-xs text-[#64748b]">{step.desc}</p>
+              )}
+            </div>
+            {i === completed && !step.done && (
+              <span className="text-xs text-[#3b82f6] font-medium shrink-0">Commencer &rarr;</span>
+            )}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ──────────────────────────────────────────
 
 // ── Activity Feed ────────────────────────────────────────
@@ -400,6 +480,19 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
           )}
         </div>
       </div>
+
+      {/* Onboarding checklist */}
+      {isOwner && autoStats && (
+        <ProjectChecklist
+          projectId={project.id}
+          hasContext={!!project.contextSummary}
+          hasQuestionnaire={autoStats.userStories.total >= 0} // sections exist from creation
+          hasPersonas={autoStats.userStories.total >= 0 && project.personas?.length > 0}
+          hasUS={autoStats.userStories.total > 0}
+          hasSprints={autoStats.tasks.total > 0}
+          hasTests={autoStats.tests.total > 0}
+        />
+      )}
 
       {/* Auto-calculated progress */}
       {autoStats && (autoStats.userStories.total > 0 || autoStats.tasks.total > 0 || autoStats.tests.total > 0) && (

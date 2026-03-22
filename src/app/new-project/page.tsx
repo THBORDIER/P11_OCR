@@ -128,7 +128,7 @@ export default function NewProjectPage() {
       }
 
       const project = await res.json();
-      router.push(`/${project.id}`);
+      router.push(`/${project.id}/onboarding`);
     } catch {
       setError("Une erreur est survenue");
       setLoading(false);

@@ -29,7 +29,7 @@ Retourne un JSON : { "items": [{ "initials": "AB", "nom": "Prénom Nom", "age": 
 };
 
 export async function POST(request: NextRequest) {
-  const { type, projectId, model } = await request.json();
+  const { type, projectId, model, getPromptOnly } = await request.json();
 
   if (!PROMPTS[type]) {
     return NextResponse.json({ error: "Type invalide" }, { status: 400 });
@@ -98,8 +98,15 @@ Phases existantes : ${project.phases.map((p) => p.title).join(", ") || "Aucune"}
     }
   }
 
+  const fullPrompt = PROMPTS[type](context);
+
+  // Return prompt only (for manual copy-paste fallback)
+  if (getPromptOnly) {
+    return NextResponse.json({ prompt: fullPrompt });
+  }
+
   try {
-    const raw = await generateWithOllama(PROMPTS[type](context), model || "llama3.2");
+    const raw = await generateWithOllama(fullPrompt, model || "llama3.2");
     const parsed = JSON.parse(raw);
     return NextResponse.json(parsed);
   } catch (e) {
