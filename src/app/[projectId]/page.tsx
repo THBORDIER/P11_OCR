@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import DashboardClient from "./DashboardClient";
+import { detectProviders, isLocalEnvironment } from "@/lib/cli-exec";
 
 export default async function ProjectDashboard({
   params,
@@ -32,5 +33,13 @@ export default async function ProjectDashboard({
     tests: { total: totalTests, ok: okTests },
   };
 
-  return <DashboardClient initialProject={project} isOwner={isOwner} autoStats={autoStats} />;
+  // Detect CLI providers for GenerateAll button
+  let cliProviders: string[] = [];
+  if (isLocalEnvironment()) {
+    try {
+      cliProviders = await detectProviders();
+    } catch { /* ignore */ }
+  }
+
+  return <DashboardClient initialProject={project} isOwner={isOwner} autoStats={autoStats} cliProviders={cliProviders} />;
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
+import GenerateAllButton from "@/components/GenerateAllButton";
 
 interface ProjectKpi {
   id: number;
@@ -405,9 +406,10 @@ interface DashboardClientProps {
   initialProject: Project;
   isOwner: boolean;
   autoStats?: AutoStats;
+  cliProviders?: string[];
 }
 
-export default function DashboardClient({ initialProject, isOwner, autoStats }: DashboardClientProps) {
+export default function DashboardClient({ initialProject, isOwner, autoStats, cliProviders = [] }: DashboardClientProps) {
   const router = useRouter();
   const project = initialProject;
 
@@ -553,6 +555,20 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
           hasRespondents={(project._count?.respondents || 0) > 0}
           hasPersonas={(project._count?.personas || 0) > 0}
           hasUS={autoStats.userStories.total > 0}
+          hasSprints={autoStats.tasks.total > 0}
+          hasTests={autoStats.tests.total > 0}
+        />
+      )}
+
+      {/* Generate All button — shows when questionnaire is filled */}
+      {isOwner && autoStats && (
+        <GenerateAllButton
+          projectId={project.id}
+          provider={cliProviders.length > 0 ? cliProviders[0] : "manual"}
+          hasRespondents={(project._count?.respondents || 0) > 0}
+          hasPersonas={(project._count?.personas || 0) > 0}
+          hasUS={autoStats.userStories.total > 0}
+          hasPhases={(project.phases?.length || 0) > 0}
           hasSprints={autoStats.tasks.total > 0}
           hasTests={autoStats.tests.total > 0}
         />
