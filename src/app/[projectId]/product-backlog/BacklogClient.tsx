@@ -43,70 +43,25 @@ const valeurColors: Record<string, string> = {
   Moyenne: "bg-[#f0f9ff] text-[#075985] border-[#bae6fd]",
 };
 
-const exemplesDetailles: Record<string, { label: string; justification: string[] }> = {
-  "US-003": {
-    label: "Exemple detaille",
-    justification: [
-      "Layout complexe avec en-tete, sidebar et zone de contenu dynamique",
-      "5 onglets distincts a implementer (Apercu, Affaires, Echanges, Taches, Documents)",
-      "4 KPIs avec calculs dynamiques (valeur totale, affaires actives, revenus, taches)",
-      "API avec relations multiples (client + contacts + opportunites + taches)",
-    ],
-  },
-  "US-007": {
-    label: "Exemple detaille",
-    justification: [
-      "6 colonnes Kanban avec affichage responsive",
-      "Drag & drop natif entre colonnes avec gestion d'etat complexe",
-      "Calculs en temps reel des totaux et compteurs par colonne",
-      "State management avance (reorganisation, persistance, synchronisation)",
-    ],
-  },
-};
-
 const getCardDetails = (us: UserStory) => {
   const detailsMetier =
     us.detailsMetier && us.detailsMetier.length > 0
       ? us.detailsMetier
       : [
           `Acteur principal : ${us.enTantQue}`,
-          `Valeur metier attendue : ${us.afinDe}`,
+          `Valeur métier attendue : ${us.afinDe}`,
           `Priorisation : ${us.priorite} (${us.valeur})`,
         ];
 
   const contraintes =
     us.contraintes && us.contraintes.length > 0
       ? us.contraintes
-      : [
-          "Respect des droits d'acces par role (RBAC).",
-          "Conformite RGPD sur les donnees clients et prospects.",
-        ];
-
-  const fullText = `${us.jeSouhaite} ${us.criteres.join(" ")}`.toLowerCase();
-  const dependances: string[] = [];
-
-  if (fullText.includes("outlook") || fullText.includes("calendar")) {
-    dependances.push("Integration Microsoft 365 (Graph API) pour emails et agendas.");
-  }
-  if (fullText.includes("hubspot")) {
-    dependances.push("Connecteur API HubSpot pour synchronisation des leads.");
-  }
-  if (fullText.includes("email") || fullText.includes("brevo")) {
-    dependances.push("Service email transactionnel (ex: Brevo) pour notifications.");
-  }
-  if (fullText.includes("excel") || fullText.includes("erp") || fullText.includes("import")) {
-    dependances.push("Module d'import de donnees (CSV/Excel/ERP) et mapping de champs.");
-  }
-  if (fullText.includes("auth") || fullText.includes("sso")) {
-    dependances.push("Mecanisme d'authentification et gestion de session securisee.");
-  }
+      : ["Aucune contrainte spécifiée."];
 
   const dependancesTech =
     us.dependancesTech && us.dependancesTech.length > 0
       ? us.dependancesTech
-      : dependances.length > 0
-        ? dependances
-        : ["Aucune dependance externe bloquante (implementation CRM interne)."];
+      : ["Aucune dépendance technique spécifiée."];
 
   return { detailsMetier, contraintes, dependancesTech };
 };
@@ -337,7 +292,7 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
         <div>
           <h1 className="text-3xl font-bold text-[#1e293b]">Product Backlog</h1>
           <p className="text-[#64748b] mt-2">
-            Livrable 4 — {backlog.length} User Stories, {backlog.reduce((s, u) => s + u.estimation, 0)} points d'effort total
+            {backlog.length} User Stories — {backlog.reduce((s, u) => s + u.estimation, 0)} points d'effort total
           </p>
         </div>
         {isOwner && (
@@ -442,53 +397,28 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
         </div>
       </div>
 
-      {/* Estimation Methodology */}
+      {/* Estimation Summary */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-4 mb-6">
         <h3 className="text-sm font-bold text-[#334155] mb-3 flex items-center gap-2">
-          <span className="text-base">&#127922;</span> Methodologie d'estimation
+          <span className="text-base">&#127922;</span> Estimation
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex items-center gap-6 text-sm text-[#475569]">
           <div>
-            <h4 className="text-xs font-semibold text-[#475569] uppercase mb-2">Methode utilisee</h4>
-            <p className="text-sm text-[#475569] mb-2">
-              <strong>Planning Poker</strong> avec story points — suite de Fibonacci : 1, 2, 3, 5, 8, 13
-            </p>
-            <div className="bg-[#eff6ff] rounded-lg p-3 border border-[#bfdbfe]">
-              <p className="text-xs font-medium text-[#1e40af] mb-1">Story de reference</p>
-              <p className="text-sm text-[#1e3a5f]">
-                <strong>US-002</strong> &laquo;Filtrer et rechercher&raquo; = <strong>3 points</strong>
-              </p>
-              <p className="text-xs text-[#3b82f6] mt-1">
-                Complexite moyenne, pas d'API custom, logique de filtrage standard
-              </p>
-            </div>
+            <span className="font-bold text-[#1e293b] text-lg">{totalPoints}</span>
+            <span className="ml-1">points total</span>
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-[#475569] uppercase mb-2">Bareme des points</h4>
-            <div className="space-y-1.5 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#3b82f6] bg-[#eff6ff] px-2 py-0.5 rounded w-12 text-center">1-2</span>
-                <span className="text-[#475569]">Configuration simple, composant UI basique</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#22c55e] bg-[#f0fdf4] px-2 py-0.5 rounded w-12 text-center">3</span>
-                <span className="text-[#475569]">Developpement standard, logique metier moderee</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#f59e0b] bg-[#fffbeb] px-2 py-0.5 rounded w-12 text-center">5</span>
-                <span className="text-[#475569]">Multi-composants, interactions entre modules</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#ef4444] bg-[#fef2f2] px-2 py-0.5 rounded w-12 text-center">8</span>
-                <span className="text-[#475569]">Complexe : API + UI riche + logique avancee</span>
-              </div>
-            </div>
-            <div className="mt-3 bg-[#f0fdf4] rounded-lg p-3 border border-[#bbf7d0]">
-              <p className="text-xs font-medium text-[#166534]">
-                Total : <strong>116 points</strong> sur 6 iterations — velocite cible de <strong>~20 pts/sprint</strong>
-              </p>
-            </div>
+            <span className="font-bold text-[#1e293b] text-lg">{sortedSprints.length}</span>
+            <span className="ml-1">sprints</span>
           </div>
+          {sortedSprints.length > 0 && (
+            <div>
+              <span className="font-bold text-[#1e293b] text-lg">
+                ~{Math.round(totalPoints / sortedSprints.length)}
+              </span>
+              <span className="ml-1">pts/sprint (vélocité moy.)</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -564,12 +494,7 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
                     <span className={`text-xs font-medium px-2 py-0.5 rounded border ${valeurColors[us.valeur]}`}>
                       {us.valeur}
                     </span>
-                    {exemplesDetailles[displayId(us.id)] && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded border bg-[#faf5ff] text-[#7c3aed] border-[#ddd6fe]">
-                        {exemplesDetailles[displayId(us.id)].label}
-                      </span>
-                    )}
-                    <span className="flex-1 font-medium text-sm text-[#334155]">{us.titre}</span>
+<span className="flex-1 font-medium text-sm text-[#334155]">{us.titre}</span>
                     {isValidated && (
                       <span className="text-xs font-bold text-[#22c55e] bg-[#dcfce7] px-2 py-0.5 rounded border border-[#86efac] flex items-center gap-1">
                         <span>&#10003;</span> Validee{validationDate ? ` le ${formatDate(validationDate)}` : ""}
@@ -674,24 +599,6 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
                       </ul>
                     </div>
                   </div>
-                  {exemplesDetailles[displayId(us.id)] && (
-                    <div className="mb-4 bg-[#faf5ff] rounded-lg p-4 border border-[#ddd6fe]">
-                      <h4 className="text-xs font-bold text-[#7c3aed] uppercase mb-2 flex items-center gap-2">
-                        <span>&#9733;</span> Pourquoi {us.estimation} points ? — Justification detaillee
-                      </h4>
-                      <ul className="space-y-1.5">
-                        {exemplesDetailles[displayId(us.id)].justification.map((j, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-[#6b21a8]">
-                            <span className="text-[#7c3aed] mt-0.5 font-bold">&rarr;</span>
-                            <span>{j}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <p className="text-xs text-[#7c3aed] mt-3 pt-2 border-t border-[#ddd6fe]">
-                        Cette US sert de <strong>reference haute</strong> dans le bareme d'estimation (8 pts = complexite elevee avec API + UI riche + logique avancee).
-                      </p>
-                    </div>
-                  )}
                   <div className="flex items-center justify-between pt-3 border-t border-[#e2e8f0]">
                     <div className="text-xs text-[#94a3b8]">
                       Sprint : {us.sprint} · Estimation : {us.estimation} pts

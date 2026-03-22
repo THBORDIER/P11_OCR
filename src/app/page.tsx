@@ -66,9 +66,13 @@ export default async function HomePage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-[#94a3b8]">
-                  {project.author} — {project.organization}
-                  {project.isPublic && " (public)"}
+                <span className="text-xs text-[#94a3b8] flex items-center gap-2">
+                  {project.author}{project.organization ? ` — ${project.organization}` : ""}
+                  {project.isPublic && (
+                    <span className="bg-[#dbeafe] text-[#1d4ed8] px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                      DÉMO
+                    </span>
+                  )}
                 </span>
                 <span
                   className="text-sm font-medium"

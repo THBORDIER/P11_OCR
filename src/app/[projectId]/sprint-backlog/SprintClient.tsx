@@ -380,7 +380,7 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
         <div>
           <h1 className="text-3xl font-bold text-[#1e293b]">Sprint Backlog</h1>
           <p className="text-[#64748b] mt-2">
-            Livrable 5 — Detail des sprints et decoupage en taches
+            Détail des sprints et découpage en tâches
           </p>
         </div>
         {isOwner && (

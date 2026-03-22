@@ -145,7 +145,7 @@ export default function CommunicationClient({
           Plan de communication client
         </h1>
         <p className="text-[#64748b] mt-2">
-          Livrable 7 — Organisation du suivi professionnel avec le client tout au long du projet
+          Organisation du suivi client tout au long du projet
         </p>
       </div>
 

@@ -26,18 +26,6 @@ interface QuestionnaireClientProps {
 }
 
 function createFakeFormData(sections: Section[]): Record<string, string | string[]> {
-  const fakeTextAnswers: Record<string, string> = {
-    q1_1: "Spart accompagne les PME dans la digitalisation commerciale et operationnelle.",
-    q1_4: "10 commerciaux",
-    q2_2: "Donnees dispersees, doublons frequents, faible visibilite sur le pipeline.",
-    q3_1: "Centraliser les donnees, fiabiliser le suivi commercial, accelerer les relances.",
-    q3_3: "Un CRM simple, rapide, utilisable sur mobile et partage par toute l'equipe.",
-    q4_2: "MVP attendu dans 3 mois.",
-    q4_3: "Sophie Martin - Directrice commerciale",
-    q5_1: "Eviter un outil lourd, lent et difficile a adopter.",
-    q5_4: "Besoin d'un reporting manager fiable avant chaque comite hebdomadaire.",
-  };
-
   const data: Record<string, string | string[]> = {};
 
   for (const section of sections) {
@@ -46,20 +34,17 @@ function createFakeFormData(sections: Section[]): Record<string, string | string
         data[question.id] = (question.options || []).slice(0, 2);
         continue;
       }
-
       if (question.type === "select") {
         data[question.id] = question.options?.[0] || "";
         continue;
       }
-
       if (question.type === "scale" && question.options) {
         question.options.forEach((opt, index) => {
           data[`${question.id}_${opt}`] = String(5 - (index % 3));
         });
         continue;
       }
-
-      data[question.id] = fakeTextAnswers[question.id] || "Reponse fictive client.";
+      data[question.id] = "Exemple de réponse client.";
     }
   }
 
@@ -76,7 +61,7 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
             Questionnaire de recueil de besoins
           </h1>
           <p className="text-[#64748b] mt-2">
-            Livrable 1 — Document de recueil de besoins
+            Recueil de besoins client
           </p>
         </div>
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-12 text-center">
@@ -525,7 +510,7 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
             Questionnaire de recueil de besoins
           </h1>
           <p className="text-[#64748b] mt-2">
-            Livrable 1 — Document de recueil de besoins
+            Recueil de besoins client
           </p>
         </div>
 

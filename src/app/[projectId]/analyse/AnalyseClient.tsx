@@ -112,7 +112,7 @@ export default function AnalyseClient({
           Analyse des retours client
         </h1>
         <p className="text-[#64748b] mt-2">
-          Livrable 2 — Synthese structuree des reponses client et de la maquette Figma
+          Synthèse des retours client et analyse
         </p>
       </div>
 
@@ -237,7 +237,7 @@ export default function AnalyseClient({
                   </p>
                 </div>
                 <span className="text-xs font-semibold bg-[#eff6ff] text-[#1d4ed8] px-2 py-1 rounded">
-                  Donnees simulees - Exercice P11
+                  Données simulées
                 </span>
               </div>
 
