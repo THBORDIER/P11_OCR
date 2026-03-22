@@ -75,10 +75,63 @@ function displayId(id: string): string {
 const statusFlow = ["A faire", "En cours", "En review", "Termine"];
 
 export default function SprintClient({ sprints, projectId, usDescriptions, isOwner }: SprintClientProps) {
+  const router = useRouter();
+
   if (sprints.length === 0) {
     return (
-      <div className="text-center py-20 text-[#94a3b8]">
-        <p className="text-lg">Aucun sprint defini pour ce projet.</p>
+      <div>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-[#1e293b]">Sprint Backlog</h1>
+            <p className="text-[#64748b] mt-2">Détail des sprints et découpage en tâches</p>
+          </div>
+          {isOwner && (
+            <AiGenerateButton
+              type="sprints"
+              projectId={projectId}
+              label="Générer des sprints"
+              onGenerated={async (items) => {
+                for (const item of items) {
+                  const s = item as { name?: string; goal?: string; startDate?: string; endDate?: string; tasks?: { title: string; status?: string; userStory?: string }[] };
+                  const sprintId = `${projectId}:${(s.name || "Sprint").toLowerCase().replace(/\s+/g, "-")}`;
+                  await fetch(`/api/projects/${projectId}/sprints`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      id: sprintId,
+                      nom: s.name || "",
+                      objectif: s.goal || "",
+                      objectifCourt: s.goal?.slice(0, 50) || "",
+                      debut: s.startDate || "",
+                      fin: s.endDate || "",
+                      duree: "2 semaines",
+                      velocite: "",
+                      userStories: [],
+                    }),
+                  });
+                  for (const t of s.tasks || []) {
+                    const taskId = `${projectId}:T-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                    await fetch(`/api/projects/${projectId}/tasks`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        id: taskId, sprintId,
+                        userStory: t.userStory || "", titre: t.title,
+                        description: "", type: "Dev", estimation: "0.5j",
+                        status: t.status || "A faire", assignee: "",
+                      }),
+                    });
+                  }
+                }
+                window.location.reload();
+              }}
+            />
+          )}
+        </div>
+        <div className="bg-white rounded-xl border border-[#e2e8f0] p-12 text-center">
+          <p className="text-[#64748b] text-lg mb-2">Aucun sprint défini</p>
+          <p className="text-sm text-[#94a3b8]">Générez des sprints avec l'IA ou créez-en manuellement.</p>
+        </div>
       </div>
     );
   }

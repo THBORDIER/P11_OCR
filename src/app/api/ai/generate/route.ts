@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { generateWithOllama, isOllamaAvailable } from "@/lib/ollama";
 
 const PROMPTS: Record<string, (ctx: string) => string> = {
-  "user-stories": (ctx) => `Tu es un Product Owner expert. Génère les User Stories nécessaires et suffisantes pour ce projet. Adapte le nombre à la complexité du projet (un projet simple = peu de US, un projet complexe = plus de US).
+  "user-stories": (ctx) => `Tu es un Product Owner expert. Génère les User Stories nécessaires et suffisantes pour ce projet. Adapte le nombre à la complexité du projet.
+IMPORTANT : Varie les priorités (Must, Should, Could, Won't) et les valeurs (Haute, Moyenne, Basse). Seules les US critiques sont "Must/Haute", les autres doivent être réparties. Répartis aussi les US sur plusieurs sprints.
 ${ctx}
-Retourne un JSON : { "items": [{ "epic": "...", "titre": "...", "enTantQue": "...", "jeSouhaite": "...", "afinDe": "...", "criteres": ["..."], "estimation": 5, "priorite": "Must", "sprint": "Sprint 1", "valeur": "Haute" }] }`,
+Retourne un JSON : { "items": [{ "epic": "...", "titre": "...", "enTantQue": "...", "jeSouhaite": "...", "afinDe": "...", "criteres": ["..."], "estimation": 5, "priorite": "Must|Should|Could|Won't", "sprint": "Sprint 1", "valeur": "Haute|Moyenne|Basse" }] }`,
 
   questionnaire: (ctx) => `Tu es un consultant en cadrage de projets. Génère un questionnaire client adapté à ce projet. Choisis le nombre de sections et de questions en fonction de la complexité. Un projet simple = questionnaire court, un projet complexe = plus de sections.
 ${ctx}
