@@ -595,7 +595,7 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
           Questionnaire de recueil de besoins
         </h1>
         <p className="text-[#64748b] mt-2">
-          Livrable 1 — Document de recueil de besoins
+          Recueil de besoins client
         </p>
       </div>
 
@@ -616,22 +616,72 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
         </p>
       </div>
 
+      {/* Actions owner */}
+      {isOwner && (
+        <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="text-sm font-medium text-[#166534]">Lien public du questionnaire</p>
+              <p className="text-xs text-[#15803d] font-mono mt-1">
+                {typeof window !== "undefined" ? `${window.location.origin}/q/${projectId}` : `/q/${projectId}`}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/q/${projectId}`;
+                  navigator.clipboard.writeText(url);
+                  alert("Lien copié !");
+                }}
+                className="px-4 py-2 rounded-lg bg-white text-[#166534] border border-[#166534] text-sm hover:bg-[#f0fdf4] transition-colors"
+              >
+                Copier le lien
+              </button>
+              <button
+                onClick={async () => {
+                  const email = prompt("Email du client :");
+                  if (!email) return;
+                  try {
+                    const res = await fetch(`/api/projects/${projectId}/questionnaire/send`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ to: email }),
+                    });
+                    if (res.ok) {
+                      alert(`Questionnaire envoyé à ${email} !`);
+                    } else {
+                      const data = await res.json();
+                      alert(data.error || "Erreur lors de l'envoi");
+                    }
+                  } catch {
+                    alert("Erreur lors de l'envoi");
+                  }
+                }}
+                className="px-4 py-2 rounded-lg bg-[#166534] text-white text-sm hover:bg-[#15803d] transition-colors"
+              >
+                Envoyer par email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-4 mb-6 flex items-center justify-between gap-3 flex-wrap">
         <p className="text-sm text-[#1e40af]">
-          Besoin d'un export de demonstration ? Generez le questionnaire fictif en PDF a tout moment.
+          Exports PDF disponibles pour démonstration ou envoi.
         </p>
         <div className="flex gap-2">
           <button
             onClick={downloadBlankPdf}
             className="px-4 py-2 rounded-lg bg-white text-[#1d4ed8] border border-[#1d4ed8] text-sm hover:bg-[#eff6ff]"
           >
-            PDF vierge (client)
+            PDF vierge
           </button>
           <button
             onClick={downloadFakePdf}
             className="px-4 py-2 rounded-lg bg-[#1d4ed8] text-white text-sm hover:bg-[#1e40af]"
           >
-            Exporter fake (.pdf)
+            PDF exemple
           </button>
         </div>
       </div>
