@@ -555,8 +555,8 @@ export default function NewProjectPage() {
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { icon: "🤖", name: "Ollama (IA locale)", ready: true },
-                      { icon: "📧", name: "Resend (Mailing)", ready: true },
+                      { icon: "🤖", name: "Ollama (IA locale)", ready: false },
+                      { icon: "📧", name: "Resend (Mailing)", ready: false },
                       { icon: "🔗", name: "Webhooks", ready: false },
                       { icon: "📊", name: "Analytics", ready: false },
                     ].map((integration) => (
