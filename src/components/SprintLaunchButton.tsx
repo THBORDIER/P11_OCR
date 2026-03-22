@@ -46,6 +46,7 @@ export default function SprintLaunchButton({
   const [currentTaskIdx, setCurrentTaskIdx] = useState(0);
   const [mode, setMode] = useState<"sprint" | "task">("task");
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+  const [autoChain, setAutoChain] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
 
   const todoTasks = tasks.filter((t) => t.status === "A faire");
@@ -96,6 +97,17 @@ export default function SprintLaunchButton({
     }, 2000);
     return () => clearInterval(interval);
   }, [jobId, mode, currentTaskIdx, todoTasks, projectId]);
+
+  // Auto-chain: launch next task when current one finishes
+  useEffect(() => {
+    if (autoChain && jobStatus === "done" && currentTaskIdx < todoTasks.length - 1) {
+      const timer = setTimeout(() => {
+        launchNextTask();
+      }, 2000); // 2s pause between tasks
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoChain, jobStatus, currentTaskIdx]);
 
   // Auto-scroll log
   useEffect(() => {
@@ -151,24 +163,13 @@ export default function SprintLaunchButton({
   };
 
   const launchWholeSprint = async () => {
+    // "Sprint complet" now launches task-by-task automatically
     setShowConfirm(false);
     setError("");
-    setMode("sprint");
+    setMode("task");
+    setAutoChain(true);
     try {
-      const res = await fetch("/api/cli/sprint", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, sprintId, provider: selectedProvider }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Erreur de lancement");
-        return;
-      }
-      setJobId(data.jobId);
-      setJobStatus("running");
-      setOutput([]);
-      setElapsed(0);
+      await launchTask(0);
     } catch {
       setError("Erreur de connexion");
     }

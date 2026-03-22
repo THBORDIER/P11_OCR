@@ -63,13 +63,14 @@ Si le projet existe, continue le développement.
 ${taskUserStory ? `- User Story: ${taskUserStory}` : ""}
 
 Instructions:
-1. Implémente UNIQUEMENT cette tâche
-2. Écris du code propre, fonctionnel et bien structuré
-3. Fais un git commit avec le message: "${taskTitle}"
-4. NE TOUCHE PAS aux fichiers node_modules/, .next/, .git/
-5. Si tu lances un serveur de dev, utilise le port 3001 (pas 3000 qui est déjà pris)
-6. NE LIS PAS package-lock.json ou les fichiers dans node_modules/
-7. Quand c'est terminé, affiche EXACTEMENT: TASK_DONE
+1. AVANT de coder, vérifie si cette tâche est déjà implémentée (regarde les fichiers existants, le code source). Si c'est déjà fait, affiche EXACTEMENT: TASK_ALREADY_DONE et ne modifie rien.
+2. Implémente UNIQUEMENT cette tâche
+3. Écris du code propre, fonctionnel et bien structuré
+4. Fais un git commit avec le message: "${taskTitle}"
+5. NE TOUCHE PAS aux fichiers node_modules/, .next/, .git/
+6. Si tu lances un serveur de dev, utilise le port 3001 (pas 3000 qui est déjà pris)
+7. NE LIS PAS package-lock.json ou les fichiers dans node_modules/
+8. Quand c'est terminé, affiche EXACTEMENT: TASK_DONE
 `;
 
     // Mark task as "En cours"
@@ -97,7 +98,7 @@ Instructions:
         const job = getJob(jobId);
         const fullOutput = job ? job.output.join("\n") : "";
 
-        if (code === 0 || fullOutput.includes("TASK_DONE")) {
+        if (fullOutput.includes("TASK_ALREADY_DONE") || fullOutput.includes("TASK_DONE") || code === 0) {
           await prisma.task.update({
             where: { id: taskId },
             data: { status: "Termine" },
