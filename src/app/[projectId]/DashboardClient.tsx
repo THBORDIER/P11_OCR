@@ -5,8 +5,70 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-type Project = any;
+interface ProjectKpi {
+  id: number;
+  label: string;
+  value: string;
+  color: string;
+  order: number;
+}
+
+interface StackItem {
+  id: number;
+  name: string;
+  tag: string;
+  tagColorBg: string;
+  tagColorText: string;
+  description: string;
+  order: number;
+}
+
+interface Phase {
+  id: number;
+  phase: string;
+  title: string;
+  objectif: string;
+  periode: string;
+  color: string;
+  bg: string;
+  order: number;
+}
+
+interface Deliverable {
+  id: number;
+  href: string;
+  title: string;
+  desc: string;
+  status: string;
+  order: number;
+}
+
+interface SkillItem {
+  id: number;
+  name: string;
+  order: number;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  author: string;
+  organization: string;
+  color: string;
+  contextSummary: string;
+  methodologyFramework: string;
+  methodologyFrameworkDescription: string;
+  methodologyPrioritization: string;
+  methodologyPrioritizationDescription: string;
+  kpis: ProjectKpi[];
+  stackItems: StackItem[];
+  phases: Phase[];
+  deliverables: Deliverable[];
+  skills: SkillItem[];
+  _count?: { respondents?: number; personas?: number };
+}
 
 // ── Icon helpers ────────────────────────────────────────────
 
@@ -563,7 +625,7 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
           </div>
         ) : (
           <div className="grid grid-cols-4 gap-4 mt-4">
-            {project.kpis.map((kpi: any) => (
+            {project.kpis.map((kpi) => (
               <div
                 key={kpi.id}
                 className="bg-[#f1f5f9] rounded p-3 text-center relative group"
@@ -597,7 +659,7 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
           <EmptyState label="technologie" isOwner={isOwner} onAdd={() => openCreate("Ajouter une technologie", stackFields, "stack-items")} />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {project.stackItems.map((tech: any) => (
+            {project.stackItems.map((tech) => (
               <div key={tech.id} className="bg-[#f1f5f9] rounded-lg p-4 relative group">
                 {isOwner && (
                   <ItemActions
@@ -689,7 +751,7 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {project.phases.map((phase: any, index: number) => (
+              {project.phases.map((phase, index) => (
                 <div key={phase.id} className="relative group">
                   {isOwner && (
                     <ItemActions
@@ -726,7 +788,7 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
               ))}
             </div>
             <div className="mt-4 flex gap-1 rounded-full overflow-hidden h-2">
-              {project.phases.map((phase: any) => (
+              {project.phases.map((phase) => (
                 <div
                   key={phase.id}
                   className="flex-1"
@@ -749,7 +811,7 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
           <EmptyState label="livrable" isOwner={isOwner} onAdd={() => openCreate("Ajouter un livrable", deliverableFields, "deliverables")} />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {project.deliverables.map((l: any) => (
+            {project.deliverables.map((l) => (
               <Link
                 key={l.id}
                 href={l.href}
@@ -783,7 +845,7 @@ export default function DashboardClient({ initialProject, isOwner, autoStats }: 
           <EmptyState label="compétence" isOwner={isOwner} onAdd={() => openCreate("Ajouter une compétence", skillFields, "skills")} />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {project.skills.map((c: any) => (
+            {project.skills.map((c) => (
               <div
                 key={c.id}
                 className="flex items-start gap-2 text-sm text-[#475569] relative group pr-16"
