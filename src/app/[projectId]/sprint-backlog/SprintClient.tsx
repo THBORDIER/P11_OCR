@@ -444,10 +444,15 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
               projectId={projectId}
               label="Générer des sprints"
               onGenerated={async (items) => {
+                // Delete existing sprints first (cascade deletes tasks)
+                for (const existing of sprints) {
+                  await fetch(`/api/projects/${projectId}/sprints/${encodeURIComponent(existing.id)}`, { method: "DELETE" });
+                }
+
                 for (const item of items) {
                   const s = item as { name?: string; goal?: string; startDate?: string; endDate?: string; tasks?: { title: string; status?: string; userStory?: string }[] };
                   const sprintId = `${projectId}:${(s.name || "Sprint").toLowerCase().replace(/\s+/g, "-")}`;
-                  await fetch(`/api/projects/${projectId}/sprints`, {
+                  const res = await fetch(`/api/projects/${projectId}/sprints`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -462,10 +467,14 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
                       userStories: [],
                     }),
                   });
+                  if (!res.ok) {
+                    console.error("Sprint creation failed:", await res.text());
+                    continue;
+                  }
                   // Create tasks
                   for (const t of s.tasks || []) {
                     const taskId = `${projectId}:T-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-                    await fetch(`/api/projects/${projectId}/tasks`, {
+                    const taskRes = await fetch(`/api/projects/${projectId}/tasks`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
@@ -480,9 +489,10 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
                         assignee: "",
                       }),
                     });
+                    if (!taskRes.ok) console.error("Task creation failed:", await taskRes.text());
                   }
                 }
-                router.refresh();
+                window.location.reload();
               }}
             />
             <button

@@ -73,19 +73,31 @@ export default function AiGenerateButton({
       setImporting(true);
       setImportProgress(0);
 
-      // Simulate progress while importing
-      const totalSteps = items.length + 2; // +2 for start/finish
-      let step = 0;
+      // Realistic progress: fast at start (1-10%), slows down, blocks at 99
+      let current = 0;
       const tick = setInterval(() => {
-        step++;
-        setImportProgress(Math.min(90, Math.round((step / totalSteps) * 100)));
-      }, 400);
+        if (current < 60) {
+          // Fast phase: +1 to +10% per tick
+          current += Math.floor(Math.random() * 10) + 1;
+        } else if (current < 85) {
+          // Medium phase: +1 to +4%
+          current += Math.floor(Math.random() * 4) + 1;
+        } else if (current < 99) {
+          // Slow phase: +1% sometimes
+          current += Math.random() > 0.5 ? 1 : 0;
+        } else {
+          // Block at 99 until real completion
+          current = 99;
+        }
+        current = Math.min(current, 99);
+        setImportProgress(current);
+      }, 800);
 
       try {
         await onGenerated(items);
         clearInterval(tick);
         setImportProgress(100);
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 600));
       } catch {
         clearInterval(tick);
       } finally {
