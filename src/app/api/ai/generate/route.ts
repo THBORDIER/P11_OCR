@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { generateWithOllama, isOllamaAvailable } from "@/lib/ollama";
+import { generateWithOllama, isOllamaAvailable, getOllamaConfig } from "@/lib/ollama";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const PROMPTS: Record<string, (ctx: string) => string> = {
@@ -172,6 +172,9 @@ Contexte : ${project.contextSummary}`;
     return NextResponse.json({ prompt: fullPrompt });
   }
 
+  // Load Ollama config from global settings
+  const ollamaConfig = await getOllamaConfig();
+
   // Check Ollama availability only when actually generating
   const available = await isOllamaAvailable();
   if (!available) {
@@ -182,7 +185,7 @@ Contexte : ${project.contextSummary}`;
   }
 
   try {
-    const raw = await generateWithOllama(fullPrompt, model || "llama3.2");
+    const raw = await generateWithOllama(fullPrompt, model || ollamaConfig.model);
     const parsed = JSON.parse(raw);
     return NextResponse.json(parsed);
   } catch (e) {

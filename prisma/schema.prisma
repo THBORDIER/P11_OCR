@@ -447,3 +447,25 @@ model ActivityLog {
 
   @@map("activity_logs")
 }
+
+// ─── GLOBAL SETTINGS (singleton) ────────────────────────
+
+model GlobalSettings {
+  id String @id @default("default")
+
+  // Ollama
+  ollamaUrl   String @default("http://localhost:11434") @map("ollama_url")
+  ollamaModel String @default("llama3.2") @map("ollama_model")
+
+  // CLI Bridge
+  cliBridgeUrl     String  @default("http://localhost:3939") @map("cli_bridge_url")
+  cliBridgeToken   String  @default("") @map("cli_bridge_token")
+  cliBridgeEnabled Boolean @default(false) @map("cli_bridge_enabled")
+
+  // CLI Providers — JSON array: [{ name, command, enabled }]
+  cliProviders Json @default("[]") @map("cli_providers")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("global_settings")
+}
