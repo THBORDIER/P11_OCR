@@ -26,6 +26,7 @@ export default function AiGenerateButton({
   onGenerated,
 }: AiGenerateButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const [error, setError] = useState("");
   const [preview, setPreview] = useState<Record<string, unknown>[] | null>(null);
   const [showManual, setShowManual] = useState(false);
@@ -114,10 +115,12 @@ export default function AiGenerateButton({
     setLoading(true);
     setError("");
     setShowManual(false);
+    setStatusMessage("Chargement du contexte projet...");
 
     try {
       if (selectedProvider === "ollama") {
         // Use Ollama API
+        setStatusMessage("Envoi à Ollama...");
         const res = await fetch("/api/ai/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -133,10 +136,11 @@ export default function AiGenerateButton({
           }
           return;
         }
+        setStatusMessage("Analyse des résultats...");
         setPreview(data.items || []);
       } else {
         // Use CLI provider (claude/gemini/codex)
-        // First get the prompt
+        setStatusMessage("Construction du prompt...");
         const promptRes = await fetch("/api/ai/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -148,7 +152,7 @@ export default function AiGenerateButton({
           return;
         }
 
-        // Send to CLI
+        setStatusMessage(`Exécution de ${PROVIDER_LABELS[selectedProvider]}... (peut prendre 30s-2min)`);
         const cliRes = await fetch("/api/cli/execute", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -160,20 +164,18 @@ export default function AiGenerateButton({
         });
         const cliData = await cliRes.json();
         if (!cliRes.ok) {
-          // If CLI fails, fallback to manual with error message
           setError(cliData.error || "Erreur CLI");
           setManualPrompt(promptData.prompt);
           return;
         }
 
-        // Parse CLI output — extract JSON from response
+        setStatusMessage("Extraction du JSON...");
         const output = cliData.response || cliData.output || cliData.result || "";
         const jsonMatch = output.match(/\{[\s\S]*"items"[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);
           setPreview(parsed.items || []);
         } else {
-          // Try parsing the whole output
           try {
             const parsed = JSON.parse(output);
             setPreview(parsed.items || (Array.isArray(parsed) ? parsed : [parsed]));
@@ -184,9 +186,10 @@ export default function AiGenerateButton({
         }
       }
     } catch {
-      setError("Erreur de connexion");
+      setError("Erreur de connexion au serveur");
     } finally {
       setLoading(false);
+      setStatusMessage("");
     }
   };
 
@@ -313,6 +316,17 @@ export default function AiGenerateButton({
           {loading ? "Génération..." : label}
         </button>
       </div>
+
+      {/* Status message during generation */}
+      {loading && statusMessage && (
+        <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-[#eff6ff] border border-[#bfdbfe] rounded-lg">
+          <svg className="w-4 h-4 text-[#3b82f6] animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <span className="text-xs text-[#1e40af]">{statusMessage}</span>
+        </div>
+      )}
 
       {error && (
         <p className="text-sm text-red-500 mt-1">{error}</p>

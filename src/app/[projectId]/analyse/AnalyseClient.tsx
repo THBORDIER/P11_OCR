@@ -186,12 +186,28 @@ export default function AnalyseClient({
               return (
                 <div key={persona.id} className="bg-[#f8fafc] rounded-lg border border-[#e2e8f0] p-5 relative">
                   {isOwner && (
-                    <button
-                      onClick={() => openEdit(persona)}
-                      className="absolute top-3 right-3 text-xs text-[#3b82f6] hover:text-[#2563eb] bg-white px-2 py-1 rounded border border-[#e2e8f0] hover:border-[#3b82f6] transition-colors"
-                    >
-                      Modifier
-                    </button>
+                    <div className="absolute top-3 right-3 flex items-center gap-1">
+                      <button
+                        onClick={() => openEdit(persona)}
+                        className="text-xs text-[#3b82f6] hover:text-[#2563eb] bg-white px-2 py-1 rounded border border-[#e2e8f0] hover:border-[#3b82f6] transition-colors"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (confirm(`Supprimer le persona "${persona.nom}" ?`)) {
+                            await fetch(`/api/projects/${projectId}/personas/${persona.id}`, { method: "DELETE" });
+                            router.refresh();
+                          }
+                        }}
+                        className="text-xs text-[#94a3b8] hover:text-red-500 bg-white p-1 rounded border border-[#e2e8f0] hover:border-red-300 transition-colors"
+                        title="Supprimer ce persona"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   )}
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`w-12 h-12 rounded-full ${color.bg} flex items-center justify-center text-xl font-bold ${color.text}`}>
