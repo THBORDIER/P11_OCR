@@ -127,7 +127,7 @@ export default async function HomePage() {
                     <h2 className="text-lg font-bold text-[#1e293b] truncate">
                       {project.name}
                     </h2>
-                    {project.isPublic && !project.userId && (
+                    {["p11-spartcrm", "template"].includes(project.id) && (
                       <span className="bg-[#dbeafe] text-[#1d4ed8] px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0">
                         Démo
                       </span>
