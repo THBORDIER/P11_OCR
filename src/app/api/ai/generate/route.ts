@@ -40,29 +40,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Type invalide" }, { status: 400 });
   }
 
+  // Load project with all relevant data for rich context
   const project = await prisma.project.findUnique({
     where: { id: projectId },
-    include: { userStories: { take: 5 }, phases: { take: 5 } },
+    include: {
+      userStories: true,
+      phases: { orderBy: { order: "asc" } },
+      personas: true,
+      sprints: { include: { tasks: true } },
+      stackItems: true,
+    },
   });
 
   if (!project) {
     return NextResponse.json({ error: "Projet introuvable" }, { status: 404 });
   }
 
+  // Base context — always included
   let context = `Projet : ${project.name}
 Description : ${project.description}
-Stack : ${project.methodologyFramework}
-Contexte : ${project.contextSummary}
-User Stories existantes : ${project.userStories.map((us) => us.titre).join(", ") || "Aucune"}
-Phases existantes : ${project.phases.map((p) => p.title).join(", ") || "Aucune"}`;
+Contexte : ${project.contextSummary}`;
 
-  // For "analyse" type, add all questionnaire responses
-  if (type === "analyse") {
+  // Stack technique
+  if (project.stackItems.length > 0) {
+    context += `\nStack technique : ${project.stackItems.map((s) => s.name).join(", ")}`;
+  }
+
+  // Questionnaire responses — for analyse, user-stories, phases, questionnaire
+  if (["analyse", "user-stories", "phases", "sprints", "test-cases"].includes(type)) {
     const responses = await prisma.questionnaireResponse.findMany({
       where: { projectId },
-      include: {
-        respondent: { select: { name: true, role: true } },
-      },
+      include: { respondent: { select: { name: true, role: true } } },
     });
     const sections = await prisma.questionnaireSection.findMany({
       where: { projectId },
@@ -74,8 +82,6 @@ Phases existantes : ${project.phases.map((p) => p.title).join(", ") || "Aucune"}
         questionMap.set(q.id, q.label);
       }
     }
-
-    // Group by respondent
     const byRespondent = new Map<string, { name: string; role: string | null; answers: string[] }>();
     for (const r of responses) {
       const key = r.respondent.name;
@@ -85,13 +91,44 @@ Phases existantes : ${project.phases.map((p) => p.title).join(", ") || "Aucune"}
       const qLabel = questionMap.get(r.questionId) || r.questionId;
       byRespondent.get(key)!.answers.push(`- Q: "${qLabel}" → "${r.value}"`);
     }
-
     if (byRespondent.size > 0) {
       context += "\n\nRéponses du questionnaire :";
-      for (const [, respondent] of byRespondent) {
-        context += `\n\nRépondant "${respondent.name}" (${respondent.role || "non précisé"}) :`;
-        context += "\n" + respondent.answers.join("\n");
+      for (const [, resp] of byRespondent) {
+        context += `\n\nRépondant "${resp.name}" (${resp.role || "non précisé"}) :`;
+        context += "\n" + resp.answers.join("\n");
       }
+    }
+  }
+
+  // Personas — for user-stories, phases, sprints, test-cases
+  if (["user-stories", "phases", "sprints", "test-cases"].includes(type) && project.personas.length > 0) {
+    context += `\n\nPersonas identifiés :`;
+    for (const p of project.personas) {
+      context += `\n- ${p.nom} (${p.role}) : besoin="${p.besoinPrincipal}", frustration="${p.frustration}", objectif="${p.objectif}"`;
+    }
+  }
+
+  // User Stories — for phases, sprints, test-cases
+  if (["phases", "sprints", "test-cases"].includes(type) && project.userStories.length > 0) {
+    context += `\n\nUser Stories du backlog (${project.userStories.length}) :`;
+    for (const us of project.userStories.slice(0, 15)) {
+      context += `\n- [${us.priorite}] ${us.titre} : "${us.enTantQue}, ${us.jeSouhaite}, ${us.afinDe}" (${us.estimation} pts)`;
+    }
+  }
+
+  // Phases — for sprints
+  if (["sprints"].includes(type) && project.phases.length > 0) {
+    context += `\n\nPhases du projet :`;
+    for (const p of project.phases) {
+      context += `\n- ${p.phase} "${p.title}" : ${p.objectif} (${p.periode})`;
+    }
+  }
+
+  // Sprints + tasks — for test-cases
+  if (["test-cases"].includes(type) && project.sprints.length > 0) {
+    context += `\n\nSprints existants :`;
+    for (const s of project.sprints) {
+      context += `\n- ${s.nom} (${s.tasks.length} tâches) : ${s.objectif}`;
     }
   }
 
