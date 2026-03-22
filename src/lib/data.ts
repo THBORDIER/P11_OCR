@@ -7,8 +7,19 @@ export async function getProjects(userId?: string | null) {
     where: userId
       ? { OR: [{ userId }, { isPublic: true }] }
       : { isPublic: true },
-    include: { kpis: { orderBy: { order: "asc" } } },
-    orderBy: { createdAt: "asc" },
+    include: {
+      kpis: { orderBy: { order: "asc" } },
+      _count: {
+        select: {
+          userStories: true,
+          sprints: true,
+          testCases: true,
+          phases: true,
+          personas: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
   });
 }
 
