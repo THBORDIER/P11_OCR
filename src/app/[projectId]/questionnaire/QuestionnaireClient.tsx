@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import AiGenerateButton from "@/components/AiGenerateButton";
 
 interface Question {
   id: string;
@@ -52,6 +54,8 @@ function createFakeFormData(sections: Section[]): Record<string, string | string
 }
 
 export default function QuestionnaireClient({ sections, projectId, projectName, isOwner }: QuestionnaireClientProps) {
+  const router = useRouter();
+
   // Empty state
   if (!sections.length) {
     return (
@@ -66,11 +70,31 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
         </div>
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-12 text-center">
           <p className="text-[#64748b] text-lg mb-2">Aucune question</p>
-          <p className="text-[#94a3b8] text-sm">
+          <p className="text-[#94a3b8] text-sm mb-4">
             {isOwner
-              ? "Ajoutez des sections ou generez-les avec l'IA."
-              : "Les sections du questionnaire n'ont pas encore ete configurees."}
+              ? "Générez des questions avec l'IA pour démarrer."
+              : "Les sections du questionnaire n'ont pas encore été configurées."}
           </p>
+          {isOwner && (
+            <AiGenerateButton
+              type="questionnaire"
+              projectId={projectId}
+              label="Générer des questions"
+              onGenerated={async (items) => {
+                // The AI returns questions — we need to POST them
+                // For simplicity, create a section with these questions
+                for (const item of items) {
+                  // Each item could be a question or section
+                  await fetch(`/api/projects/${projectId}/questionnaire`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ generated: item }),
+                  });
+                }
+                router.refresh();
+              }}
+            />
+          )}
         </div>
       </div>
     );

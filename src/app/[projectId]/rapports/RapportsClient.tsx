@@ -112,6 +112,48 @@ export default function RapportsClient({
 
   const { stats, recentActivity } = data;
 
+  const exportPdf = async () => {
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const mx = 40;
+    const pw = doc.internal.pageSize.getWidth();
+    let y = 50;
+
+    const hr = () => { doc.setDrawColor(200); doc.line(mx, y, pw - mx, y); y += 12; };
+    const txt = (t: string, bold = false, size = 10) => {
+      doc.setFont("helvetica", bold ? "bold" : "normal");
+      doc.setFontSize(size);
+      const lines = doc.splitTextToSize(t, pw - mx * 2) as string[];
+      for (const l of lines) { doc.text(l, mx, y); y += size + 4; }
+    };
+
+    txt(`Rapport d'avancement — ${projectName}`, true, 18);
+    y += 4;
+    txt(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, false, 9);
+    y += 8; hr();
+
+    const usPct = pct(stats.userStories.validated, stats.userStories.total);
+    const taskPct = pct(stats.tasks.done, stats.tasks.total);
+    const testPct = pct(stats.tests.ok, stats.tests.total);
+
+    txt("INDICATEURS", true, 13); y += 4;
+    txt(`User Stories : ${stats.userStories.validated}/${stats.userStories.total} validées (${usPct}%)`);
+    txt(`Tâches : ${stats.tasks.done}/${stats.tasks.total} terminées (${taskPct}%) — ${stats.tasks.inProgress} en cours`);
+    txt(`Tests : ${stats.tests.ok}/${stats.tests.total} OK (${testPct}%) — ${stats.tests.ko} KO`);
+    txt(`${stats.phases} phases · ${stats.sprints} sprints · ${stats.userStories.total} US · ${stats.tasks.total} tâches`);
+    y += 8; hr();
+
+    if (recentActivity.length > 0) {
+      txt("ACTIVITÉ RÉCENTE", true, 13); y += 4;
+      for (const log of recentActivity.slice(0, 10)) {
+        const d = new Date(log.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+        txt(`• [${d}] ${log.title}`);
+      }
+    }
+
+    doc.save(`rapport-${projectId}-${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   return (
     <div>
       <div className="mb-6 flex items-start justify-between">
@@ -121,7 +163,14 @@ export default function RapportsClient({
             Vue d&apos;ensemble et envoi de rapports d&apos;avancement
           </p>
         </div>
-        {isOwner && (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportPdf}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#e2e8f0] text-[#475569] text-sm font-medium rounded-lg hover:bg-[#f8fafc] transition-colors"
+          >
+            📄 PDF
+          </button>
+          {isOwner && (
           <button
             onClick={sendReport}
             disabled={sending || !hasRecipients}
@@ -139,7 +188,8 @@ export default function RapportsClient({
               <>📧 Envoyer le rapport</>
             )}
           </button>
-        )}
+          )}
+        </div>
       </div>
 
       {sent && (

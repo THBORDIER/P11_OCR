@@ -615,6 +615,34 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
                       )}
                     </div>
                     <div className="flex items-center gap-2">
+                      {isOwner && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const body = `**En tant que** ${us.enTantQue}, **je souhaite** ${us.jeSouhaite}, **afin de** ${us.afinDe}.\n\n**Critères d'acceptation :**\n${us.criteres.map(c => `- [ ] ${c}`).join("\n")}\n\n**Estimation :** ${us.estimation} pts · **Priorité :** ${us.priorite} · **Sprint :** ${us.sprint}`;
+                            try {
+                              const res = await fetch(`/api/projects/${projectId}/github/issues`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  title: `[${displayId(us.id)}] ${us.titre}`,
+                                  description: body,
+                                  labels: [us.priorite.toLowerCase()],
+                                }),
+                              });
+                              const data = await res.json();
+                              if (res.ok) {
+                                alert(`Issue #${data.number} créée sur GitHub !`);
+                              } else {
+                                alert(data.error || "Erreur");
+                              }
+                            } catch { alert("Erreur réseau"); }
+                          }}
+                          className="px-3 py-2 rounded-lg text-xs font-medium border border-[#e2e8f0] text-[#475569] hover:text-[#1e293b] hover:border-[#1e293b] transition-all"
+                        >
+                          🔗 Issue GitHub
+                        </button>
+                      )}
                       {isValidated && (
                         <button
                           onClick={(e) => {

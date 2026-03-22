@@ -252,12 +252,19 @@ function ActivityFeed({ projectId }: { projectId: string }) {
   );
 }
 
+interface AutoStats {
+  userStories: { total: number; validated: number };
+  tasks: { total: number; done: number };
+  tests: { total: number; ok: number };
+}
+
 interface DashboardClientProps {
   initialProject: Project;
   isOwner: boolean;
+  autoStats?: AutoStats;
 }
 
-export default function DashboardClient({ initialProject, isOwner }: DashboardClientProps) {
+export default function DashboardClient({ initialProject, isOwner, autoStats }: DashboardClientProps) {
   const router = useRouter();
   const project = initialProject;
 
@@ -393,6 +400,57 @@ export default function DashboardClient({ initialProject, isOwner }: DashboardCl
           )}
         </div>
       </div>
+
+      {/* Auto-calculated progress */}
+      {autoStats && (autoStats.userStories.total > 0 || autoStats.tasks.total > 0 || autoStats.tests.total > 0) && (
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-lg border border-[#e2e8f0] p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-[#64748b] uppercase">User Stories</span>
+              <span className="text-lg font-bold text-[#3b82f6]">
+                {autoStats.userStories.validated}/{autoStats.userStories.total}
+              </span>
+            </div>
+            <div className="h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#3b82f6] rounded-full"
+                style={{ width: `${autoStats.userStories.total > 0 ? (autoStats.userStories.validated / autoStats.userStories.total) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-[#e2e8f0] p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-[#64748b] uppercase">Tâches</span>
+              <span className="text-lg font-bold text-[#22c55e]">
+                {autoStats.tasks.done}/{autoStats.tasks.total}
+              </span>
+            </div>
+            <div className="h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#22c55e] rounded-full"
+                style={{ width: `${autoStats.tasks.total > 0 ? (autoStats.tasks.done / autoStats.tasks.total) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-[#e2e8f0] p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-[#64748b] uppercase">Tests</span>
+              <span className={`text-lg font-bold ${autoStats.tests.ok === autoStats.tests.total && autoStats.tests.total > 0 ? "text-[#22c55e]" : "text-[#f59e0b]"}`}>
+                {autoStats.tests.ok}/{autoStats.tests.total}
+              </span>
+            </div>
+            <div className="h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${autoStats.tests.total > 0 ? (autoStats.tests.ok / autoStats.tests.total) * 100 : 0}%`,
+                  backgroundColor: autoStats.tests.ok === autoStats.tests.total && autoStats.tests.total > 0 ? "#22c55e" : "#f59e0b",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Contexte + KPIs */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-8">
