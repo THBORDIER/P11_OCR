@@ -15,7 +15,7 @@ export default async function GitHubPage({
     select: { userId: true, githubRepo: true, name: true },
   });
 
-  const isOwner = !!session?.user?.id && project?.userId === session.user.id;
+  const isOwner = !project?.userId || (!!session?.user?.id && project.userId === session.user.id);
 
   return (
     <GitHubClient

@@ -14,7 +14,7 @@ export default async function ProjectDashboard({
   if (!project) notFound();
 
   const session = await auth();
-  const isOwner = project?.userId === session?.user?.id;
+  const isOwner = !project?.userId || (!!session?.user?.id && project.userId === session.user.id);
 
   // Auto-calculate stats for dashboard
   const [totalUS, validatedUS, totalTasks, doneTasks, totalTests, okTests] = await Promise.all([

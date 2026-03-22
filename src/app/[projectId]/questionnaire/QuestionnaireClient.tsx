@@ -56,6 +56,24 @@ function createFakeFormData(sections: Section[]): Record<string, string | string
 export default function QuestionnaireClient({ sections, projectId, projectName, isOwner }: QuestionnaireClientProps) {
   const router = useRouter();
 
+  // AI generation callback for questionnaire sections
+  const handleAiGenerated = async (items: Record<string, unknown>[]) => {
+    for (const item of items) {
+      const section = item as { sectionTitle?: string; sectionDescription?: string; questions?: { label: string; type: string; options?: string[]; required?: boolean }[] };
+      // Create section with questions via dedicated API
+      await fetch(`/api/projects/${projectId}/questionnaire`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: section.sectionTitle || (item as Record<string, string>).label || "Section",
+          description: section.sectionDescription || "",
+          questions: section.questions || [{ label: (item as Record<string, string>).label, type: (item as Record<string, string>).type || "textarea", required: true }],
+        }),
+      });
+    }
+    router.refresh();
+  };
+
   // Empty state
   if (!sections.length) {
     return (
@@ -71,30 +89,14 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-12 text-center">
           <p className="text-[#64748b] text-lg mb-2">Aucune question</p>
           <p className="text-[#94a3b8] text-sm mb-4">
-            {isOwner
-              ? "Générez des questions avec l'IA pour démarrer."
-              : "Les sections du questionnaire n'ont pas encore été configurées."}
+            Générez des questions avec l'IA ou ajoutez-les manuellement.
           </p>
-          {isOwner && (
-            <AiGenerateButton
-              type="questionnaire"
-              projectId={projectId}
-              label="Générer des questions"
-              onGenerated={async (items) => {
-                // The AI returns questions — we need to POST them
-                // For simplicity, create a section with these questions
-                for (const item of items) {
-                  // Each item could be a question or section
-                  await fetch(`/api/projects/${projectId}/questionnaire`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ generated: item }),
-                  });
-                }
-                router.refresh();
-              }}
-            />
-          )}
+          <AiGenerateButton
+            type="questionnaire"
+            projectId={projectId}
+            label="Générer le questionnaire"
+            onGenerated={handleAiGenerated}
+          />
         </div>
       </div>
     );
@@ -609,12 +611,36 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#1e293b]">
-          Questionnaire de recueil de besoins
-        </h1>
-        <p className="text-[#64748b] mt-2">
-          Recueil de besoins client
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-[#1e293b]">
+              Questionnaire de recueil de besoins
+            </h1>
+            <p className="text-[#64748b] mt-2">
+              Recueil de besoins client
+            </p>
+          </div>
+          {isOwner && (
+            <div className="flex items-center gap-2">
+              <AiGenerateButton
+                type="questionnaire"
+                projectId={projectId}
+                label="Régénérer avec l'IA"
+                onGenerated={handleAiGenerated}
+              />
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/q/${projectId}`;
+                  navigator.clipboard.writeText(url);
+                  alert("Lien copié : " + url);
+                }}
+                className="px-3 py-1.5 text-sm bg-[#f0fdf4] text-[#16a34a] rounded-lg hover:bg-[#dcfce7] transition-colors"
+              >
+                Copier le lien client
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">

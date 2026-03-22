@@ -16,7 +16,7 @@ export default async function CommunicationPage({
 
   const session = await auth();
   const project = await prisma.project.findUnique({ where: { id: projectId }, select: { userId: true, name: true } });
-  const isOwner = !!session?.user?.id && project?.userId === session.user.id;
+  const isOwner = !project?.userId || (!!session?.user?.id && project.userId === session.user.id);
 
   const serializedStakeholders = JSON.parse(JSON.stringify(stakeholders));
   const serializedRituals = JSON.parse(JSON.stringify(rituals));

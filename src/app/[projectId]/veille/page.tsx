@@ -13,7 +13,7 @@ export default async function VeillePage({
 
   const session = await auth();
   const project = await prisma.project.findUnique({ where: { id: projectId }, select: { userId: true, name: true } });
-  const isOwner = !!session?.user?.id && project?.userId === session.user.id;
+  const isOwner = !project?.userId || (!!session?.user?.id && project.userId === session.user.id);
 
   const categories = dbCategories.map((cat) => ({
     id: cat.id,

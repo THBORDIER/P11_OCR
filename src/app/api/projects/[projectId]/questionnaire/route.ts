@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { getQuestionnaireResponses, saveQuestionnaireResponse, getRespondents, createRespondent } from "@/lib/data";
 
 export async function GET(
@@ -56,4 +57,48 @@ export async function POST(
 
   const respondent = await createRespondent(projectId, name.trim(), email?.trim(), role?.trim());
   return NextResponse.json(respondent, { status: 201 });
+}
+
+// Create a section with questions (from AI generation)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ projectId: string }> }
+) {
+  const { projectId } = await params;
+  const { title, description, questions } = await request.json();
+
+  if (!title) {
+    return NextResponse.json({ error: "Titre requis" }, { status: 400 });
+  }
+
+  // Get current max order
+  const maxSection = await prisma.questionnaireSection.findFirst({
+    where: { projectId },
+    orderBy: { order: "desc" },
+    select: { order: true },
+  });
+  const nextOrder = (maxSection?.order ?? -1) + 1;
+
+  const section = await prisma.questionnaireSection.create({
+    data: {
+      title,
+      description: description || "",
+      pourquoi: "",
+      order: nextOrder,
+      projectId,
+      questions: {
+        create: (questions || []).map((q: { label: string; type?: string; options?: string[]; required?: boolean }, i: number) => ({
+          id: `${projectId}:ai_${nextOrder}_${i}`,
+          label: q.label,
+          type: q.type || "textarea",
+          options: q.options || [],
+          required: q.required ?? false,
+          order: i,
+        })),
+      },
+    },
+    include: { questions: true },
+  });
+
+  return NextResponse.json(section, { status: 201 });
 }

@@ -7,9 +7,14 @@ const PROMPTS: Record<string, (ctx: string) => string> = {
 ${ctx}
 Retourne un JSON : { "items": [{ "epic": "...", "titre": "...", "enTantQue": "...", "jeSouhaite": "...", "afinDe": "...", "criteres": ["..."], "estimation": 5, "priorite": "Must", "sprint": "Sprint 1", "valeur": "Haute" }] }`,
 
-  questionnaire: (ctx) => `Tu es un consultant en cadrage de projets. Génère 8 questions de cadrage pertinentes pour ce projet :
+  questionnaire: (ctx) => `Tu es un consultant en cadrage de projets. Génère un questionnaire client structuré en 3-4 sections avec 3-5 questions par section pour ce projet :
 ${ctx}
-Retourne un JSON : { "items": [{ "label": "...", "type": "textarea", "required": true }] }`,
+Retourne un JSON : { "items": [{ "sectionTitle": "Contexte et objectifs", "sectionDescription": "Comprendre le contexte business", "questions": [{ "label": "Décrivez votre activité", "type": "textarea", "required": true }, { "label": "Budget estimé ?", "type": "select", "options": ["< 5k", "5-15k", "15-50k", "> 50k"], "required": false }] }] }
+Types possibles : "textarea", "text", "select" (avec options[]), "checkbox" (avec options[])`,
+
+  sprints: (ctx) => `Tu es un Scrum Master expert. Génère 3-4 sprints avec des tâches pour ce projet :
+${ctx}
+Retourne un JSON : { "items": [{ "name": "Sprint 1", "goal": "MVP — fonctionnalités de base", "startDate": "2026-04-01", "endDate": "2026-04-14", "tasks": [{ "title": "Tâche 1", "status": "A faire", "userStory": "" }] }] }`,
 
   "test-cases": (ctx) => `Tu es un QA engineer. Génère 5 cas de test pour ce projet :
 ${ctx}

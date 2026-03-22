@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
+import AiGenerateButton from "@/components/AiGenerateButton";
 
 interface Task {
   id: string;
@@ -384,15 +385,63 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
           </p>
         </div>
         {isOwner && (
-          <button
-            onClick={openCreateSprint}
-            className="flex items-center gap-2 px-4 py-2 bg-[#3b82f6] text-white rounded-lg text-sm font-medium hover:bg-[#2563eb] transition-colors shadow-sm"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Sprint
-          </button>
+          <div className="flex items-center gap-2">
+            <AiGenerateButton
+              type="sprints"
+              projectId={projectId}
+              label="Générer des sprints"
+              onGenerated={async (items) => {
+                for (const item of items) {
+                  const s = item as { name?: string; goal?: string; startDate?: string; endDate?: string; tasks?: { title: string; status?: string; userStory?: string }[] };
+                  const sprintId = `${projectId}:${(s.name || "Sprint").toLowerCase().replace(/\s+/g, "-")}`;
+                  await fetch(`/api/projects/${projectId}/sprints`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      id: sprintId,
+                      nom: s.name || "",
+                      objectif: s.goal || "",
+                      objectifCourt: s.goal?.slice(0, 50) || "",
+                      debut: s.startDate || "",
+                      fin: s.endDate || "",
+                      duree: "2 semaines",
+                      velocite: "",
+                      userStories: [],
+                    }),
+                  });
+                  // Create tasks
+                  for (const t of s.tasks || []) {
+                    const taskId = `${projectId}:T-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                    await fetch(`/api/projects/${projectId}/tasks`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        id: taskId,
+                        sprintId,
+                        userStory: t.userStory || "",
+                        titre: t.title,
+                        description: "",
+                        type: "Dev",
+                        estimation: "0.5j",
+                        status: t.status || "A faire",
+                        assignee: "",
+                      }),
+                    });
+                  }
+                }
+                router.refresh();
+              }}
+            />
+            <button
+              onClick={openCreateSprint}
+              className="flex items-center gap-2 px-4 py-2 bg-[#3b82f6] text-white rounded-lg text-sm font-medium hover:bg-[#2563eb] transition-colors shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Sprint
+            </button>
+          </div>
         )}
       </div>
 

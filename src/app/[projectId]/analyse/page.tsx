@@ -9,7 +9,7 @@ export default async function AnalysePage({ params }: { params: Promise<{ projec
 
   const session = await auth();
   const project = await prisma.project.findUnique({ where: { id: projectId }, select: { userId: true, name: true } });
-  const isOwner = !!session?.user?.id && project?.userId === session.user.id;
+  const isOwner = !project?.userId || (!!session?.user?.id && project.userId === session.user.id);
 
   const serializedPersonas = JSON.parse(JSON.stringify(personas));
 

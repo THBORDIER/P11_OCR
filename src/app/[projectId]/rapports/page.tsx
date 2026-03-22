@@ -14,7 +14,7 @@ export default async function RapportsPage({
     select: { userId: true, name: true, clientEmail: true, notificationEmails: true },
   });
 
-  const isOwner = !!session?.user?.id && project?.userId === session.user.id;
+  const isOwner = !project?.userId || (!!session?.user?.id && project.userId === session.user.id);
 
   return (
     <RapportsClient
