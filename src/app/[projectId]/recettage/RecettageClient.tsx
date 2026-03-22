@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 import AiGenerateButton from "@/components/AiGenerateButton";
 import SendPageButton from "@/components/SendPageButton";
+import TestLaunchButton from "@/components/TestLaunchButton";
 
 interface RecettageRow {
   id: string;
@@ -246,6 +247,7 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
             </button>
           </div>
         )}
+        <TestLaunchButton projectId={projectId} testCount={initialRows.filter(r => r.statut === "A tester" || r.statut === "A retester").length} />
         <SendPageButton projectId={projectId} pageType="recettage" />
       </div>
 

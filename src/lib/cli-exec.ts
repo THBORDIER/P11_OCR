@@ -29,6 +29,10 @@ export async function detectProviders(): Promise<string[]> {
 /**
  * Ensure the project directory exists and return its path.
  */
+export function ensureProjectDirPublic(projectSlug?: string): string {
+  return ensureProjectDir(projectSlug);
+}
+
 function ensureProjectDir(projectSlug?: string): string {
   if (!existsSync(BASE_DIR)) {
     mkdirSync(BASE_DIR, { recursive: true });
@@ -41,6 +45,61 @@ function ensureProjectDir(projectSlug?: string): string {
     mkdirSync(dir, { recursive: true });
   }
   return dir;
+}
+
+/**
+ * Execute a CLI AI tool in the background (long-running, e.g. sprint coding).
+ * Returns the ChildProcess immediately. Calls onOutput/onClose callbacks.
+ */
+export function executeCliBackground(
+  command: string,
+  prompt: string,
+  projectSlug: string,
+  onOutput: (line: string) => void,
+  onClose: (code: number | null, stderr: string) => void
+): ReturnType<typeof spawn> {
+  const cwd = ensureProjectDir(projectSlug);
+  const args: string[] = [];
+
+  if (command === "claude") args.push("--print");
+  else if (command === "codex") args.push("--quiet");
+
+  const child = spawn(command, args, {
+    cwd,
+    stdio: ["pipe", "pipe", "pipe"],
+    timeout: 30 * 60 * 1000, // 30 minutes
+    shell: platform() === "win32",
+  });
+
+  let stderr = "";
+
+  child.stdout.on("data", (data: Buffer) => {
+    const lines = data.toString().split("\n").filter(Boolean);
+    for (const line of lines) {
+      onOutput(line);
+    }
+  });
+  child.stderr.on("data", (data: Buffer) => {
+    stderr += data.toString();
+    const lines = data.toString().split("\n").filter(Boolean);
+    for (const line of lines) {
+      onOutput(`[stderr] ${line}`);
+    }
+  });
+
+  child.on("close", (code) => {
+    saveExchange(command, prompt, { response: "(background job)", error: stderr || undefined, exitCode: code }, cwd);
+    onClose(code, stderr);
+  });
+
+  child.on("error", (err) => {
+    onClose(null, err.message);
+  });
+
+  child.stdin.write(prompt);
+  child.stdin.end();
+
+  return child;
 }
 
 /**

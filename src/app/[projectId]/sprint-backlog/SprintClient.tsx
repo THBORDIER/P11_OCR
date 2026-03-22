@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 import AiGenerateButton from "@/components/AiGenerateButton";
 import SendPageButton from "@/components/SendPageButton";
+import SprintLaunchButton from "@/components/SprintLaunchButton";
+import DevServerButton from "@/components/DevServerButton";
 
 interface Task {
   id: string;
@@ -522,6 +524,13 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
               </svg>
               Sprint
             </button>
+            <SprintLaunchButton
+              projectId={projectId}
+              sprintId={selectedSprint}
+              sprintName={displayId(selectedSprint).replace("sprint-", "Sprint ")}
+              todoCount={currentTasks.filter((t) => t.status === "A faire").length}
+            />
+            <DevServerButton projectId={projectId} />
           </div>
         )}
         <SendPageButton projectId={projectId} pageType="sprints" />
