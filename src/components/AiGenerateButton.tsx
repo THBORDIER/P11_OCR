@@ -23,6 +23,8 @@ export default function AiGenerateButton({
   const [pasteInput, setPasteInput] = useState("");
   const [pasteError, setPasteError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
 
   const generate = async () => {
     setLoading(true);
@@ -66,10 +68,30 @@ export default function AiGenerateButton({
 
   const acceptAll = async () => {
     if (preview) {
+      const items = preview;
       setPreview(null);
-      setLoading(true);
-      await onGenerated(preview);
-      setLoading(false);
+      setImporting(true);
+      setImportProgress(0);
+
+      // Simulate progress while importing
+      const totalSteps = items.length + 2; // +2 for start/finish
+      let step = 0;
+      const tick = setInterval(() => {
+        step++;
+        setImportProgress(Math.min(90, Math.round((step / totalSteps) * 100)));
+      }, 400);
+
+      try {
+        await onGenerated(items);
+        clearInterval(tick);
+        setImportProgress(100);
+        await new Promise((r) => setTimeout(r, 500));
+      } catch {
+        clearInterval(tick);
+      } finally {
+        setImporting(false);
+        setImportProgress(0);
+      }
     }
   };
 
@@ -94,9 +116,41 @@ export default function AiGenerateButton({
 
   return (
     <>
+      {/* Import overlay — blocks all interaction */}
+      {importing && (
+        <div className="fixed inset-0 z-[100] bg-[#0f172a]/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-[#eff6ff] flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-[#3b82f6] animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-[#1e293b] mb-2">
+              {importProgress < 100 ? "Importation en cours..." : "Terminé !"}
+            </h3>
+            <p className="text-sm text-[#64748b] mb-4">
+              {importProgress < 100
+                ? "Les données sont en cours d'insertion. Merci de patienter."
+                : "Rechargement de la page..."}
+            </p>
+            <div className="w-full h-3 bg-[#f1f5f9] rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-300 ease-out"
+                style={{
+                  width: `${importProgress}%`,
+                  backgroundColor: importProgress < 100 ? "#3b82f6" : "#22c55e",
+                }}
+              />
+            </div>
+            <p className="text-xs text-[#94a3b8] mt-2 font-mono">{importProgress}%</p>
+          </div>
+        </div>
+      )}
+
       <button
         onClick={generate}
-        disabled={loading}
+        disabled={loading || importing}
         className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#f5f3ff] text-[#7c3aed] rounded-lg hover:bg-[#ede9fe] transition-colors disabled:opacity-50"
       >
         {loading ? (
