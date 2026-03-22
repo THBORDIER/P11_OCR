@@ -40,14 +40,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Type invalide" }, { status: 400 });
   }
 
-  const available = await isOllamaAvailable();
-  if (!available) {
-    return NextResponse.json(
-      { error: "Ollama n'est pas disponible. Vérifiez qu'il est lancé sur " + (process.env.OLLAMA_URL || "http://localhost:11434") },
-      { status: 503 }
-    );
-  }
-
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     include: { userStories: { take: 5 }, phases: { take: 5 } },
@@ -108,6 +100,15 @@ Phases existantes : ${project.phases.map((p) => p.title).join(", ") || "Aucune"}
   // Return prompt only (for manual copy-paste fallback)
   if (getPromptOnly) {
     return NextResponse.json({ prompt: fullPrompt });
+  }
+
+  // Check Ollama availability only when actually generating
+  const available = await isOllamaAvailable();
+  if (!available) {
+    return NextResponse.json(
+      { error: "Ollama n'est pas disponible", prompt: fullPrompt },
+      { status: 503 }
+    );
   }
 
   try {

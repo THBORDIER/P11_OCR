@@ -35,16 +35,19 @@ export default function AiGenerateButton({
       });
       const data = await res.json();
       if (!res.ok) {
-        // If Ollama unavailable, show manual fallback
         if (res.status === 503) {
-          // Fetch the prompt to show to user
-          const promptRes = await fetch("/api/ai/generate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ type, projectId, getPromptOnly: true }),
-          });
-          const promptData = await promptRes.json();
-          setManualPrompt(promptData.prompt || "");
+          // Ollama unavailable — use prompt from response or fetch it
+          if (data.prompt) {
+            setManualPrompt(data.prompt);
+          } else {
+            const promptRes = await fetch("/api/ai/generate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type, projectId, getPromptOnly: true }),
+            });
+            const promptData = await promptRes.json();
+            setManualPrompt(promptData.prompt || "Erreur de chargement du prompt");
+          }
           setShowManual(true);
         } else {
           setError(data.error || "Erreur de génération");
