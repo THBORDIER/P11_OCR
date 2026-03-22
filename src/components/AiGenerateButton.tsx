@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AiGenerateButtonProps {
   type: string;
@@ -8,6 +8,16 @@ interface AiGenerateButtonProps {
   label?: string;
   onGenerated: (items: Record<string, unknown>[]) => void;
 }
+
+type Provider = "ollama" | "claude" | "gemini" | "codex" | "manual";
+
+const PROVIDER_LABELS: Record<Provider, string> = {
+  ollama: "Ollama (local)",
+  claude: "Claude CLI",
+  gemini: "Gemini CLI",
+  codex: "Codex CLI",
+  manual: "Copier/Coller",
+};
 
 export default function AiGenerateButton({
   type,
@@ -26,41 +36,154 @@ export default function AiGenerateButton({
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
 
+  // Provider detection
+  const [availableProviders, setAvailableProviders] = useState<Provider[]>(["manual"]);
+  const [selectedProvider, setSelectedProvider] = useState<Provider>("manual");
+  const [providersLoaded, setProvidersLoaded] = useState(false);
+
+  useEffect(() => {
+    async function detect() {
+      const providers: Provider[] = [];
+
+      // Check Ollama
+      try {
+        const res = await fetch("/api/ai/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, projectId, getPromptOnly: true }),
+        });
+        if (res.ok) {
+          // Try Ollama health check
+          try {
+            const ollamaRes = await fetch("/api/settings/test-ollama");
+            if (ollamaRes.ok) {
+              const data = await ollamaRes.json();
+              if (data.available) providers.push("ollama");
+            }
+          } catch { /* Ollama not available */ }
+        }
+      } catch { /* API error */ }
+
+      // Check CLI providers
+      try {
+        const res = await fetch("/api/cli/providers");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.local && data.providers) {
+            for (const p of data.providers) {
+              if (["claude", "gemini", "codex"].includes(p)) {
+                providers.push(p as Provider);
+              }
+            }
+          }
+        }
+      } catch { /* CLI detection failed */ }
+
+      // Always add manual as fallback
+      providers.push("manual");
+
+      setAvailableProviders(providers);
+      setSelectedProvider(providers[0]); // Auto-select best available
+      setProvidersLoaded(true);
+    }
+    detect();
+  }, [type, projectId]);
+
   const generate = async () => {
+    if (selectedProvider === "manual") {
+      // Fetch prompt and show manual modal
+      setLoading(true);
+      try {
+        const promptRes = await fetch("/api/ai/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, projectId, getPromptOnly: true }),
+        });
+        const promptData = await promptRes.json();
+        setManualPrompt(promptData.prompt || "Erreur de chargement du prompt");
+        setShowManual(true);
+      } catch {
+        setManualPrompt("Erreur de connexion au serveur.");
+        setShowManual(true);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     setLoading(true);
     setError("");
     setShowManual(false);
+
     try {
-      const res = await fetch("/api/ai/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, projectId }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        if (res.status === 503) {
-          // Ollama unavailable — use prompt from response or fetch it
-          if (data.prompt) {
+      if (selectedProvider === "ollama") {
+        // Use Ollama API
+        const res = await fetch("/api/ai/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, projectId }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 503 && data.prompt) {
             setManualPrompt(data.prompt);
+            setShowManual(true);
           } else {
-            const promptRes = await fetch("/api/ai/generate", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ type, projectId, getPromptOnly: true }),
-            });
-            const promptData = await promptRes.json();
-            setManualPrompt(promptData.prompt || "Erreur de chargement du prompt");
+            setError(data.error || "Erreur Ollama");
           }
-          setShowManual(true);
-        } else {
-          setError(data.error || "Erreur de génération");
+          return;
         }
-        return;
+        setPreview(data.items || []);
+      } else {
+        // Use CLI provider (claude/gemini/codex)
+        // First get the prompt
+        const promptRes = await fetch("/api/ai/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, projectId, getPromptOnly: true }),
+        });
+        const promptData = await promptRes.json();
+        if (!promptData.prompt) {
+          setError("Impossible de générer le prompt");
+          return;
+        }
+
+        // Send to CLI
+        const cliRes = await fetch("/api/cli/execute", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            provider: selectedProvider,
+            prompt: promptData.prompt + "\n\nRéponds UNIQUEMENT avec le JSON demandé, sans texte ni commentaire avant ou après.",
+            projectSlug: projectId,
+          }),
+        });
+        const cliData = await cliRes.json();
+        if (!cliRes.ok) {
+          setError(cliData.error || "Erreur CLI");
+          return;
+        }
+
+        // Parse CLI output — extract JSON from response
+        const output = cliData.output || cliData.result || "";
+        const jsonMatch = output.match(/\{[\s\S]*"items"[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          setPreview(parsed.items || []);
+        } else {
+          // Try parsing the whole output
+          try {
+            const parsed = JSON.parse(output);
+            setPreview(parsed.items || (Array.isArray(parsed) ? parsed : [parsed]));
+          } catch {
+            setError("La réponse CLI ne contient pas de JSON valide. Essayez le mode manuel.");
+            setManualPrompt(promptData.prompt);
+            setShowManual(true);
+          }
+        }
       }
-      setPreview(data.items || []);
     } catch {
-      setShowManual(true);
-      setManualPrompt("Erreur de connexion au serveur IA. Utilisez le mode manuel ci-dessous.");
+      setError("Erreur de connexion");
     } finally {
       setLoading(false);
     }
@@ -73,20 +196,15 @@ export default function AiGenerateButton({
       setImporting(true);
       setImportProgress(0);
 
-      // Realistic progress: fast at start (1-10%), slows down, blocks at 99
       let current = 0;
       const tick = setInterval(() => {
         if (current < 60) {
-          // Fast phase: +1 to +10% per tick
           current += Math.floor(Math.random() * 10) + 1;
         } else if (current < 85) {
-          // Medium phase: +1 to +4%
           current += Math.floor(Math.random() * 4) + 1;
         } else if (current < 99) {
-          // Slow phase: +1% sometimes
           current += Math.random() > 0.5 ? 1 : 0;
         } else {
-          // Block at 99 until real completion
           current = 99;
         }
         current = Math.min(current, 99);
@@ -128,7 +246,7 @@ export default function AiGenerateButton({
 
   return (
     <>
-      {/* Import overlay — blocks all interaction */}
+      {/* Import overlay */}
       {importing && (
         <div className="fixed inset-0 z-[100] bg-[#0f172a]/80 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center">
@@ -160,38 +278,55 @@ export default function AiGenerateButton({
         </div>
       )}
 
-      <button
-        onClick={generate}
-        disabled={loading || importing}
-        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#f5f3ff] text-[#7c3aed] rounded-lg hover:bg-[#ede9fe] transition-colors disabled:opacity-50"
-      >
-        {loading ? (
-          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-        ) : (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        )}
-        {loading ? "Génération..." : label}
-      </button>
+      {/* Button + provider selector */}
+      <div className="flex items-center gap-1.5">
+        <select
+          value={selectedProvider}
+          onChange={(e) => setSelectedProvider(e.target.value as Provider)}
+          disabled={loading || importing || !providersLoaded}
+          className="text-xs bg-[#f5f3ff] text-[#7c3aed] border border-[#e9e5ff] rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]/30 disabled:opacity-50"
+          title="Choisir le provider IA"
+        >
+          {availableProviders.map((p) => (
+            <option key={p} value={p}>
+              {PROVIDER_LABELS[p]}
+            </option>
+          ))}
+        </select>
+
+        <button
+          onClick={generate}
+          disabled={loading || importing}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#f5f3ff] text-[#7c3aed] rounded-lg hover:bg-[#ede9fe] transition-colors disabled:opacity-50"
+        >
+          {loading ? (
+            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          )}
+          {loading ? "Génération..." : label}
+        </button>
+      </div>
 
       {error && (
         <p className="text-sm text-red-500 mt-1">{error}</p>
       )}
 
-      {/* Manual fallback when Ollama is unavailable */}
+      {/* Manual fallback modal */}
       {showManual && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[85vh] flex flex-col">
             <div className="p-6 border-b border-[#e2e8f0]">
               <h3 className="text-lg font-semibold text-[#1e293b]">
-                IA non disponible — Mode manuel
+                Mode manuel — Copier/Coller
               </h3>
               <p className="text-sm text-[#64748b] mt-1">
-                Ollama n'est pas connecté. Copiez le prompt ci-dessous, collez-le dans ChatGPT, Claude ou un autre LLM, puis collez la réponse.
+                Copiez le prompt ci-dessous, collez-le dans ChatGPT, Claude ou un autre LLM, puis collez la réponse JSON.
               </p>
             </div>
 
