@@ -213,11 +213,23 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
               }}
               onGenerated={async (items) => {
                 for (const item of items) {
-                  await fetch(`/api/projects/${projectId}/recettage`, {
+                  const tc = item as Record<string, string>;
+                  const id = tc.id || `${projectId}:TC-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                  const res = await fetch(`/api/projects/${projectId}/recettage`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(item),
+                    body: JSON.stringify({
+                      id,
+                      us: tc.us || "",
+                      sprint: tc.sprint || "",
+                      etape: tc.etape || "",
+                      action: tc.action || "",
+                      attendu: tc.attendu || "",
+                      obtenu: tc.obtenu || "",
+                      statut: tc.statut || "A tester",
+                    }),
                   });
+                  if (!res.ok) console.error("Test case creation failed:", await res.text());
                 }
                 router.refresh();
               }}
