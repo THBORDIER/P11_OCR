@@ -56,9 +56,10 @@ export default async function HomePage() {
   const session = await auth();
   const projects = await getProjects(session?.user?.id);
 
-  const totalProjects = projects.length;
-  const totalUS = projects.reduce((s, p) => s + p._count.userStories, 0);
-  const totalTests = projects.reduce((s, p) => s + p._count.testCases, 0);
+  const visibleProjects = projects.filter((p) => p.id !== "template");
+  const totalProjects = visibleProjects.length;
+  const totalUS = visibleProjects.reduce((s, p) => s + p._count.userStories, 0);
+  const totalTests = visibleProjects.reduce((s, p) => s + p._count.testCases, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f8fafc] to-[#eef2f7]">
@@ -108,7 +109,7 @@ export default async function HomePage() {
 
         {/* Projects grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {projects.map((project) => (
+          {projects.filter((p) => p.id !== "template").map((project) => (
             <Link
               key={project.id}
               href={`/${project.id}`}
