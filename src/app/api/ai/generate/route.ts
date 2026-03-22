@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateWithOllama, isOllamaAvailable } from "@/lib/ollama";
 
@@ -23,14 +22,13 @@ Retourne un JSON : { "items": [{ "initials": "AB", "nom": "...", "age": 35, "rol
   phases: (ctx) => `Tu es un chef de projet Agile. Génère 4-6 phases/sprints pour ce projet :
 ${ctx}
 Retourne un JSON : { "items": [{ "phase": "Phase 0", "title": "...", "objectif": "...", "fonctionnalites": ["..."], "horsPerimetre": ["..."], "utilisateurs": ["..."], "dependances": ["..."], "ressources": "...", "periode": "Semaine 1-2", "budget": "...", "color": "border-l-[#3b82f6]", "bg": "bg-[#eff6ff]" }] }`,
+
+  analyse: (ctx) => `Tu es un consultant UX/Product senior. Analyse les retours du questionnaire ci-dessous et génère des personas utilisateurs réalistes.
+${ctx}
+Retourne un JSON : { "items": [{ "initials": "AB", "nom": "Prénom Nom", "age": 35, "role": "...", "contexte": "...", "besoinPrincipal": "...", "frustration": "...", "objectif": "..." }] }`,
 };
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-  }
-
   const { type, projectId, model } = await request.json();
 
   if (!PROMPTS[type]) {
@@ -54,12 +52,51 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Projet introuvable" }, { status: 404 });
   }
 
-  const context = `Projet : ${project.name}
+  let context = `Projet : ${project.name}
 Description : ${project.description}
 Stack : ${project.methodologyFramework}
 Contexte : ${project.contextSummary}
 User Stories existantes : ${project.userStories.map((us) => us.titre).join(", ") || "Aucune"}
 Phases existantes : ${project.phases.map((p) => p.title).join(", ") || "Aucune"}`;
+
+  // For "analyse" type, add all questionnaire responses
+  if (type === "analyse") {
+    const responses = await prisma.questionnaireResponse.findMany({
+      where: { projectId },
+      include: {
+        respondent: { select: { name: true, role: true } },
+      },
+    });
+    const sections = await prisma.questionnaireSection.findMany({
+      where: { projectId },
+      include: { questions: true },
+    });
+    const questionMap = new Map<string, string>();
+    for (const s of sections) {
+      for (const q of s.questions) {
+        questionMap.set(q.id, q.label);
+      }
+    }
+
+    // Group by respondent
+    const byRespondent = new Map<string, { name: string; role: string | null; answers: string[] }>();
+    for (const r of responses) {
+      const key = r.respondent.name;
+      if (!byRespondent.has(key)) {
+        byRespondent.set(key, { name: r.respondent.name, role: r.respondent.role, answers: [] });
+      }
+      const qLabel = questionMap.get(r.questionId) || r.questionId;
+      byRespondent.get(key)!.answers.push(`- Q: "${qLabel}" → "${r.value}"`);
+    }
+
+    if (byRespondent.size > 0) {
+      context += "\n\nRéponses du questionnaire :";
+      for (const [, respondent] of byRespondent) {
+        context += `\n\nRépondant "${respondent.name}" (${respondent.role || "non précisé"}) :`;
+        context += "\n" + respondent.answers.join("\n");
+      }
+    }
+  }
 
   try {
     const raw = await generateWithOllama(PROMPTS[type](context), model || "llama3.2");

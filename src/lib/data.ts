@@ -41,6 +41,18 @@ export async function getProject(id: string) {
       deliverables: { orderBy: { order: "asc" } },
       navItems: { orderBy: { order: "asc" } },
       skills: { orderBy: { order: "asc" } },
+      _count: {
+        select: {
+          questionnaireSections: true,
+          personas: true,
+          phases: true,
+          userStories: true,
+          sprints: true,
+          testCases: true,
+          stakeholders: true,
+          respondents: true,
+        },
+      },
     },
   });
 }
@@ -106,23 +118,44 @@ export async function getQuestionnaireSections(projectId: string) {
   });
 }
 
-export async function getQuestionnaireResponses(projectId: string) {
+export async function getQuestionnaireResponses(projectId: string, respondentId?: string) {
+  if (respondentId) {
+    return prisma.questionnaireResponse.findMany({
+      where: { projectId, respondentId },
+    });
+  }
   return prisma.questionnaireResponse.findMany({
     where: { projectId },
+    include: { respondent: { select: { id: true, name: true, email: true, role: true } } },
   });
 }
 
 export async function saveQuestionnaireResponse(
   projectId: string,
   questionId: string,
-  value: string
+  value: string,
+  respondentId: string
 ) {
   return prisma.questionnaireResponse.upsert({
     where: {
-      projectId_questionId: { projectId, questionId },
+      respondentId_questionId: { respondentId, questionId },
     },
     update: { value },
-    create: { projectId, questionId, value },
+    create: { projectId, questionId, value, respondentId },
+  });
+}
+
+export async function getRespondents(projectId: string) {
+  return prisma.respondent.findMany({
+    where: { projectId },
+    include: { _count: { select: { responses: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function createRespondent(projectId: string, name: string, email?: string, role?: string) {
+  return prisma.respondent.create({
+    data: { projectId, name, email: email || null, role: role || null },
   });
 }
 

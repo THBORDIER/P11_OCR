@@ -112,7 +112,7 @@ export default async function HomePage() {
             <Link
               key={project.id}
               href={`/${project.id}`}
-              className="group bg-white rounded-xl border border-[#e2e8f0] p-5 hover:shadow-xl hover:border-[#cbd5e1] transition-all duration-200 hover:-translate-y-0.5"
+              className="block group bg-white rounded-xl border border-[#e2e8f0] p-5 hover:shadow-xl hover:border-[#cbd5e1] transition-all duration-200 hover:-translate-y-1 will-change-transform"
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-3">
