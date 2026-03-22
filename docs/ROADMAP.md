@@ -1,6 +1,6 @@
 # Roadmap — Outil de Suivi de Projets Dev
 
-> Dernière mise à jour : 22 mars 2026
+> Dernière mise à jour : 22 mars 2026 (Sprint 2)
 
 ## Vision
 
@@ -109,13 +109,13 @@ GITHUB_WEBHOOK_SECRET="votre-secret-webhook"
 
 ---
 
-## Phase 2 — Emails automatiques d'avancement
+## Phase 2 — Emails automatiques d'avancement ✅ PARTIELLEMENT
 
 **Objectif** : Envoyer automatiquement des rapports d'avancement au client.
 
 ### Fonctionnalités
 
-- [ ] **Rapport hebdomadaire** (cron ou trigger manuel)
+- [x] **Rapport d'avancement** (trigger manuel via page Rapports)
   - Progression sprint : X/Y tâches terminées, Z points livrés
   - User stories validées cette semaine
   - Derniers commits du repo GitHub (résumé)
@@ -128,11 +128,14 @@ GITHUB_WEBHOOK_SECRET="votre-secret-webhook"
   - Toutes les US d'un sprint validées PO → alerte
   - Nouveau commentaire/issue GitHub → résumé
 
-- [ ] **Page "Rapports"** dans le dashboard
-  - Historique des rapports envoyés
-  - Bouton "Envoyer un rapport maintenant"
-  - Personnalisation du template
-  - Prévisualisation avant envoi
+- [x] **Page "Rapports"** dans le dashboard (`/[projectId]/rapports`)
+  - Barres de progression US / Tâches / Tests
+  - Stats globales (phases, sprints, US, tâches)
+  - Activité récente (depuis ActivityLog)
+  - Bouton "Envoyer le rapport" (→ Resend)
+  - [ ] Historique des rapports envoyés
+  - [ ] Personnalisation du template
+  - [ ] Prévisualisation HTML avant envoi
 
 ### API
 
@@ -152,12 +155,12 @@ POST /api/projects/[projectId]/reports/preview
 
 - [x] API `/api/ai/generate` avec types : `user-stories`, `questionnaire`, `test-cases`, `personas`, `phases`
 - [x] Composant `AiGenerateButton.tsx` prêt (preview + accept all)
-- [ ] **Brancher le bouton** sur chaque page CRUD :
-  - Analyse → "Générer des personas"
-  - Backlog → "Générer des user stories"
-  - Roadmap → "Générer des phases"
-  - Recettage → "Générer des cas de test"
-  - Questionnaire → "Générer des questions"
+- [x] **Bouton IA branché** sur 4 pages CRUD :
+  - ✅ Analyse → "Générer des personas"
+  - ✅ Backlog → "Générer des user stories"
+  - ✅ Roadmap → "Générer des phases"
+  - ✅ Recettage → "Générer des cas de test"
+  - [ ] Questionnaire → "Générer des questions"
 
 ### Fonctionnalités futures
 
@@ -243,12 +246,9 @@ POST /api/projects/[projectId]/reports/preview
 
 ## Bugs connus / dette technique
 
-- [ ] AnalyseClient.tsx : le template collapsible contient encore ~300 lignes de contenu CRM
-  spécifique (prospects, pipeline Kanban, WeWeb+Xano). À généraliser ou rendre dynamique.
-- [ ] Les statuts des test cases (recettage) sont en localStorage uniquement,
-  pas persistés en BDD via l'API `PATCH /tasks/status`
-- [ ] Les validations PO du backlog sont en localStorage — à synchroniser avec la BDD
-  (`validatedAt` existe déjà sur le modèle UserStory)
+- [x] ~~AnalyseClient.tsx : template CRM~~ → Remplacé par un guide d'analyse générique (310 lignes vs 631)
+- [x] ~~Recettage localStorage~~ → Statuts persistés en BDD via PATCH API
+- [x] ~~Validations PO localStorage~~ → Persistées en BDD via /backlog/validate
 - [ ] Commentaire "p11-spartcrm:R-001" encore présent dans 3 fichiers (cosmétique)
 
 ---

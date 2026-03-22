@@ -80,8 +80,9 @@ export async function POST(request: NextRequest) {
           { href: `/${id}/product-backlog`, label: "Product Backlog", icon: "📦", order: 5 },
           { href: `/${id}/sprint-backlog`, label: "Sprint Backlog", icon: "🏃", order: 6 },
           { href: `/${id}/github`, label: "GitHub", icon: "🔗", order: 7 },
-          { href: `/${id}/communication`, label: "Communication", icon: "💬", order: 8 },
-          { href: `/${id}/settings`, label: "Paramètres", icon: "⚙️", order: 9 },
+          { href: `/${id}/rapports`, label: "Rapports", icon: "📊", order: 8 },
+          { href: `/${id}/communication`, label: "Communication", icon: "💬", order: 9 },
+          { href: `/${id}/settings`, label: "Paramètres", icon: "⚙️", order: 10 },
         ],
       },
       // Questionnaire de cadrage par défaut
