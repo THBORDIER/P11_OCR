@@ -3,6 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AiGenerateButton from "@/components/AiGenerateButton";
+import {
+  getAnsweredCount,
+  downloadMarkdown,
+  downloadFilledPdf,
+  downloadBlankPdf,
+  type PdfSection,
+} from "@/lib/questionnaire-pdf";
 
 // ── Respondents Panel — shows client responses ──────────────
 
@@ -242,6 +249,9 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
   const [formData, setFormData] = useState<Record<string, string | string[]>>({});
   const [submitted, setSubmitted] = useState(false);
 
+  // Cast sections for PDF helpers (same shape, just lacks pourquoi which is unused)
+  const pdfSections: PdfSection[] = sections;
+
   // Load from localStorage on mount
   useEffect(() => {
     try {
@@ -291,378 +301,40 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
   const handleSubmit = () => {
     setSubmitted(true);
   };
-  const getAnsweredCountFromData = useCallback((data: Record<string, string | string[]>): { answered: number; total: number } => {
-    let total = 0;
-    let answered = 0;
 
-    for (const sec of sections) {
-      for (const q of sec.questions) {
-        total++;
-        if (q.type === "scale" && q.options) {
-          const hasAnswer = q.options.some(
-            (opt) => data[`${q.id}_${opt}`] && String(data[`${q.id}_${opt}`]).trim() !== ""
-          );
-          if (hasAnswer) answered++;
-        } else if (q.type === "checkbox") {
-          const val = data[q.id] as string[] | undefined;
-          if (val && val.length > 0) answered++;
-        } else {
-          const val = data[q.id] as string | undefined;
-          if (val && val.trim() !== "") answered++;
-        }
-      }
-    }
+  const handleDownloadMd = useCallback(
+    (data: Record<string, string | string[]> = formData) => {
+      downloadMarkdown(pdfSections, data, projectName, `questionnaire-${projectId}`);
+    },
+    [formData, pdfSections, projectName, projectId]
+  );
 
-    return { answered, total };
-  }, [sections]);
+  const handleDownloadPdf = useCallback(() => {
+    void downloadFilledPdf(
+      pdfSections,
+      formData,
+      `questionnaire-${projectId}`,
+      `Questionnaire de recueil de besoins - ${projectName}`
+    );
+  }, [pdfSections, formData, projectId, projectName]);
 
-  const generateMarkdown = useCallback((data: Record<string, string | string[]> = formData): string => {
-    const lines: string[] = [];
-    lines.push(`# Questionnaire de recueil de besoins - ${projectName}`);
-    lines.push("");
-    lines.push(`> Document genere le ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} a ${new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`);
-    lines.push("");
-    lines.push("---");
-    lines.push("");
+  const handleDownloadFakePdf = useCallback(() => {
+    void downloadFilledPdf(
+      pdfSections,
+      FAKE_FORM_DATA,
+      `questionnaire-${projectId}-fake`,
+      `Questionnaire fictif - ${projectName}`
+    );
+  }, [pdfSections, FAKE_FORM_DATA, projectId, projectName]);
 
-    let globalIndex = 0;
+  const handleDownloadBlankPdf = useCallback(() => {
+    void downloadBlankPdf(pdfSections, projectId, projectName);
+  }, [pdfSections, projectId, projectName]);
 
-    for (const sec of sections) {
-      lines.push(`## ${sec.title}`);
-      lines.push("");
-      lines.push(`*${sec.description}*`);
-      lines.push("");
-
-      for (const q of sec.questions) {
-        globalIndex++;
-        lines.push(`### Q${globalIndex}. ${q.label}`);
-        lines.push("");
-
-        if (q.type === "scale" && q.options) {
-          let hasAnyScale = false;
-          for (const opt of q.options) {
-            const val = data[`${q.id}_${opt}`];
-            if (val && String(val).trim() !== "") {
-              lines.push(`- **${opt}** : ${val}/5`);
-              hasAnyScale = true;
-            } else {
-              lines.push(`- **${opt}** : _Non renseigne_`);
-            }
-          }
-          if (!hasAnyScale) {
-            lines.push("_Aucune note attribuee_");
-          }
-        } else if (q.type === "checkbox") {
-          const val = data[q.id] as string[] | undefined;
-          if (val && val.length > 0) {
-            for (const item of val) {
-              lines.push(`- [x] ${item}`);
-            }
-            const unchecked = (q.options || []).filter((o) => !val.includes(o));
-            for (const item of unchecked) {
-              lines.push(`- [ ] ${item}`);
-            }
-          } else {
-            lines.push("_Non renseigne_");
-          }
-        } else {
-          const val = data[q.id] as string | undefined;
-          if (val && val.trim() !== "") {
-            lines.push(`**Reponse :** ${val}`);
-          } else {
-            lines.push("_Non renseigne_");
-          }
-        }
-
-        lines.push("");
-      }
-
-      lines.push("---");
-      lines.push("");
-    }
-
-    const { answered: a, total: t } = getAnsweredCountFromData(data);
-    lines.push("## Recapitulatif");
-    lines.push("");
-    lines.push(`- **Questions repondues :** ${a} / ${t}`);
-    lines.push(`- **Taux de completion :** ${t > 0 ? Math.round((a / t) * 100) : 0}%`);
-    lines.push("");
-    lines.push("---");
-    lines.push("");
-    lines.push(`*Document genere automatiquement depuis le questionnaire ${projectName}.*`);
-
-    return lines.join("\n");
-  }, [formData, getAnsweredCountFromData, sections]);
-
-  const downloadMarkdown = useCallback((data: Record<string, string | string[]> = formData, filePrefix = `questionnaire-${projectId}`) => {
-    const md = generateMarkdown(data);
-    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${filePrefix}-${new Date().toISOString().slice(0, 10)}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [formData, generateMarkdown]);
-
-  const downloadPdf = useCallback(async (
-    data: Record<string, string | string[]>,
-    filePrefix: string,
-    title: string
-  ) => {
-    const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-    const marginX = 40;
-    const marginTop = 44;
-    const lineHeight = 14;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const maxWidth = pageWidth - marginX * 2;
-    const pageBottom = pageHeight - 40;
-
-    let y = marginTop;
-
-    const writeLines = (input: string, font: "normal" | "bold" = "normal", size = 11) => {
-      doc.setFont("helvetica", font);
-      doc.setFontSize(size);
-      const wrapped = doc.splitTextToSize(input, maxWidth) as string[];
-      for (const line of wrapped) {
-        if (y > pageBottom) {
-          doc.addPage();
-          y = marginTop;
-        }
-        doc.text(line, marginX, y);
-        y += lineHeight;
-      }
-    };
-
-    writeLines(title, "bold", 16);
-    y += 4;
-    writeLines(`Genere le ${new Date().toLocaleDateString("fr-FR")} a ${new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`);
-    y += 8;
-
-    let globalIndex = 0;
-    for (const sec of sections) {
-      writeLines(sec.title, "bold", 13);
-      writeLines(sec.description);
-      y += 2;
-
-      for (const q of sec.questions) {
-        globalIndex++;
-        writeLines(`Q${globalIndex}. ${q.label}`, "bold");
-
-        if (q.type === "scale" && q.options) {
-          for (const opt of q.options) {
-            const val = data[`${q.id}_${opt}`];
-            writeLines(`- ${opt}: ${val && String(val).trim() !== "" ? `${val}/5` : "Non renseigne"}`);
-          }
-        } else if (q.type === "checkbox") {
-          const val = data[q.id] as string[] | undefined;
-          writeLines(`- ${val && val.length ? val.join(", ") : "Non renseigne"}`);
-        } else {
-          const val = data[q.id] as string | undefined;
-          writeLines(`- ${val && val.trim() !== "" ? val : "Non renseigne"}`);
-        }
-
-        y += 4;
-      }
-
-      y += 6;
-    }
-
-    const counts = getAnsweredCountFromData(data);
-    writeLines(`Recapitulatif: ${counts.answered}/${counts.total} questions repondues (${counts.total > 0 ? Math.round((counts.answered / counts.total) * 100) : 0}%)`, "bold");
-
-    doc.save(`${filePrefix}-${new Date().toISOString().slice(0, 10)}.pdf`);
-  }, [getAnsweredCountFromData, sections]);
-
-  const downloadCurrentPdf = useCallback(() => {
-    void downloadPdf(formData, `questionnaire-${projectId}`, `Questionnaire de recueil de besoins - ${projectName}`);
-  }, [downloadPdf, formData]);
-
-  const downloadFakePdf = useCallback(() => {
-    void downloadPdf(FAKE_FORM_DATA, `questionnaire-${projectId}-fake`, `Questionnaire fictif - ${projectName}`);
-  }, [downloadPdf]);
-
-  const downloadBlankPdf = useCallback(async () => {
-    const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-    const marginX = 40;
-    const marginTop = 44;
-    const lineHeight = 14;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const maxWidth = pageWidth - marginX * 2;
-    const pageBottom = pageHeight - 50;
-
-    let y = marginTop;
-
-    const checkPage = (needed = lineHeight) => {
-      if (y + needed > pageBottom) {
-        doc.addPage();
-        y = marginTop;
-      }
-    };
-
-    const writeLines = (
-      input: string,
-      font: "normal" | "bold" = "normal",
-      size = 10
-    ) => {
-      doc.setFont("helvetica", font);
-      doc.setFontSize(size);
-      const wrapped = doc.splitTextToSize(input, maxWidth) as string[];
-      for (const line of wrapped) {
-        checkPage();
-        doc.text(line, marginX, y);
-        y += lineHeight;
-      }
-    };
-
-    const drawBlankLines = (count: number) => {
-      for (let i = 0; i < count; i++) {
-        checkPage(16);
-        doc.setDrawColor(200);
-        doc.line(marginX + 10, y, pageWidth - marginX, y);
-        y += 18;
-      }
-    };
-
-    const drawCheckboxes = (options: string[]) => {
-      for (const opt of options) {
-        checkPage(16);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.rect(marginX + 10, y - 8, 10, 10);
-        doc.text(opt, marginX + 26, y);
-        y += 16;
-      }
-    };
-
-    const drawScaleRow = (label: string) => {
-      checkPage(20);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text(label, marginX + 10, y);
-      // Draw 5 circles for scale 1-5
-      const scaleX = marginX + 300;
-      for (let i = 1; i <= 5; i++) {
-        doc.circle(scaleX + i * 30, y - 3, 6);
-        doc.setFontSize(8);
-        doc.text(String(i), scaleX + i * 30 - 2.5, y - 0.5);
-      }
-      y += 18;
-    };
-
-    // ── Titre
-    writeLines(`Questionnaire de recueil de besoins - ${projectName}`, "bold", 16);
-    y += 2;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(100);
-    doc.text(`Document a remplir par le client | Projet ${projectName}`, marginX, y);
-    doc.setTextColor(0);
-    y += 20;
-
-    // ── Intro
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(80);
-    const intro = doc.splitTextToSize(
-      "Merci de prendre le temps de remplir ce questionnaire. Vos reponses nous permettront de concevoir un CRM parfaitement adapte a vos besoins. Temps estime : 15 a 20 minutes.",
-      maxWidth
-    ) as string[];
-    for (const line of intro) {
-      checkPage();
-      doc.text(line, marginX, y);
-      y += 12;
-    }
-    doc.setTextColor(0);
-    y += 10;
-
-    // ── Sections
-    let globalQ = 0;
-    for (const sec of sections) {
-      checkPage(40);
-
-      // Section header with background
-      doc.setFillColor(241, 245, 249);
-      doc.rect(marginX - 5, y - 12, maxWidth + 10, 32, "F");
-      writeLines(sec.title, "bold", 13);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(100);
-      const descWrapped = doc.splitTextToSize(sec.description, maxWidth) as string[];
-      for (const line of descWrapped) {
-        checkPage();
-        doc.text(line, marginX, y);
-        y += 12;
-      }
-      doc.setTextColor(0);
-      y += 8;
-
-      for (const q of sec.questions) {
-        globalQ++;
-        checkPage(40);
-
-        // Question label
-        writeLines(`Q${globalQ}. ${q.label}`, "bold", 10);
-        y += 2;
-
-        if (q.type === "checkbox" && q.options) {
-          drawCheckboxes(q.options);
-        } else if (q.type === "select" && q.options) {
-          drawCheckboxes(q.options);
-        } else if (q.type === "scale" && q.options) {
-          // Scale header
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(8);
-          doc.setTextColor(120);
-          doc.text("(1 = Peu important, 5 = Indispensable)", marginX + 10, y);
-          doc.setTextColor(0);
-          y += 14;
-          for (const opt of q.options) {
-            drawScaleRow(opt);
-          }
-        } else if (q.type === "textarea") {
-          drawBlankLines(4);
-        } else {
-          // text
-          drawBlankLines(2);
-        }
-
-        y += 8;
-      }
-
-      y += 10;
-    }
-
-    // Footer
-    checkPage(30);
-    doc.setDrawColor(200);
-    doc.line(marginX, y, pageWidth - marginX, y);
-    y += 14;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("Merci pour vos reponses !", marginX, y);
-    y += 12;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(100);
-    doc.text(`Ce document est strictement confidentiel. Projet ${projectName}`, marginX, y);
-
-    doc.save(`questionnaire-${projectId}-vierge-${new Date().toISOString().slice(0, 10)}.pdf`);
-  }, [sections]);
-
-  const getAnsweredCount = (): { answered: number; total: number } => getAnsweredCountFromData(formData);
+  const { answered, total } = getAnsweredCount(pdfSections, formData);
 
   // Submitted confirmation screen
   if (submitted) {
-    const { answered, total } = getAnsweredCount();
     return (
       <div>
         <div className="mb-6">
@@ -715,19 +387,19 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
               Revenir au questionnaire
             </button>
             <button
-              onClick={() => downloadMarkdown(formData, `questionnaire-${projectId}`)}
+              onClick={() => handleDownloadMd(formData)}
               className="px-6 py-2 rounded-lg bg-[#3b82f6] text-white text-sm hover:bg-[#2563eb]"
             >
               Telecharger (.md)
             </button>
             <button
-              onClick={downloadCurrentPdf}
+              onClick={handleDownloadPdf}
               className="px-6 py-2 rounded-lg bg-[#0ea5e9] text-white text-sm hover:bg-[#0284c7]"
             >
               Telecharger (.pdf)
             </button>
             <button
-              onClick={downloadBlankPdf}
+              onClick={handleDownloadBlankPdf}
               className="px-6 py-2 rounded-lg border border-[#64748b] text-[#64748b] text-sm hover:bg-[#f1f5f9]"
             >
               PDF vierge
@@ -739,7 +411,6 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
   }
 
   const section = sections[currentSection];
-  const { answered, total } = getAnsweredCount();
   const isLastSection = currentSection === sections.length - 1;
 
   return (
@@ -853,7 +524,7 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
         </p>
         <div className="flex gap-2">
           <button
-            onClick={downloadBlankPdf}
+            onClick={handleDownloadBlankPdf}
             className="px-4 py-2 rounded-lg bg-white text-[#1d4ed8] border border-[#1d4ed8] text-sm hover:bg-[#eff6ff]"
           >
             PDF vierge
@@ -1068,21 +739,21 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
 
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <button
-              onClick={() => downloadMarkdown(formData, `questionnaire-${projectId}`)}
+              onClick={() => handleDownloadMd(formData)}
               className="px-4 py-2 rounded-lg border border-[#3b82f6] text-[#3b82f6] text-sm hover:bg-[#eff6ff]"
               title="Telecharger les reponses en Markdown"
             >
               Telecharger (.md)
             </button>
             <button
-              onClick={downloadCurrentPdf}
+              onClick={handleDownloadPdf}
               className="px-4 py-2 rounded-lg bg-[#0ea5e9] text-white text-sm hover:bg-[#0284c7]"
               title="Telecharger les reponses en PDF"
             >
               Telecharger (.pdf)
             </button>
             <button
-              onClick={downloadBlankPdf}
+              onClick={handleDownloadBlankPdf}
               className="px-4 py-2 rounded-lg border border-[#64748b] text-[#64748b] text-sm hover:bg-[#f1f5f9]"
               title="Telecharger le questionnaire vierge en PDF"
             >

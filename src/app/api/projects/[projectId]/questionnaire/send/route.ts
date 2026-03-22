@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendQuestionnaireEmail } from "@/lib/resend";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   const { projectId } = await params;
+
+  // Rate limit: 5 emails per minute per IP
+  const ip = getClientIp(request.headers);
+  if (!checkRateLimit(`email:${ip}`, 5)) {
+    return NextResponse.json({ error: "Trop de requêtes. Réessayez dans une minute." }, { status: 429 });
+  }
 
   const body = await request.json();
   const email = body.email || body.to;

@@ -1,50 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireProjectOwner } from "@/lib/auth-helpers";
+import { createCrudHandlers, intId } from "@/lib/crud-route";
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ projectId: string; id: string }> }
-) {
-  const { projectId, id } = await params;
-  const { error } = await requireProjectOwner(projectId);
-  if (error)
-    return NextResponse.json(
-      { error },
-      {
-        status:
-          error === "UNAUTHORIZED" ? 401 : error === "NOT_FOUND" ? 404 : 403,
-      }
-    );
-
-  const data = await req.json();
-  const { sources, ...themeData } = data;
-
-  // Update theme fields
-  const item = await prisma.techWatchTheme.update({
-    where: { id: parseInt(id) },
-    data: themeData,
-    include: { sources: true },
-  });
-
-  return NextResponse.json(item);
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ projectId: string; id: string }> }
-) {
-  const { projectId, id } = await params;
-  const { error } = await requireProjectOwner(projectId);
-  if (error)
-    return NextResponse.json(
-      { error },
-      {
-        status:
-          error === "UNAUTHORIZED" ? 401 : error === "NOT_FOUND" ? 404 : 403,
-      }
-    );
-
-  await prisma.techWatchTheme.delete({ where: { id: parseInt(id) } });
-  return NextResponse.json({ success: true });
-}
+export const { PATCH, DELETE } = createCrudHandlers({
+  parseId: intId,
+  update: (id, data) => {
+    const { sources, ...themeData } = data as Record<string, unknown>;
+    return prisma.techWatchTheme.update({
+      where: { id: id as number },
+      data: themeData,
+      include: { sources: true },
+    });
+  },
+  remove: (id) => prisma.techWatchTheme.delete({ where: { id: id as number } }),
+});

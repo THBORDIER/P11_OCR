@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog";
 
 interface ProjectData {
@@ -43,8 +44,8 @@ export default function SettingsPage() {
   // Delete dialog
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  // For now, allow all users to edit settings (auth will restrict later)
-  const isOwner = true;
+  const { data: session } = useSession();
+  const isOwner = !project?.userId || (!!session?.user?.id && project.userId === session.user.id);
 
   useEffect(() => {
     async function loadProject() {
@@ -108,8 +109,8 @@ export default function SettingsPage() {
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inconnue");
     } finally {
       setSaving(false);
     }

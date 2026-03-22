@@ -44,12 +44,20 @@ export async function POST(request: NextRequest) {
   const event = request.headers.get("x-github-event");
   const signature = request.headers.get("x-hub-signature-256");
 
-  // Verify signature if secret is configured
-  if (secret && !verifySignature(body, signature, secret)) {
+  // Verify signature — reject if secret is not configured
+  if (!secret) {
+    return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
+  }
+  if (!verifySignature(body, signature, secret)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const payload = JSON.parse(body);
+  let payload: Record<string, unknown>;
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
 
   // Find project by repo name
   const repoFullName = payload.repository?.full_name;

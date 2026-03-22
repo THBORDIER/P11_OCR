@@ -71,6 +71,13 @@ export async function GET(
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   const { projectId } = await params;
+  const { error } = await requireProjectOwner(projectId);
+  if (error)
+    return NextResponse.json(
+      { error },
+      { status: error === "UNAUTHORIZED" ? 401 : error === "NOT_FOUND" ? 404 : 403 }
+    );
+
   const data = await buildReportData(projectId);
   if (!data) {
     return NextResponse.json({ error: "Projet introuvable" }, { status: 404 });

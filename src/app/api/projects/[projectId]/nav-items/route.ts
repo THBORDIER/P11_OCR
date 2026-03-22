@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireProjectOwner } from "@/lib/auth-helpers";
+import { pick, ALLOWED_FIELDS } from "@/lib/sanitize";
 
 export async function GET(
   req: NextRequest,
@@ -29,9 +30,10 @@ export async function POST(
       }
     );
 
-  const data = await req.json();
+  const raw = await req.json();
+  const data = pick(raw, [...ALLOWED_FIELDS.navItem]);
   const item = await prisma.navItem.create({
-    data: { ...data, projectId },
+    data: { ...data, projectId } as Parameters<typeof prisma.navItem.create>[0]["data"],
   });
   return NextResponse.json(item, { status: 201 });
 }
