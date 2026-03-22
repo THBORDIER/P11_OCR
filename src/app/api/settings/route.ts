@@ -4,8 +4,7 @@ import { pick } from "@/lib/sanitize";
 
 const ALLOWED = [
   "ollamaUrl", "ollamaModel",
-  "cliBridgeUrl", "cliBridgeToken", "cliBridgeEnabled",
-  "cliProviders",
+  "cliBridgeEnabled", "cliProviders",
 ];
 
 export async function GET() {

@@ -23,8 +23,6 @@ export async function getGlobalSettings() {
 export async function updateGlobalSettings(data: {
   ollamaUrl?: string;
   ollamaModel?: string;
-  cliBridgeUrl?: string;
-  cliBridgeToken?: string;
   cliBridgeEnabled?: boolean;
   cliProviders?: unknown;
 }) {

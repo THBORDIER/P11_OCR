@@ -1,21 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 interface CliProvider {
   name: string;
   command: string;
   enabled: boolean;
-}
-
-interface Settings {
-  ollamaUrl: string;
-  ollamaModel: string;
-  cliBridgeUrl: string;
-  cliBridgeToken: string;
-  cliBridgeEnabled: boolean;
-  cliProviders: CliProvider[];
 }
 
 type TestStatus = "idle" | "testing" | "ok" | "error";
@@ -33,15 +24,13 @@ export default function GlobalSettingsPage() {
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
   const [ollamaError, setOllamaError] = useState("");
 
-  // CLI Bridge
-  const [bridgeUrl, setBridgeUrl] = useState("http://localhost:3939");
-  const [bridgeToken, setBridgeToken] = useState("");
-  const [bridgeEnabled, setBridgeEnabled] = useState(false);
-  const [bridgeStatus, setBridgeStatus] = useState<TestStatus>("idle");
-  const [bridgeError, setBridgeError] = useState("");
-  const [bridgeProviders, setBridgeProviders] = useState<string[]>([]);
+  // CLI
+  const [cliEnabled, setCliEnabled] = useState(false);
+  const [isLocal, setIsLocal] = useState(false);
+  const [detectedProviders, setDetectedProviders] = useState<string[]>([]);
+  const [cliDetecting, setCliDetecting] = useState(false);
 
-  // CLI Providers
+  // CLI Providers config
   const [providers, setProviders] = useState<CliProvider[]>([
     { name: "claude", command: "claude", enabled: true },
     { name: "gemini", command: "gemini", enabled: false },
@@ -54,21 +43,37 @@ export default function GlobalSettingsPage() {
   const [testResponse, setTestResponse] = useState("");
   const [testLoading, setTestLoading] = useState(false);
 
+  // Load settings
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
-      .then((data: Settings) => {
+      .then((data) => {
         setOllamaUrl(data.ollamaUrl || "http://localhost:11434");
         setOllamaModel(data.ollamaModel || "llama3.2");
-        setBridgeUrl(data.cliBridgeUrl || "http://localhost:3939");
-        setBridgeToken(data.cliBridgeToken || "");
-        setBridgeEnabled(data.cliBridgeEnabled || false);
+        setCliEnabled(data.cliBridgeEnabled || false);
         if (Array.isArray(data.cliProviders) && data.cliProviders.length > 0) {
           setProviders(data.cliProviders);
         }
       })
       .catch(() => setError("Impossible de charger les paramètres"))
       .finally(() => setLoading(false));
+  }, []);
+
+  // Detect CLI providers on mount
+  const detectCli = () => {
+    setCliDetecting(true);
+    fetch("/api/cli/providers")
+      .then((r) => r.json())
+      .then((data) => {
+        setIsLocal(data.local ?? false);
+        setDetectedProviders(data.providers || []);
+      })
+      .catch(() => setIsLocal(false))
+      .finally(() => setCliDetecting(false));
+  };
+
+  useEffect(() => {
+    detectCli();
   }, []);
 
   const handleSave = async () => {
@@ -82,9 +87,7 @@ export default function GlobalSettingsPage() {
         body: JSON.stringify({
           ollamaUrl,
           ollamaModel,
-          cliBridgeUrl: bridgeUrl,
-          cliBridgeToken: bridgeToken,
-          cliBridgeEnabled: bridgeEnabled,
+          cliBridgeEnabled: cliEnabled,
           cliProviders: providers,
         }),
       });
@@ -121,35 +124,12 @@ export default function GlobalSettingsPage() {
     }
   };
 
-  const testBridge = useCallback(async () => {
-    setBridgeStatus("testing");
-    setBridgeError("");
-    try {
-      const res = await fetch("/api/settings/test-bridge", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: bridgeUrl, token: bridgeToken }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        setBridgeStatus("ok");
-        setBridgeProviders(data.providers || []);
-      } else {
-        setBridgeStatus("error");
-        setBridgeError(data.error || "Erreur de connexion");
-      }
-    } catch {
-      setBridgeStatus("error");
-      setBridgeError("Impossible de tester la connexion");
-    }
-  }, [bridgeUrl, bridgeToken]);
-
   const sendTestPrompt = async () => {
     if (!testPrompt.trim()) return;
     setTestLoading(true);
     setTestResponse("");
     try {
-      const res = await fetch("/api/settings/bridge-prompt", {
+      const res = await fetch("/api/cli/execute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: testProvider, prompt: testPrompt }),
@@ -158,10 +138,10 @@ export default function GlobalSettingsPage() {
       if (data.error) {
         setTestResponse(`Erreur : ${data.error}`);
       } else {
-        setTestResponse(data.response || JSON.stringify(data, null, 2));
+        setTestResponse(data.response || "(Pas de réponse)");
       }
     } catch {
-      setTestResponse("Erreur de connexion à l'agent");
+      setTestResponse("Erreur de connexion");
     } finally {
       setTestLoading(false);
     }
@@ -180,7 +160,7 @@ export default function GlobalSettingsPage() {
   };
 
   const addProvider = () => {
-    const name = prompt("Nom du provider :");
+    const name = window.prompt("Nom du provider :");
     if (!name?.trim()) return;
     setProviders((prev) => [
       ...prev,
@@ -231,7 +211,7 @@ export default function GlobalSettingsPage() {
         {/* ── Ollama ── */}
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
           <h2 className="text-lg font-semibold text-[#1e293b] mb-1">Ollama</h2>
-          <p className="text-xs text-[#94a3b8] mb-4">Serveur de modèles IA local</p>
+          <p className="text-xs text-[#94a3b8] mb-4">Serveur de modèles IA local pour la génération automatique</p>
 
           <div className="space-y-4">
             <div>
@@ -252,11 +232,10 @@ export default function GlobalSettingsPage() {
                   {ollamaStatus === "testing" ? "Test..." : "Tester"}
                 </button>
               </div>
-
               {ollamaStatus === "ok" && (
                 <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
-                  Connecté — {ollamaModels.length} modèle{ollamaModels.length > 1 ? "s" : ""} disponible{ollamaModels.length > 1 ? "s" : ""}
+                  Connecté — {ollamaModels.length} modèle{ollamaModels.length > 1 ? "s" : ""}
                 </p>
               )}
               {ollamaStatus === "error" && (
@@ -292,79 +271,50 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
 
-        {/* ── CLI Bridge ── */}
+        {/* ── CLI IA ── */}
         <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-lg font-semibold text-[#1e293b]">CLI Bridge</h2>
+            <h2 className="text-lg font-semibold text-[#1e293b]">CLI IA</h2>
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
-                checked={bridgeEnabled}
-                onChange={(e) => setBridgeEnabled(e.target.checked)}
+                checked={cliEnabled}
+                onChange={(e) => setCliEnabled(e.target.checked)}
                 className="rounded border-slate-300 accent-blue-600"
               />
               Activé
             </label>
           </div>
-          <p className="text-xs text-[#94a3b8] mb-4">Agent local pour exécuter des CLI IA (Claude, Gemini, Codex)</p>
+          <p className="text-xs text-[#94a3b8] mb-4">
+            Exécutez Claude, Gemini ou Codex directement depuis l'application (localhost uniquement)
+          </p>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">URL de l'agent</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={bridgeUrl}
-                  onChange={(e) => setBridgeUrl(e.target.value)}
-                  placeholder="http://localhost:3939"
-                  className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={testBridge}
-                  disabled={bridgeStatus === "testing"}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
-                >
-                  {bridgeStatus === "testing" ? "Test..." : "Tester"}
-                </button>
-              </div>
-
-              {bridgeStatus === "ok" && (
-                <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
-                  Agent connecté — providers détectés : {bridgeProviders.join(", ") || "aucun"}
-                </p>
-              )}
-              {bridgeStatus === "error" && (
-                <p className="text-xs text-red-600 mt-2 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
-                  {bridgeError}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Token de sécurité</label>
-              <input
-                type="password"
-                value={bridgeToken}
-                onChange={(e) => setBridgeToken(e.target.value)}
-                placeholder="Laissez vide si non configuré sur l'agent"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <p className="text-xs text-slate-500 mt-1">
-                Doit correspondre au BRIDGE_TOKEN configuré sur l'agent local.
-              </p>
-            </div>
+          {/* Environment detection */}
+          <div className={`rounded-lg p-3 mb-4 text-sm flex items-center gap-2 ${
+            isLocal
+              ? "bg-green-50 border border-green-200 text-green-700"
+              : "bg-amber-50 border border-amber-200 text-amber-700"
+          }`}>
+            <span className={`w-2.5 h-2.5 rounded-full ${isLocal ? "bg-green-500" : "bg-amber-500"}`} />
+            {cliDetecting ? (
+              "Détection en cours..."
+            ) : isLocal ? (
+              <>Environnement local détecté — {detectedProviders.length} CLI disponible{detectedProviders.length > 1 ? "s" : ""} : <strong>{detectedProviders.join(", ") || "aucun"}</strong></>
+            ) : (
+              "Environnement serverless détecté — les CLI ne sont disponibles qu'en localhost"
+            )}
+            <button
+              onClick={detectCli}
+              disabled={cliDetecting}
+              className="ml-auto text-xs font-medium underline hover:no-underline"
+            >
+              Rafraîchir
+            </button>
           </div>
-        </div>
 
-        {/* ── Providers ── */}
-        <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-[#1e293b]">Providers CLI</h2>
-              <p className="text-xs text-[#94a3b8]">Outils CLI IA disponibles sur votre machine</p>
-            </div>
+          {/* Providers */}
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium text-[#1e293b]">Providers</p>
             <button
               onClick={addProvider}
               className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -373,7 +323,7 @@ export default function GlobalSettingsPage() {
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {providers.map((p, i) => (
               <div
                 key={p.name}
@@ -387,17 +337,20 @@ export default function GlobalSettingsPage() {
                   onChange={() => toggleProvider(i)}
                   className="rounded border-slate-300 accent-blue-600"
                 />
-                <span className="text-sm font-medium text-[#1e293b] w-20">{p.name}</span>
+                <span className="text-sm font-semibold text-[#1e293b] w-20">{p.name}</span>
                 <input
                   type="text"
                   value={p.command}
                   onChange={(e) => updateProviderCommand(i, e.target.value)}
-                  placeholder="commande"
                   className="flex-1 px-2 py-1 border border-slate-200 rounded text-sm text-slate-600 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-                {bridgeProviders.includes(p.name) && (
-                  <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
-                    Détecté
+                {detectedProviders.includes(p.name) ? (
+                  <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full font-medium">
+                    Installé
+                  </span>
+                ) : (
+                  <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                    Non trouvé
                   </span>
                 )}
               </div>
@@ -406,23 +359,27 @@ export default function GlobalSettingsPage() {
         </div>
 
         {/* ── Zone de test ── */}
-        {bridgeEnabled && (
+        {cliEnabled && isLocal && (
           <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
-            <h2 className="text-lg font-semibold text-[#1e293b] mb-1">Zone de test</h2>
-            <p className="text-xs text-[#94a3b8] mb-4">Envoyez un prompt de test via le CLI Bridge</p>
+            <h2 className="text-lg font-semibold text-[#1e293b] mb-1">Test rapide</h2>
+            <p className="text-xs text-[#94a3b8] mb-4">Envoyez un prompt à un CLI et visualisez la réponse</p>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Provider</label>
-                <select
-                  value={testProvider}
-                  onChange={(e) => setTestProvider(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {enabledProviders.map((p) => (
-                    <option key={p.name} value={p.name}>{p.name}</option>
-                  ))}
-                </select>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Provider</label>
+                  <select
+                    value={testProvider}
+                    onChange={(e) => setTestProvider(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {enabledProviders.map((p) => (
+                      <option key={p.name} value={p.name}>
+                        {p.name} {detectedProviders.includes(p.name) ? "" : "(non installé)"}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -433,26 +390,51 @@ export default function GlobalSettingsPage() {
                   placeholder="Posez une question..."
                   rows={3}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) sendTestPrompt();
+                  }}
                 />
+                <p className="text-xs text-slate-400 mt-1">Ctrl+Enter pour envoyer</p>
               </div>
 
               <button
                 onClick={sendTestPrompt}
-                disabled={testLoading || !testPrompt.trim()}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                disabled={testLoading || !testPrompt.trim() || !detectedProviders.includes(testProvider)}
+                className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
               >
+                {testLoading && (
+                  <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                )}
                 {testLoading ? "Exécution en cours..." : "Envoyer"}
               </button>
 
               {testResponse && (
-                <div className="bg-[#1e293b] rounded-lg p-4 mt-4">
-                  <p className="text-xs text-[#94a3b8] mb-2 font-mono">Réponse :</p>
-                  <pre className="text-sm text-[#e2e8f0] whitespace-pre-wrap font-mono leading-relaxed">
+                <div className="bg-[#1e293b] rounded-lg p-4 mt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-[#94a3b8] font-mono">Réponse de {testProvider} :</p>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(testResponse)}
+                      className="text-xs text-[#94a3b8] hover:text-white transition-colors"
+                    >
+                      Copier
+                    </button>
+                  </div>
+                  <pre className="text-sm text-[#e2e8f0] whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
                     {testResponse}
                   </pre>
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* CLI disabled or serverless notice */}
+        {cliEnabled && !isLocal && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6 text-center">
+            <p className="text-sm text-amber-800 font-medium mb-1">CLI non disponible sur Vercel</p>
+            <p className="text-xs text-amber-600">
+              Lancez l'application en local (<code className="bg-amber-100 px-1 rounded">npm run dev</code>) pour utiliser les CLI IA.
+            </p>
           </div>
         )}
 
@@ -465,27 +447,6 @@ export default function GlobalSettingsPage() {
           >
             {saving ? "Enregistrement..." : "Enregistrer les paramètres"}
           </button>
-        </div>
-
-        {/* ── Info CLI Bridge ── */}
-        <div className="bg-slate-50 rounded-lg border border-slate-200 p-6">
-          <h3 className="text-sm font-semibold text-[#1e293b] mb-2">Comment lancer l'agent CLI Bridge ?</h3>
-          <div className="bg-[#1e293b] rounded-lg p-4">
-            <pre className="text-sm text-[#e2e8f0] font-mono">
-{`# Optionnel : définir un token de sécurité
-export BRIDGE_TOKEN="votre-token-secret"
-
-# Lancer l'agent
-node cli-bridge/agent.mjs
-
-# Ou avec un port personnalisé
-PORT=4000 node cli-bridge/agent.mjs`}
-            </pre>
-          </div>
-          <p className="text-xs text-slate-500 mt-3">
-            L'agent doit tourner sur la machine où sont installés les CLI (claude, gemini, codex).
-            Il crée automatiquement un dossier par projet dans <code className="bg-slate-200 px-1 rounded">DevTracker/</code>.
-          </p>
         </div>
       </main>
     </div>
