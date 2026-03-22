@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireProjectOwner } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { sendQuestionnaireEmail } from "@/lib/resend";
 
@@ -8,15 +7,9 @@ export async function POST(
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   const { projectId } = await params;
-  const { error } = await requireProjectOwner(projectId);
-  if (error) {
-    return NextResponse.json(
-      { error },
-      { status: error === "UNAUTHORIZED" ? 401 : error === "NOT_FOUND" ? 404 : 403 }
-    );
-  }
 
-  const { email } = await request.json();
+  const body = await request.json();
+  const email = body.email || body.to;
   if (!email) {
     return NextResponse.json({ error: "Email requis" }, { status: 400 });
   }
@@ -30,7 +23,7 @@ export async function POST(
     return NextResponse.json({ error: "Projet introuvable" }, { status: 404 });
   }
 
-  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
   const questionnaireUrl = `${baseUrl}/q/${projectId}`;
 
   try {
