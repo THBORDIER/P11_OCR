@@ -204,6 +204,13 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
               type="test-cases"
               projectId={projectId}
               label="Générer avec l'IA"
+              hasExistingData={initialRows.length > 0}
+              onClearExisting={async () => {
+                for (const row of initialRows) {
+                  await fetch(`/api/projects/${projectId}/recettage/${encodeURIComponent(row.id)}`, { method: "DELETE" });
+                }
+                router.refresh();
+              }}
               onGenerated={async (items) => {
                 for (const item of items) {
                   await fetch(`/api/projects/${projectId}/recettage`, {

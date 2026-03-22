@@ -7,6 +7,10 @@ interface AiGenerateButtonProps {
   projectId: string;
   label?: string;
   onGenerated: (items: Record<string, unknown>[]) => void;
+  /** If provided, shows "Ajouter / Remplacer" choice before inserting */
+  onClearExisting?: () => Promise<void>;
+  /** Whether there's existing data that could be replaced */
+  hasExistingData?: boolean;
 }
 
 type Provider = "ollama" | "claude" | "gemini" | "codex" | "manual";
@@ -24,6 +28,8 @@ export default function AiGenerateButton({
   projectId,
   label = "Générer avec l'IA",
   onGenerated,
+  onClearExisting,
+  hasExistingData = false,
 }: AiGenerateButtonProps) {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -193,40 +199,49 @@ export default function AiGenerateButton({
     }
   };
 
-  const acceptAll = async () => {
-    if (preview) {
-      const items = preview;
-      setPreview(null);
-      setImporting(true);
-      setImportProgress(0);
+  const doImport = async (items: Record<string, unknown>[], replaceExisting: boolean) => {
+    setPreview(null);
+    setImporting(true);
+    setImportProgress(0);
 
-      let current = 0;
-      const tick = setInterval(() => {
-        if (current < 60) {
-          current += Math.floor(Math.random() * 10) + 1;
-        } else if (current < 85) {
-          current += Math.floor(Math.random() * 4) + 1;
-        } else if (current < 99) {
-          current += Math.random() > 0.5 ? 1 : 0;
-        } else {
-          current = 99;
-        }
-        current = Math.min(current, 99);
-        setImportProgress(current);
-      }, 800);
-
-      try {
-        await onGenerated(items);
-        clearInterval(tick);
-        setImportProgress(100);
-        await new Promise((r) => setTimeout(r, 600));
-      } catch {
-        clearInterval(tick);
-      } finally {
-        setImporting(false);
-        setImportProgress(0);
+    let current = 0;
+    const tick = setInterval(() => {
+      if (current < 60) {
+        current += Math.floor(Math.random() * 10) + 1;
+      } else if (current < 85) {
+        current += Math.floor(Math.random() * 4) + 1;
+      } else if (current < 99) {
+        current += Math.random() > 0.5 ? 1 : 0;
+      } else {
+        current = 99;
       }
+      current = Math.min(current, 99);
+      setImportProgress(current);
+    }, 800);
+
+    try {
+      if (replaceExisting && onClearExisting) {
+        await onClearExisting();
+      }
+      await onGenerated(items);
+      clearInterval(tick);
+      setImportProgress(100);
+      await new Promise((r) => setTimeout(r, 600));
+    } catch {
+      clearInterval(tick);
+    } finally {
+      setImporting(false);
+      setImportProgress(0);
     }
+  };
+
+  const acceptAll = () => {
+    if (!preview) return;
+    if (hasExistingData && onClearExisting) {
+      // Will show choice in preview modal
+      return;
+    }
+    doImport(preview, false);
   };
 
   const handlePaste = () => {
@@ -442,12 +457,29 @@ export default function AiGenerateButton({
               >
                 Annuler
               </button>
-              <button
-                onClick={acceptAll}
-                className="px-4 py-2 text-sm bg-[#3b82f6] text-white rounded-lg hover:bg-[#2563eb] transition-colors"
-              >
-                Tout ajouter ({preview.length})
-              </button>
+              {hasExistingData && onClearExisting ? (
+                <>
+                  <button
+                    onClick={() => doImport(preview!, false)}
+                    className="px-4 py-2 text-sm bg-[#f1f5f9] text-[#334155] rounded-lg hover:bg-[#e2e8f0] transition-colors border border-[#e2e8f0]"
+                  >
+                    + Ajouter aux existants
+                  </button>
+                  <button
+                    onClick={() => doImport(preview!, true)}
+                    className="px-4 py-2 text-sm bg-[#ef4444] text-white rounded-lg hover:bg-[#dc2626] transition-colors"
+                  >
+                    Remplacer tout ({preview.length})
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => doImport(preview!, false)}
+                  className="px-4 py-2 text-sm bg-[#3b82f6] text-white rounded-lg hover:bg-[#2563eb] transition-colors"
+                >
+                  Tout ajouter ({preview.length})
+                </button>
+              )}
             </div>
           </div>
         </div>

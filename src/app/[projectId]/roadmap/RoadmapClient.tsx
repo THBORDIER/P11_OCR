@@ -140,6 +140,13 @@ export default function RoadmapClient({
               type="phases"
               projectId={projectId}
               label="Générer avec l'IA"
+              hasExistingData={phases.length > 0}
+              onClearExisting={async () => {
+                for (const p of phases) {
+                  await fetch(`/api/projects/${projectId}/phases/${p.id}`, { method: "DELETE" });
+                }
+                router.refresh();
+              }}
               onGenerated={async (items) => {
                 for (const item of items) {
                   await fetch(`/api/projects/${projectId}/phases`, {

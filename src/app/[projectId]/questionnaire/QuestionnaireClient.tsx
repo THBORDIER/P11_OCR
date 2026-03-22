@@ -236,6 +236,7 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
             type="questionnaire"
             projectId={projectId}
             label="Générer le questionnaire"
+            hasExistingData={false}
             onGenerated={handleAiGenerated}
           />
         </div>
@@ -431,6 +432,7 @@ export default function QuestionnaireClient({ sections, projectId, projectName, 
                 type="questionnaire"
                 projectId={projectId}
                 label="Régénérer avec l'IA"
+                hasExistingData={sections.length > 0}
                 onGenerated={handleAiGenerated}
               />
               <button

@@ -138,6 +138,13 @@ export default function AnalyseClient({
                 type="analyse"
                 projectId={projectId}
                 label="Analyser les retours"
+                hasExistingData={personas.length > 0}
+                onClearExisting={async () => {
+                  for (const p of personas) {
+                    await fetch(`/api/projects/${projectId}/personas/${p.id}`, { method: "DELETE" });
+                  }
+                  router.refresh();
+                }}
                 onGenerated={async (items) => {
                   for (const item of items) {
                     await fetch(`${apiBase}/personas`, {

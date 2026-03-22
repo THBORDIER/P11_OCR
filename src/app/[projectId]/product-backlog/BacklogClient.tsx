@@ -311,6 +311,13 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
               type="user-stories"
               projectId={projectId}
               label="Générer avec l'IA"
+              hasExistingData={backlog.length > 0}
+              onClearExisting={async () => {
+                for (const us of backlog) {
+                  await fetch(`/api/projects/${projectId}/user-stories/${encodeURIComponent(us.id)}`, { method: "DELETE" });
+                }
+                router.refresh();
+              }}
               onGenerated={async (items) => {
                 for (const item of items) {
                   await fetch(`/api/projects/${projectId}/user-stories`, {
