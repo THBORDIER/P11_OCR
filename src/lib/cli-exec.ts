@@ -3,10 +3,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir, platform } from "node:os";
 
-const BASE_DIR =
-  platform() === "win32"
-    ? join(process.env.PROGRAMFILES || "C:\\Program Files", "DevTracker")
-    : join(homedir(), "DevTracker");
+const BASE_DIR = join(homedir(), "DevTracker");
 
 /**
  * Detect which CLI tools are installed on this machine.
