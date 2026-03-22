@@ -8,11 +8,6 @@ export async function getAuthenticatedUser() {
 }
 
 export async function requireProjectOwner(projectId: string) {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return { error: "UNAUTHORIZED" as const, user: null };
-  }
-
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     select: { userId: true },
@@ -20,6 +15,18 @@ export async function requireProjectOwner(projectId: string) {
 
   if (!project) {
     return { error: "NOT_FOUND" as const, user: null };
+  }
+
+  // Anonymous projects (no userId) are editable by everyone
+  if (!project.userId) {
+    const user = await getAuthenticatedUser();
+    return { error: null, user };
+  }
+
+  // Owned projects require the owner to be authenticated
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return { error: "UNAUTHORIZED" as const, user: null };
   }
 
   if (project.userId !== user.id) {

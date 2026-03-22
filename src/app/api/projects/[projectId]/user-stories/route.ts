@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireProjectOwner } from "@/lib/auth-helpers";
 
 export async function GET(
   req: NextRequest,
@@ -19,19 +18,34 @@ export async function POST(
   { params }: { params: Promise<{ projectId: string }> }
 ) {
   const { projectId } = await params;
-  const { error } = await requireProjectOwner(projectId);
-  if (error)
-    return NextResponse.json(
-      { error },
-      {
-        status:
-          error === "UNAUTHORIZED" ? 401 : error === "NOT_FOUND" ? 404 : 403,
-      }
-    );
-
   const data = await req.json();
-  const item = await prisma.userStory.create({
-    data: { ...data, projectId },
-  });
-  return NextResponse.json(item, { status: 201 });
+
+  // Generate ID if not provided
+  const count = await prisma.userStory.count({ where: { projectId } });
+  const id = data.id || `${projectId}:US-${String(count + 1).padStart(3, "0")}`;
+
+  try {
+    const item = await prisma.userStory.create({
+      data: {
+        id,
+        projectId,
+        epic: data.epic || "",
+        titre: data.titre || data.title || "",
+        enTantQue: data.enTantQue || "",
+        jeSouhaite: data.jeSouhaite || "",
+        afinDe: data.afinDe || "",
+        criteres: data.criteres || data.criteria || [],
+        estimation: data.estimation || 0,
+        priorite: data.priorite || data.priority || "Should",
+        sprint: data.sprint || "",
+        valeur: data.valeur || data.value || "Moyenne",
+      },
+    });
+    return NextResponse.json(item, { status: 201 });
+  } catch (e) {
+    return NextResponse.json(
+      { error: "Erreur création US : " + (e instanceof Error ? e.message : "inconnue") },
+      { status: 500 }
+    );
+  }
 }
