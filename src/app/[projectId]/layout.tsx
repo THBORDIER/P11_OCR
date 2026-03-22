@@ -65,35 +65,65 @@ export default async function ProjectLayout({
 
         {/* Navigation */}
         <nav className="flex-1 py-3 overflow-y-auto">
-          {project.navItems.map((item) => {
-            // Progress indicator based on nav href
+          {(() => {
             const counts = project._count;
-            const progressMap: Record<string, boolean> = {
-              questionnaire: counts.questionnaireSections > 0,
-              analyse: counts.personas > 0,
-              roadmap: counts.phases > 0,
-              "product-backlog": counts.userStories > 0,
-              "sprint-backlog": counts.sprints > 0,
-              recettage: counts.testCases > 0,
-              communication: counts.stakeholders > 0,
-            };
-            const segment = item.href.split("/").pop() || "";
-            const isDone = progressMap[segment];
+            // Ordered pipeline steps with their completion conditions and dependencies
+            const pipeline: { segment: string; done: boolean; requires?: string }[] = [
+              { segment: "questionnaire", done: counts.respondents > 0 },
+              { segment: "analyse", done: counts.personas > 0, requires: "questionnaire" },
+              { segment: "product-backlog", done: counts.userStories > 0, requires: "analyse" },
+              { segment: "roadmap", done: counts.phases > 0, requires: "product-backlog" },
+              { segment: "sprint-backlog", done: counts.sprints > 0, requires: "roadmap" },
+              { segment: "recettage", done: counts.testCases > 0, requires: "sprint-backlog" },
+            ];
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-2.5 px-5 py-2 text-[13px] text-[#94a3b8] hover:text-white hover:bg-[#1e293b] transition-all duration-150 group"
-              >
-                <span className="text-base w-5 text-center group-hover:scale-110 transition-transform">{item.icon}</span>
-                <span className="flex-1">{item.label}</span>
-                {isDone && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                )}
-              </Link>
-            );
-          })}
+            // Determine status for each step
+            const statusMap: Record<string, "done" | "next" | "blocked" | null> = {};
+            let foundNext = false;
+            for (const step of pipeline) {
+              if (step.done) {
+                statusMap[step.segment] = "done";
+              } else if (!foundNext) {
+                // Check if dependency is met
+                if (!step.requires || statusMap[step.requires] === "done") {
+                  statusMap[step.segment] = "next";
+                  foundNext = true;
+                } else {
+                  statusMap[step.segment] = "blocked";
+                  foundNext = true;
+                }
+              } else {
+                statusMap[step.segment] = "blocked";
+              }
+            }
+            // Communication is independent
+            statusMap["communication"] = counts.stakeholders > 0 ? "done" : null;
+
+            return project.navItems.map((item) => {
+              const segment = item.href.split("/").pop() || "";
+              const status = statusMap[segment] || null;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-2.5 px-5 py-2 text-[13px] text-[#94a3b8] hover:text-white hover:bg-[#1e293b] transition-all duration-150 group"
+                >
+                  <span className="text-base w-5 text-center group-hover:scale-110 transition-transform">{item.icon}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {status === "done" && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" title="Terminé" />
+                  )}
+                  {status === "next" && (
+                    <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-pulse" title="Prochaine étape" />
+                  )}
+                  {status === "blocked" && (
+                    <span className="w-2 h-2 rounded-full bg-red-400/60 shrink-0" title="En attente" />
+                  )}
+                </Link>
+              );
+            });
+          })()}
         </nav>
 
         {/* Footer */}
