@@ -145,7 +145,7 @@ export default function RoadmapClient({
                 for (const p of phases) {
                   await fetch(`/api/projects/${projectId}/phases/${p.id}`, { method: "DELETE" });
                 }
-                router.refresh();
+                window.location.reload();
               }}
               onGenerated={async (items) => {
                 for (const item of items) {
@@ -155,7 +155,7 @@ export default function RoadmapClient({
                     body: JSON.stringify(item),
                   });
                 }
-                router.refresh();
+                window.location.reload();
               }}
             />
             <button

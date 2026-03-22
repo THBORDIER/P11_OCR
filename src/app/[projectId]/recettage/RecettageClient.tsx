@@ -209,7 +209,7 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
                 for (const row of initialRows) {
                   await fetch(`/api/projects/${projectId}/recettage/${encodeURIComponent(row.id)}`, { method: "DELETE" });
                 }
-                router.refresh();
+                window.location.reload();
               }}
               onGenerated={async (items) => {
                 for (const item of items) {
@@ -231,7 +231,7 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
                   });
                   if (!res.ok) console.error("Test case creation failed:", await res.text());
                 }
-                router.refresh();
+                window.location.reload();
               }}
             />
             <button

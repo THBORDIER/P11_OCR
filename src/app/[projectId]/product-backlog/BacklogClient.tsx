@@ -316,7 +316,7 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
                 for (const us of backlog) {
                   await fetch(`/api/projects/${projectId}/user-stories/${encodeURIComponent(us.id)}`, { method: "DELETE" });
                 }
-                router.refresh();
+                window.location.reload();
               }}
               onGenerated={async (items) => {
                 for (const item of items) {
@@ -326,7 +326,7 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
                     body: JSON.stringify(item),
                   });
                 }
-                router.refresh();
+                window.location.reload();
               }}
             />
             <button

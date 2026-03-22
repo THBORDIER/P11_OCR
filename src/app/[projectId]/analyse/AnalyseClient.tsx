@@ -143,7 +143,7 @@ export default function AnalyseClient({
                   for (const p of personas) {
                     await fetch(`/api/projects/${projectId}/personas/${p.id}`, { method: "DELETE" });
                   }
-                  router.refresh();
+                  window.location.reload();
                 }}
                 onGenerated={async (items) => {
                   for (const item of items) {
@@ -153,7 +153,7 @@ export default function AnalyseClient({
                       body: JSON.stringify(item),
                     });
                   }
-                  router.refresh();
+                  window.location.reload();
                 }}
               />
               <button

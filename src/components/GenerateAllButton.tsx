@@ -236,7 +236,7 @@ export default function GenerateAllButton({
 
     setCurrentStep(-1);
     setRunning(false);
-    router.refresh();
+    window.location.reload();
   }
 
   return (

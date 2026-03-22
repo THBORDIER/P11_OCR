@@ -95,7 +95,7 @@ export default function SprintClient({ sprints, projectId, usDescriptions, isOwn
                 for (const s of sprints) {
                   await fetch(`/api/projects/${projectId}/sprints/${encodeURIComponent(s.id)}`, { method: "DELETE" });
                 }
-                router.refresh();
+                window.location.reload();
               }}
               onGenerated={async (items) => {
                 for (const item of items) {
@@ -457,7 +457,7 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
                 for (const s of sprints) {
                   await fetch(`/api/projects/${projectId}/sprints/${encodeURIComponent(s.id)}`, { method: "DELETE" });
                 }
-                router.refresh();
+                window.location.reload();
               }}
               onGenerated={async (items) => {
                 // Delete existing sprints first (cascade deletes tasks)
