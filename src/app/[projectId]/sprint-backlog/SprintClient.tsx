@@ -604,6 +604,44 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
         </div>
       </div>
 
+      {/* Kanban mini overview */}
+      {currentTasks.length > 0 && (() => {
+        const kanbanCounts: Record<string, number> = {
+          "A faire": currentTasks.filter((t: { status: string }) => t.status === "A faire").length,
+          "En cours": currentTasks.filter((t: { status: string }) => t.status === "En cours").length,
+          "En review": currentTasks.filter((t: { status: string }) => t.status === "En review").length,
+          "Termine": currentTasks.filter((t: { status: string }) => t.status === "Termine").length,
+        };
+        const kanbanColors: Record<string, string> = { "A faire": "#94a3b8", "En cours": "#3b82f6", "En review": "#f59e0b", "Termine": "#22c55e" };
+        return (
+          <div className="bg-white rounded-lg border border-[#e2e8f0] p-4 mb-6">
+            <div className="flex gap-1 h-3 rounded-full overflow-hidden mb-3">
+              {Object.entries(kanbanCounts).map(([status, count]) => (
+                count > 0 ? (
+                  <div
+                    key={status}
+                    className="h-full transition-all"
+                    style={{
+                      width: `${(count / currentTasks.length) * 100}%`,
+                      backgroundColor: kanbanColors[status],
+                    }}
+                  />
+                ) : null
+              ))}
+            </div>
+            <div className="flex justify-between text-xs">
+              {Object.entries(kanbanCounts).map(([status, count]) => (
+                <div key={status} className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: kanbanColors[status] }} />
+                  <span className="text-[#64748b]">{status === "Termine" ? "Terminé" : status}</span>
+                  <span className="font-semibold text-[#1e293b]">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Status filter + reset */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {["all", "A faire", "En cours", "En review", "Termine"].map((s) => (

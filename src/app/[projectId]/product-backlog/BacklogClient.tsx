@@ -284,7 +284,28 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
             {backlog.length} User Stories — {backlog.reduce((s, u) => s + u.estimation, 0)} points d'effort total
           </p>
         </div>
-        {isOwner && (
+        <div className="flex items-center gap-2">
+          {backlog.length > 0 && (
+            <button
+              onClick={() => {
+                const headers = ["ID", "Epic", "Titre", "En tant que", "Je souhaite", "Afin de", "Estimation", "Priorité", "Sprint", "Valeur", "Validée"];
+                const rows = backlog.map((us) => [
+                  displayId(us.id), us.epic, us.titre, us.enTantQue, us.jeSouhaite, us.afinDe,
+                  us.estimation, us.priorite, us.sprint, us.valeur, us.validatedAt ? "Oui" : "Non",
+                ]);
+                const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+                const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = `backlog-${projectId}.csv`; a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="px-3 py-2 text-sm border border-[#e2e8f0] text-[#475569] rounded-lg hover:bg-[#f8fafc] transition-colors"
+            >
+              📥 CSV
+            </button>
+          )}
+          {isOwner && (
           <div className="flex items-center gap-2">
             <AiGenerateButton
               type="user-stories"
@@ -311,7 +332,8 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
               User Story
             </button>
           </div>
-        )}
+          )}
+        </div>
       </div>
 
       {backlog.length === 0 ? (
