@@ -129,6 +129,7 @@ export default async function ProjectLayout({
         {/* Footer */}
         <div className="p-4 border-t border-[#1e293b] text-[10px] text-[#475569]">
           <p className="truncate">{project.author}{project.organization ? ` · ${project.organization}` : ""}</p>
+          <p className="italic text-[#334155] mt-2 opacity-40" title="Samuel Bordier, 3 ans — premier commit">&quot;,j+++&sup2;&sup2;&sup2;&sup2;&amp;&eacute;&quot;&apos;w((-&egrave;_&ccedil;&agrave;n&quot; — Samuel B., 3 ans</p>
         </div>
       </aside>
 
