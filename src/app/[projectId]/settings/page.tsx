@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog";
@@ -20,7 +19,6 @@ interface ProjectData {
 }
 
 export default function SettingsPage() {
-  const { data: session, status } = useSession();
   const params = useParams();
   const router = useRouter();
   const projectId = params.projectId as string;
@@ -45,7 +43,8 @@ export default function SettingsPage() {
   // Delete dialog
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const isOwner = project?.userId === session?.user?.id;
+  // For now, allow all users to edit settings (auth will restrict later)
+  const isOwner = true;
 
   useEffect(() => {
     async function loadProject() {
@@ -124,7 +123,7 @@ export default function SettingsPage() {
     router.push("/");
   }
 
-  if (status === "loading" || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />

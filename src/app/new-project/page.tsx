@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -33,7 +32,6 @@ interface SiretData {
 }
 
 export default function NewProjectPage() {
-  const { status } = useSession();
   const router = useRouter();
 
   // Project fields
@@ -56,21 +54,6 @@ export default function NewProjectPage() {
 
   // Active step (wizard-like)
   const [step, setStep] = useState(1);
-
-  // Redirect unauthenticated users
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
-
-  if (status === "loading" || status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
-        <div className="text-[#64748b]">Chargement...</div>
-      </div>
-    );
-  }
 
   // ── SIRET lookup ──
   const handleSiretLookup = async () => {

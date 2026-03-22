@@ -127,7 +127,7 @@ export default async function HomePage() {
                     <h2 className="text-lg font-bold text-[#1e293b] truncate">
                       {project.name}
                     </h2>
-                    {project.isPublic && (
+                    {project.isPublic && !project.userId && (
                       <span className="bg-[#dbeafe] text-[#1d4ed8] px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0">
                         Démo
                       </span>
@@ -182,22 +182,20 @@ export default async function HomePage() {
           ))}
 
           {/* New project card */}
-          {session && (
-            <Link
-              href="/new-project"
-              className="group bg-white/50 rounded-xl border-2 border-dashed border-[#cbd5e1] p-5 hover:shadow-lg hover:border-[#3b82f6] hover:bg-white transition-all duration-200 flex flex-col items-center justify-center text-center min-h-[220px]"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-[#f1f5f9] flex items-center justify-center text-2xl text-[#94a3b8] group-hover:bg-[#dbeafe] group-hover:text-[#3b82f6] transition-all duration-200 mb-4">
-                +
-              </div>
-              <h2 className="text-base font-semibold text-[#64748b] group-hover:text-[#3b82f6] transition-colors">
-                Nouveau projet
-              </h2>
-              <p className="text-xs text-[#94a3b8] mt-1">
-                Démarrer un nouveau cadrage
-              </p>
-            </Link>
-          )}
+          <Link
+            href="/new-project"
+            className="group bg-white/50 rounded-xl border-2 border-dashed border-[#cbd5e1] p-5 hover:shadow-lg hover:border-[#3b82f6] hover:bg-white transition-all duration-200 flex flex-col items-center justify-center text-center min-h-[220px]"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-[#f1f5f9] flex items-center justify-center text-2xl text-[#94a3b8] group-hover:bg-[#dbeafe] group-hover:text-[#3b82f6] transition-all duration-200 mb-4">
+              +
+            </div>
+            <h2 className="text-base font-semibold text-[#64748b] group-hover:text-[#3b82f6] transition-colors">
+              Nouveau projet
+            </h2>
+            <p className="text-xs text-[#94a3b8] mt-1">
+              Démarrer un nouveau cadrage
+            </p>
+          </Link>
         </div>
       </main>
     </div>

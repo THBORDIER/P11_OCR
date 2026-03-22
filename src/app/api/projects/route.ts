@@ -19,9 +19,6 @@ function slugify(text: string): string {
 
 export async function POST(request: NextRequest) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-  }
 
   const body = await request.json();
   const { name, subtitle, description, color, organization, githubRepo } = body;
@@ -58,9 +55,10 @@ export async function POST(request: NextRequest) {
       subtitle: subtitle?.trim() || "",
       description: description?.trim() || "",
       color: color || "#3b82f6",
-      author: session.user.name || "",
+      author: session?.user?.name || "",
       organization: organization?.trim() || "",
       githubRepo: githubRepo?.trim() || null,
+      isPublic: !session?.user?.id,
       contextSummary: "",
       methodologyFramework: "Scrum",
       methodologyFrameworkDescription:
@@ -68,7 +66,7 @@ export async function POST(request: NextRequest) {
       methodologyPrioritization: "MoSCoW",
       methodologyPrioritizationDescription:
         "Chaque fonctionnalité est classée Must / Should / Could / Won't pour garantir que le MVP livre un maximum de valeur.",
-      userId: session.user.id,
+      userId: session?.user?.id || undefined,
       // Navigation par défaut
       navItems: {
         create: [
