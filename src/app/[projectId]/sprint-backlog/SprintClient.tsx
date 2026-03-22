@@ -563,90 +563,24 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
           {sprint.nom}
         </h2>
         <p className="text-sm text-[#475569] mb-4">{sprint.objectif}</p>
-        <div className="grid grid-cols-4 gap-4">
-          <div className="bg-[#f1f5f9] rounded p-3 text-center">
-            <div className="text-lg font-bold text-[#1e293b]">{sprint.debut} - {sprint.fin}</div>
-            <div className="text-xs text-[#64748b]">Periode</div>
-          </div>
-          <div className="bg-[#f1f5f9] rounded p-3 text-center">
-            <div className="text-lg font-bold text-[#3b82f6]">{sprint.velocite}</div>
-            <div className="text-xs text-[#64748b]">Points d&apos;effort</div>
-          </div>
-          <div className="bg-[#f1f5f9] rounded p-3 text-center">
-            <div className="text-lg font-bold text-[#8b5cf6]">{sprint.userStories.length} US</div>
-            <div className="text-xs text-[#64748b]">User Stories</div>
-          </div>
-          <div className="bg-[#f1f5f9] rounded p-3 text-center">
-            <div className="text-lg font-bold text-[#f59e0b]">{totalHeures}h</div>
-            <div className="text-xs text-[#64748b]">Estimation totale</div>
-          </div>
-        </div>
-
-        {/* Team Capacity - Sprint 1 only for detail */}
-        {selectedSprint === sprints[0]?.id && (
-          <div className="mt-6 border-t border-[#e2e8f0] pt-5">
-            <h3 className="text-sm font-bold text-[#1e293b] uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span className="text-base">&#128101;</span> Capacite de l&apos;equipe
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
-                <div className="text-xs text-[#64748b] mb-1">Developpeur</div>
-                <div className="text-sm font-semibold text-[#1e293b]">Developpeur principal</div>
-                <div className="text-xs text-[#475569] mt-0.5">5j/semaine, 7h/jour = 35h/semaine</div>
-              </div>
-              <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
-                <div className="text-xs text-[#64748b] mb-1">Capacite brute</div>
-                <div className="text-sm font-semibold text-[#1e293b]">105 heures</div>
-                <div className="text-xs text-[#475569] mt-0.5">Sprint de 3 semaines (35h x 3)</div>
-              </div>
-              <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
-                <div className="text-xs text-[#64748b] mb-1">Facteur de focus</div>
-                <div className="text-sm font-semibold text-[#f59e0b]">80% &rarr; 84h disponibles</div>
-                <div className="text-xs text-[#475569] mt-0.5">Reunions, imprevus, apprentissage</div>
-              </div>
-              <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-3">
-                <div className="text-xs text-[#64748b] mb-1">Charge planifiee</div>
-                <div className="text-sm font-semibold text-[#22c55e]">50h &rarr; taux d&apos;occupation 60%</div>
-                <div className="text-xs text-[#475569] mt-0.5">Marge pour imprevus et dette technique</div>
-              </div>
+        <div className="grid grid-cols-3 gap-4">
+          {(sprint.debut || sprint.fin) && (
+            <div className="bg-[#f1f5f9] rounded p-3 text-center">
+              <div className="text-sm font-bold text-[#1e293b]">{sprint.debut}{sprint.fin ? ` — ${sprint.fin}` : ""}</div>
+              <div className="text-xs text-[#64748b]">Période</div>
             </div>
+          )}
+          <div className="bg-[#f1f5f9] rounded p-3 text-center">
+            <div className="text-lg font-bold text-[#3b82f6]">{currentTasks.length}</div>
+            <div className="text-xs text-[#64748b]">Tâches</div>
           </div>
-        )}
-
-        {/* Daily Standup */}
-        <div className="mt-5 bg-[#eff6ff] border border-[#bfdbfe] rounded-lg p-3 flex items-start gap-2.5">
-          <span className="text-base mt-0.5">&#128172;</span>
-          <div>
-            <div className="text-xs font-bold text-[#1e40af] mb-0.5">Rituel quotidien</div>
-            <p className="text-xs text-[#1e40af]">
-              Standup asynchrone via Slack (<span className="font-mono font-semibold">#spartcrm-daily</span>) — Qu&apos;ai-je fait hier ? Que vais-je faire aujourd&apos;hui ? Ai-je des blocages ?
-            </p>
+          <div className="bg-[#f1f5f9] rounded p-3 text-center">
+            <div className="text-lg font-bold text-[#22c55e]">{currentTasks.filter((t: Task) => t.status === "Termine").length}/{currentTasks.length}</div>
+            <div className="text-xs text-[#64748b]">Terminées</div>
           </div>
         </div>
+
       </div>
-
-      {/* Sprint Selection Criteria - Sprint 1 only */}
-      {selectedSprint === sprints[0]?.id && (
-        <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
-          <h2 className="text-lg font-semibold text-[#1e293b] mb-3 flex items-center gap-2">
-            <span className="text-base">&#128203;</span> Pourquoi ces 6 User Stories dans le Sprint 1 ?
-          </h2>
-          <div className="space-y-2.5">
-            {[
-              { icon: "\u{1F534}", text: "Toutes sont des US \u00AB Must Have \u00BB (priorite MoSCoW la plus haute)" },
-              { icon: "\u{1F9E9}", text: "Elles forment un ensemble fonctionnel complet et autonome (module Clients)" },
-              { icon: "\u{1F4CA}", text: "29 points d'effort respectent la velocite cible de l'equipe" },
-              { icon: "\u{1F3D7}\uFE0F", text: "Elles constituent le socle de donnees necessaire aux sprints suivants (Pipeline, Taches)" },
-              { icon: "\u2705", text: "Le client a valide ce perimetre lors du Sprint Planning" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-2.5 text-sm text-[#334155]">
-                <span className="mt-0.5 shrink-0">{item.icon}</span>
-                <span>{item.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Burndown / Progress chart */}
       <div className="bg-white rounded-lg border border-[#e2e8f0] p-6 mb-6">
@@ -861,28 +795,6 @@ function SprintClientInner({ sprints, projectId, usDescriptions, isOwner }: Spri
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Definition of Done */}
-      <div className="bg-[#f0fdf4] rounded-lg border border-[#bbf7d0] p-6 mt-8">
-        <h2 className="text-lg font-semibold text-[#166534] mb-3">
-          Definition of Done (DoD)
-        </h2>
-        <div className="grid grid-cols-2 gap-2 text-sm text-[#166534]">
-          {[
-            "Le code est deploye sur l'environnement de staging",
-            "Les tests fonctionnels sont passes avec succes",
-            "L'affichage est responsive (desktop + tablette)",
-            "Les permissions par role sont respectees",
-            "La fonctionnalite a ete demontree au Product Owner",
-            "Aucun bug bloquant ou critique n'est ouvert",
-          ].map((d, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <span className="mt-0.5">&#10003;</span>
-              <span>{d}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Sprint CRUD Modal */}
