@@ -67,7 +67,9 @@ Instructions:
 2. Écris du code propre, fonctionnel et bien structuré
 3. Fais un git commit avec le message: "${taskTitle}"
 4. NE TOUCHE PAS aux fichiers node_modules/, .next/, .git/
-5. Quand c'est terminé, affiche EXACTEMENT: TASK_DONE
+5. Si tu lances un serveur de dev, utilise le port 3001 (pas 3000 qui est déjà pris)
+6. NE LIS PAS package-lock.json ou les fichiers dans node_modules/
+7. Quand c'est terminé, affiche EXACTEMENT: TASK_DONE
 `;
 
     // Mark task as "En cours"
@@ -152,7 +154,9 @@ Instructions:
 2. Écris du code propre, fonctionnel et bien structuré
 3. Fais un git commit après chaque tâche terminée avec le message: "[ID] Titre de la tâche"
 4. NE TOUCHE PAS aux fichiers node_modules/, .next/, .git/
-5. Si une tâche n'est pas claire, fais au mieux avec le contexte disponible
+5. Si tu lances un serveur de dev, utilise le port 3001 (pas 3000 qui est déjà pris)
+6. NE LIS PAS package-lock.json ou les fichiers dans node_modules/
+7. Si une tâche n'est pas claire, fais au mieux avec le contexte disponible
 6. Quand tout est terminé, affiche sur la dernière ligne EXACTEMENT ce JSON:
    {"completed": [${todoTasks.map((t) => `"${t.id.split(":").pop()}"`).join(", ")}], "status": "done"}
 7. Si certaines tâches échouent, indique:
