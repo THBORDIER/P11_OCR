@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 
@@ -54,28 +54,17 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<RecettageRow | null>(null);
 
-  // Load saved statuses from localStorage
-  useEffect(() => {
+  // Persist status change to DB
+  const persistStatus = useCallback(async (rowId: string, newStatus: string) => {
     try {
-      const saved = localStorage.getItem(`${projectId}-recettage-statuses`);
-      if (saved) {
-        const savedStatuses: Record<string, string> = JSON.parse(saved);
-        setRows(
-          initialRows.map((r) => ({
-            ...r,
-            statut: savedStatuses[r.id] || r.statut,
-          }))
-        );
-      }
-    } catch {}
-  }, [projectId, initialRows]);
-
-  const saveStatuses = useCallback((updated: RecettageRow[]) => {
-    try {
-      const statuses: Record<string, string> = {};
-      updated.forEach((r) => { statuses[r.id] = r.statut; });
-      localStorage.setItem(`${projectId}-recettage-statuses`, JSON.stringify(statuses));
-    } catch {}
+      await fetch(`/api/projects/${projectId}/recettage/${encodeURIComponent(rowId)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ statut: newStatus }),
+      });
+    } catch {
+      // Silent fail — UI already updated optimistically
+    }
   }, [projectId]);
 
   const cycleStatus = (rowId: string) => {
@@ -84,16 +73,19 @@ export default function RecettageClient({ initialRows, projectId, isOwner }: Rec
         if (r.id !== rowId) return r;
         const currentIndex = statusFlow.indexOf(r.statut);
         const nextIndex = (currentIndex + 1) % statusFlow.length;
-        return { ...r, statut: statusFlow[nextIndex] };
+        const newStatus = statusFlow[nextIndex];
+        persistStatus(r.id, newStatus);
+        return { ...r, statut: newStatus };
       });
-      saveStatuses(updated);
       return updated;
     });
   };
 
   const resetAllStatuses = () => {
-    setRows(initialRows);
-    saveStatuses(initialRows);
+    const reset = initialRows.map((r) => ({ ...r, statut: "A tester" }));
+    setRows(reset);
+    // Persist all resets
+    reset.forEach((r) => persistStatus(r.id, "A tester"));
   };
 
   const filtered = sprintFilter === "Tous"

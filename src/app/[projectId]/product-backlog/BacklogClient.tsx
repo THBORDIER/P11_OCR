@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import CrudModal, { FieldConfig } from "@/components/CrudModal";
 
@@ -94,38 +94,26 @@ export default function BacklogClient({ initialStories, projectId, isOwner }: Ba
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUS, setEditingUS] = useState<UserStory | null>(null);
 
-  // Load validated state from localStorage
-  useEffect(() => {
+  // Persist validation to DB
+  const persistValidation = useCallback(async (usId: string, validated: boolean) => {
+    // Strip project prefix for API: "my-project:US-001" → "US-001"
+    const shortId = usId.includes(":") ? usId.split(":").slice(1).join(":") : usId;
     try {
-      const saved = localStorage.getItem(`${projectId}-backlog-validated`);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // Migration: convert old boolean format to date format
-        const migrated: Record<string, string | null> = {};
-        for (const [key, value] of Object.entries(parsed)) {
-          if (value === true) migrated[key] = new Date().toISOString();
-          else if (typeof value === "string") migrated[key] = value;
-          else migrated[key] = null;
-        }
-        setValidatedUS(migrated);
-      }
-    } catch {}
-  }, [projectId]);
-
-  // Save to localStorage on change
-  const saveValidation = useCallback((newState: Record<string, string | null>) => {
-    setValidatedUS(newState);
-    try {
-      localStorage.setItem(`${projectId}-backlog-validated`, JSON.stringify(newState));
-    } catch {}
+      await fetch(`/api/projects/${projectId}/backlog/validate`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: shortId, validated }),
+      });
+    } catch {
+      // Silent fail — UI already updated optimistically
+    }
   }, [projectId]);
 
   const toggleValidation = (id: string) => {
     const current = validatedUS[id];
-    saveValidation({
-      ...validatedUS,
-      [id]: current ? null : new Date().toISOString(),
-    });
+    const newVal = current ? null : new Date().toISOString();
+    setValidatedUS((prev) => ({ ...prev, [id]: newVal }));
+    persistValidation(id, !current);
   };
 
   const isUSValidated = (id: string) => !!validatedUS[id];
