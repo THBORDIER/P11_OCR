@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { projects, getProjectOrThrow } from "@/config/project.config";
+import { getProject, getProjects } from "@/lib/data";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
+  const projects = await getProjects();
   return projects.map((p) => ({ projectId: p.id }));
 }
 
@@ -12,15 +13,12 @@ export async function generateMetadata({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
-  try {
-    const project = getProjectOrThrow(projectId);
-    return {
-      title: `${project.name} — ${project.subtitle}`,
-      description: project.description,
-    };
-  } catch {
-    return { title: "Projet introuvable" };
-  }
+  const project = await getProject(projectId);
+  if (!project) return { title: "Projet introuvable" };
+  return {
+    title: `${project.name} — ${project.subtitle}`,
+    description: project.description,
+  };
 }
 
 export default async function ProjectLayout({
@@ -31,12 +29,8 @@ export default async function ProjectLayout({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
-  let project;
-  try {
-    project = getProjectOrThrow(projectId);
-  } catch {
-    notFound();
-  }
+  const project = await getProject(projectId);
+  if (!project) notFound();
 
   return (
     <div className="flex min-h-screen">

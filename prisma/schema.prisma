@@ -1,0 +1,416 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── AUTH (NextAuth.js / Auth.js) ────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+
+  accounts Account[]
+  sessions Session[]
+  projects Project[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── PROJET ──────────────────────────────────────────────
+
+model Project {
+  id           String  @id // ex: "p11-spartcrm"
+  name         String
+  subtitle     String
+  description  String
+  author       String
+  organization String
+  color        String
+  isPublic     Boolean @default(false) @map("is_public")
+
+  // Owner
+  userId String? @map("user_id")
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // GitHub
+  githubRepo String? @map("github_repo") // ex: "user/repo"
+
+  // Mailing
+  clientEmail        String?  @map("client_email")
+  notificationEmails String[] @map("notification_emails")
+
+  // Contexte
+  contextSummary String @map("context_summary")
+
+  // Méthodologie
+  methodologyFramework              String @map("methodology_framework")
+  methodologyFrameworkDescription   String @map("methodology_framework_desc")
+  methodologyPrioritization         String @map("methodology_prioritization")
+  methodologyPrioritizationDescription String @map("methodology_prioritization_desc")
+
+  // Relations
+  kpis                   ProjectKpi[]
+  stackItems             StackItem[]
+  phases                 Phase[]
+  deliverables           Deliverable[]
+  navItems               NavItem[]
+  skills                 Skill[]
+  userStories            UserStory[]
+  sprints                Sprint[]
+  questionnaireSections  QuestionnaireSection[]
+  questionnaireResponses QuestionnaireResponse[]
+  personas               Persona[]
+  stakeholders           Stakeholder[]
+  rituals                Ritual[]
+  techWatchCategories    TechWatchCategory[]
+  testCases              TestCase[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("projects")
+}
+
+model ProjectKpi {
+  id        Int     @id @default(autoincrement())
+  label     String
+  value     String
+  color     String
+  order     Int     @default(0)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_kpis")
+}
+
+model StackItem {
+  id          Int     @id @default(autoincrement())
+  name        String
+  tag         String
+  tagColorBg  String  @map("tag_color_bg")
+  tagColorText String @map("tag_color_text")
+  description String
+  order       Int     @default(0)
+  projectId   String  @map("project_id")
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("stack_items")
+}
+
+// ─── ROADMAP ─────────────────────────────────────────────
+
+model Phase {
+  id              Int      @id @default(autoincrement())
+  phase           String   // "Phase 0", "Sprint 1"
+  title           String
+  objectif        String
+  fonctionnalites String[] // features
+  horsPerimetre   String[] @map("hors_perimetre") // out of scope
+  utilisateurs    String[] // user roles
+  dependances     String[] // dependencies
+  ressources      String
+  periode         String
+  budget          String
+  color           String
+  bg              String
+  order           Int      @default(0)
+  projectId       String   @map("project_id")
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("phases")
+}
+
+// ─── LIVRABLES & NAVIGATION ──────────────────────────────
+
+model Deliverable {
+  id        Int     @id @default(autoincrement())
+  href      String
+  title     String
+  desc      String
+  status    String
+  order     Int     @default(0)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("deliverables")
+}
+
+model NavItem {
+  id        Int     @id @default(autoincrement())
+  href      String
+  label     String
+  icon      String
+  order     Int     @default(0)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("nav_items")
+}
+
+model Skill {
+  id        Int     @id @default(autoincrement())
+  name      String
+  order     Int     @default(0)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("skills")
+}
+
+// ─── PRODUCT BACKLOG ─────────────────────────────────────
+
+model UserStory {
+  id              String   @id // ex: "US-001"
+  epic            String
+  titre           String
+  enTantQue       String   @map("en_tant_que")
+  jeSouhaite      String   @map("je_souhaite")
+  afinDe          String   @map("afin_de")
+  criteres        String[]
+  detailsMetier   String[] @map("details_metier")
+  contraintes     String[]
+  dependancesTech String[] @map("dependances_tech")
+  estimation      Int
+  priorite        String   // Must, Should, Could, Won't
+  sprint          String
+  valeur          String   // Critique, Haute, Moyenne
+  validatedAt     DateTime? @map("validated_at")
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("user_stories")
+}
+
+// ─── SPRINT BACKLOG ──────────────────────────────────────
+
+model Sprint {
+  id            String   @id // ex: "sprint-1"
+  nom           String
+  objectif      String
+  objectifCourt String   @map("objectif_court")
+  debut         String
+  fin           String
+  duree         String
+  velocite      String
+  userStories   String[] @map("user_stories_ids") // US IDs
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+
+  @@map("sprints")
+}
+
+model Task {
+  id          String @id // ex: "T-001"
+  userStory   String @map("user_story") // US ID
+  titre       String
+  description String
+  type        String // Dev, Design, Test, Config
+  estimation  String // "2h", "3h"
+  status      String @default("A faire") // A faire, En cours, En review, Termine
+  assignee    String
+
+  sprintId String @map("sprint_id")
+  sprint   Sprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+// ─── QUESTIONNAIRE ───────────────────────────────────────
+
+model QuestionnaireSection {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String
+  pourquoi    String
+  order       Int        @default(0)
+  projectId   String     @map("project_id")
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  questions   Question[]
+
+  @@map("questionnaire_sections")
+}
+
+model Question {
+  id          String   @id // ex: "q1_1"
+  label       String
+  type        String   // text, textarea, select, checkbox, scale
+  options     String[]
+  placeholder String?
+  required    Boolean  @default(false)
+  order       Int      @default(0)
+  sectionId   Int      @map("section_id")
+  section     QuestionnaireSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@map("questions")
+}
+
+model QuestionnaireResponse {
+  id         Int     @id @default(autoincrement())
+  questionId String  @map("question_id")
+  value      String  // JSON string for complex values (checkboxes, etc.)
+  projectId  String  @map("project_id")
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, questionId])
+  @@map("questionnaire_responses")
+}
+
+// ─── ANALYSE ─────────────────────────────────────────────
+
+model Persona {
+  id              Int     @id @default(autoincrement())
+  initials        String
+  nom             String
+  age             Int
+  role            String
+  contexte        String
+  besoinPrincipal String  @map("besoin_principal")
+  frustration     String
+  objectif        String
+  order           Int     @default(0)
+  projectId       String  @map("project_id")
+  project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("personas")
+}
+
+// ─── COMMUNICATION ───────────────────────────────────────
+
+model Stakeholder {
+  id          Int     @id @default(autoincrement())
+  nom         String
+  role        String
+  implication String  // Haute, Moyenne, Faible
+  canal       String
+  order       Int     @default(0)
+  projectId   String  @map("project_id")
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("stakeholders")
+}
+
+model Ritual {
+  id           Int     @id @default(autoincrement())
+  rituel       String
+  frequence    String
+  participants String
+  objectif     String
+  format       String
+  livrable     String
+  order        Int     @default(0)
+  projectId    String  @map("project_id")
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("rituals")
+}
+
+// ─── VEILLE TECHNOLOGIQUE ────────────────────────────────
+
+model TechWatchCategory {
+  id         Int              @id @default(autoincrement())
+  titre      String
+  miseAJour  String           @map("mise_a_jour")
+  order      Int              @default(0)
+  projectId  String           @map("project_id")
+  project    Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  themes     TechWatchTheme[]
+
+  @@map("tech_watch_categories")
+}
+
+model TechWatchTheme {
+  id                Int              @id @default(autoincrement())
+  theme             String
+  description       String
+  avantages         String
+  consultation      String
+  utiliseDansProjet Boolean          @default(false) @map("utilise_dans_projet")
+  apprentissage     String?
+  order             Int              @default(0)
+  categoryId        Int              @map("category_id")
+  category          TechWatchCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  sources           TechWatchSource[]
+
+  @@map("tech_watch_themes")
+}
+
+model TechWatchSource {
+  id      Int            @id @default(autoincrement())
+  nom     String
+  url     String
+  order   Int            @default(0)
+  themeId Int            @map("theme_id")
+  theme   TechWatchTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@map("tech_watch_sources")
+}
+
+// ─── RECETTAGE ───────────────────────────────────────────
+
+model TestCase {
+  id        String  @id // ex: "R-001"
+  us        String  // US ID or "Transversal"
+  sprint    String
+  etape     String
+  action    String
+  attendu   String
+  obtenu    String
+  statut    String  @default("A tester") // A tester, En cours, OK, KO, A retester
+  order     Int     @default(0)
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("test_cases")
+}
