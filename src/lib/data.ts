@@ -5,8 +5,8 @@ import { prisma } from "./prisma";
 export async function getProjects(userId?: string | null) {
   return prisma.project.findMany({
     where: userId
-      ? { OR: [{ userId }, { isPublic: true }] }
-      : { isPublic: true },
+      ? { OR: [{ userId }, { isPublic: true, userId: null }] }
+      : { isPublic: true, userId: null },
     include: {
       kpis: { orderBy: { order: "asc" } },
       _count: {

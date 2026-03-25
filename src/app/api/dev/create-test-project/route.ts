@@ -17,7 +17,7 @@ export async function POST() {
       color: "#8b5cf6",
       author: "Thomas B.",
       organization: "",
-      isPublic: true,
+      isPublic: false,
       contextSummary: "",
       methodologyFramework: "Scrum",
       methodologyFrameworkDescription:

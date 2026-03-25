@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       author: session?.user?.name || "",
       organization: organization?.trim() || "",
       githubRepo: githubRepo?.trim() || null,
-      isPublic: true,
+      isPublic: false,
       contextSummary: "",
       methodologyFramework: "Scrum",
       methodologyFrameworkDescription:
